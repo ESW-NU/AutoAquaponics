@@ -18,7 +18,7 @@ def DataLogger(file_name):
     print("{:>5}\t{:>5}".format('P0','P1'))
 
     #create subplots and set axis
-    fig, (ax1, ax2) = plt.subplots(2)
+    fig, (ax1, ax2) = plt.subplots(nrows=2, num=1)
     fig.suptitle('Aquaponic Sensors')
     ax1.set_ylabel('pH (V)')
     ax1.set_ylim([2,4])
@@ -30,16 +30,16 @@ def DataLogger(file_name):
     from datetime import datetime
 
     #clear csv file on flash drive
-    file = "/media/pi/68D2-7E93/" + file_name
-    f = open(file, "w")
+    loc = "/media/pi/68D2-7E93/" + file_name
+    f = open(loc, "w")
     f.truncate()
     f.close()
 
     #save data into test.csv on flash drive by appending new row
-    with open(file,'a+',newline='') as file:
+    with open(loc,'a+',newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Date and Time","P0 (V)", "P1 (V)"])
-        f.close()
+        file.flush()
         #define output of both channels
         while True:
             voltage = round(getData()[0], 3)
@@ -56,7 +56,7 @@ def DataLogger(file_name):
                 now = datetime.now()
                 dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
                 writer.writerow([dt_string, voltage, voltage1])
-                f.close()
+                file.flush()
                 #plot the lists
                 ax1.plot(t, voltage_list, 'tab:blue')
                 ax2.plot(t, voltage1_list, 'tab:red')
@@ -67,4 +67,4 @@ def DataLogger(file_name):
            #ncol=2, mode="expand", borderaxespad=0.)
 #actually draws plot
                 plt.draw()
-                plt.pause(0.001) #some weird thing that makes the plot update, doesn't work without this pause
+                plt.pause(0.0001) #some weird thing that makes the plot update, doesn't work without this pause
