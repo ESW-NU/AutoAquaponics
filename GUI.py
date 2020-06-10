@@ -23,7 +23,7 @@ import matplotlib.animation as animation
 from matplotlib import style
 style.use("seaborn-darkgrid")
 #animate function
-f = Figure(figsize=(20,20), dpi=100)
+f = Figure(figsize=(10,5), dpi=100)
 plot1 = f.add_subplot(211)
 plot2 = f.add_subplot(212)
 def animate(ii):
@@ -46,14 +46,13 @@ def animate(ii):
     plot2.plot(tList, v1List, 'b')
     #add labels and config axis
     plot1.set_title("Aquaponic Sensors")
-    plot1.set_autoscaley_on(False)
-    plot1.set_autoscalex_on(False)
+    #plot1.set_autoscaley_on(False)
+    #plot1.set_autoscalex_on(False)
     plot1.set_ylabel("pH (v)")
     #plot1.set_xlim(t-60,t)
-    #plot1.axes.set_ybound(0,1)
     #plot1.set_ylim(2,4)
-    #plot1.set_xlim(500, 510)
-
+    #plot2.set_xlim(500, 510)
+    #plot2.set_ylim(0,5)
     plot2.set_ylabel("Temperature (v)")
     plot2.set_xlabel("Time (s)")
     #plot2.set_ybound(0,5)
@@ -167,7 +166,9 @@ class Settings(tk.Frame):
         navibutton2.pack()
 
 app = AllWindow()
-app.geometry('1025x690')
+#app.geometry('1025x690')
+app.attributes('-fullscreen', True)
 #update animation first
 ani = animation.FuncAnimation(f, animate, interval=1000)
+#mainloop
 app.mainloop()
