@@ -1,6 +1,7 @@
 #import led info, replace with relay info
 from gpiozero import PWMLED
 LED1 = PWMLED(17)
+
 #import DataLogger.py
 from DataLogger import DataLogger
 
@@ -27,7 +28,7 @@ f = Figure(figsize=(10,5), dpi=100)
 plot1 = f.add_subplot(211)
 plot2 = f.add_subplot(212)
 def animate(ii):
-    pullData = open("/media/pi/68D2-7E93/test2.csv","r").read()
+    pullData = open("./media/pi/68D2-7E93/test2.csv","r").read()
     dataList = pullData.split('\n')
     tList = []
     vList = []
@@ -35,27 +36,23 @@ def animate(ii):
     for eachLine in dataList:
         if len(eachLine) >1:
             timedate, t, voltage, voltage1 = eachLine.split(',')
-            tList.append(t)
-            vList.append(voltage)
-            v1List.append(voltage1)
+            tList.append(float(t))
+            vList.append(float(voltage))
+            v1List.append(float(voltage1))
     
     #plot graphs
     plot1.clear()
-    plot1.plot(tList, vList, 'r')
+    plot1.plot(tList[-60:], vList[-60:], 'r')
     plot2.clear()
-    plot2.plot(tList, v1List, 'b')
+    plot2.plot(tList[-60:], v1List[-60:], 'b')
     #add labels and config axis
     plot1.set_title("Aquaponic Sensors")
-    #plot1.set_autoscaley_on(False)
-    #plot1.set_autoscalex_on(False)
-    plot1.set_ylabel("pH (v)")
-    #plot1.set_xlim(t-60,t)
-    #plot1.set_ylim(2,4)
-    #plot2.set_xlim(500, 510)
-    #plot2.set_ylim(0,5)
+    plot1.set_ybound(lower = 2, upper = 4)
+    plot1.yaxis.set_major_locator(plt.MaxNLocator(4))
+    plot2.set_ybound(lower = 0, upper = 5)
+    plot2.yaxis.set_major_locator(plt.MaxNLocator(4))
     plot2.set_ylabel("Temperature (v)")
     plot2.set_xlabel("Time (s)")
-    #plot2.set_ybound(0,5)
     
     
 
