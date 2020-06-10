@@ -1,6 +1,3 @@
-#Stop code with Ctrl+C in shell, the stop button deletes
-#the graph and csv file for some reason
-
 #importing/initializing for plotting/saving
 def DataLogger(file_name):
     #importing data from other function
@@ -38,7 +35,7 @@ def DataLogger(file_name):
     #save data into test.csv on flash drive by appending new row
     with open(loc,'a+',newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["Date and Time","P0 (V)", "P1 (V)"])
+        #writer.writerow(["Date and Time","P0 (V)", "P1 (V)"])
         file.flush()
         #define output of both channels
         while True:
@@ -55,7 +52,7 @@ def DataLogger(file_name):
             if ii/5 == int(ii/5):
                 now = datetime.now()
                 dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
-                writer.writerow([dt_string, voltage, voltage1])
+                writer.writerow([dt_string, next(reversed(t)), voltage, voltage1])
                 file.flush()
                 #plot the lists
                 ax1.plot(t, voltage_list, 'tab:blue')
