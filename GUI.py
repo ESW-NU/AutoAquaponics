@@ -1,3 +1,5 @@
+import datetime
+
 #import led info, replace with relay info
 from gpiozero import PWMLED
 LED1 = PWMLED(17)
@@ -35,15 +37,15 @@ def animate(ii):
     v1List = []
     for eachLine in dataList:
         if len(eachLine) >1:
-            timedate, t, voltage, voltage1 = eachLine.split(',')
-            tList.append(float(t))
+            timedate, voltage, voltage1 = eachLine.split(',')
+            tList.append(datetime.datetime.strptime(timedate, "%m/%d/%Y %H:%M:%S"))
             vList.append(float(voltage))
             v1List.append(float(voltage1))
     
     #plot graphs
     plot1.clear()
     plot2.clear()
-    timeframe = int(-48*60*60/5)
+    timeframe = int(-15)
     plot1.plot(tList[timeframe:], vList[timeframe:], 'r')
     plot2.plot(tList[timeframe:], v1List[timeframe:], 'b')
     #add labels and config axis
@@ -51,7 +53,7 @@ def animate(ii):
     plot1.set_ylabel("pH (v)")
     plot1.set_ylim(2,4)
     plot2.set_ylabel("Temperature (v)")
-    plot2.set_xlabel("Time (s)")
+    plot2.set_xlabel("Time")
     plot2.set_ylim(0,5)
 
 #initialization
@@ -86,7 +88,7 @@ class HomePage(tk.Frame):
         
         #quit button
         quitButton = tk.Button(self, text="QUIT", fg='red',
-                                command=quit)
+                                command=self.die)
         quitButton.pack()
         #navigation button
         navibutton1 = ttk.Button(self, text="Control Panel",
@@ -105,7 +107,9 @@ class HomePage(tk.Frame):
         toolbar.update()
         canvas._tkcanvas.pack()
         canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand = True)
-
+        #end program
+    def die(self):
+        exit()
 
 #add control panel page
 class ControlPanel(tk.Frame):

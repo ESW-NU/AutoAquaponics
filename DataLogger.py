@@ -10,7 +10,6 @@ def DataLogger(file_name):
     #plt.ion()
     voltage_list = []
     voltage1_list = []
-    t = []
     ii = 0
     #print("{:>5}\t{:>5}".format('P0','P1'))
 
@@ -45,14 +44,13 @@ def DataLogger(file_name):
         #append new output to existing lists
             voltage_list.append(voltage)
             voltage1_list.append(voltage1)
-            t.append(ii)
             ii = ii+1 #time counter
             sleep(1)
             #append data to csv file & plot
             if ii/5 == int(ii/5):
                 now = datetime.now()
                 dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
-                writer.writerow([dt_string, next(reversed(t)), voltage, voltage1])
+                writer.writerow([dt_string, voltage, voltage1])
                 file.flush()
                 #plot the lists
                 #ax1.plot(t, voltage_list, 'tab:blue')
