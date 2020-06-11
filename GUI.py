@@ -1,3 +1,5 @@
+import datetime
+
 #import led info, replace with relay info
 from gpiozero import PWMLED
 LED1 = PWMLED(17)
@@ -36,7 +38,7 @@ def animate(ii):
     for eachLine in dataList:
         if len(eachLine) >1:
             timedate, t, voltage, voltage1 = eachLine.split(',')
-            tList.append(float(t))
+            tList.append(datetime.datetime.strptime(timedate, "%Y-%m-%d %H:%M:%S"))
             vList.append(float(voltage))
             v1List.append(float(voltage1))
     
@@ -51,7 +53,7 @@ def animate(ii):
     plot1.set_ylabel("pH (v)")
     plot1.set_ylim(2,4)
     plot2.set_ylabel("Temperature (v)")
-    plot2.set_xlabel("Time (s)")
+    plot2.set_xlabel("Datetime")
     plot2.set_ylim(0,5)
 
 #initialization
