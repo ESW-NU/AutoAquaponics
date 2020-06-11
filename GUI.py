@@ -27,7 +27,7 @@ f = Figure(figsize=(10,5), dpi=100)
 plot1 = f.add_subplot(211)
 plot2 = f.add_subplot(212)
 def animate(ii):
-    pullData = open("/media/pi/68D2-7E93/test2.csv","r").read()
+    pullData = open("/media/pi/68D2-7E93/test.csv","r").read()
     dataList = pullData.split('\n')
     tList = []
     vList = []
@@ -35,29 +35,24 @@ def animate(ii):
     for eachLine in dataList:
         if len(eachLine) >1:
             timedate, t, voltage, voltage1 = eachLine.split(',')
-            tList.append(t)
-            vList.append(voltage)
-            v1List.append(voltage1)
+            tList.append(float(t))
+            vList.append(float(voltage))
+            v1List.append(float(voltage1))
     
     #plot graphs
     plot1.clear()
-    plot1.plot(tList, vList, 'r')
     plot2.clear()
-    plot2.plot(tList, v1List, 'b')
+    timeframe = int(-48*60*60/5)
+    plot1.plot(tList[timeframe:], vList[timeframe:], 'r')
+    plot2.plot(tList[timeframe:], v1List[timeframe:], 'b')
     #add labels and config axis
     plot1.set_title("Aquaponic Sensors")
-    #plot1.set_autoscaley_on(False)
-    #plot1.set_autoscalex_on(False)
     plot1.set_ylabel("pH (v)")
-    #plot1.set_xlim(t-60,t)
-    #plot1.set_ylim(2,4)
-    #plot2.set_xlim(500, 510)
-    #plot2.set_ylim(0,5)
+    plot1.set_ylim(2,4)
+    #plot1.set_xlim(min_t,float(t))
     plot2.set_ylabel("Temperature (v)")
     plot2.set_xlabel("Time (s)")
-    #plot2.set_ybound(0,5)
-    
-    
+    plot2.set_ylim(0,5)
 
 #initialization
 class AllWindow(tk.Tk):
@@ -166,8 +161,9 @@ class Settings(tk.Frame):
         navibutton2.pack()
 
 app = AllWindow()
-#app.geometry('1025x690')
-app.attributes('-fullscreen', True)
+app.geometry('1025x690')
+#this makes app full screen, not sure if it's good for us or not
+#app.attributes('-fullscreen', True)
 #update animation first
 ani = animation.FuncAnimation(f, animate, interval=1000)
 #mainloop

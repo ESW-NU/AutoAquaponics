@@ -3,25 +3,25 @@ def DataLogger(file_name):
     #importing data from other function
     from getData import getData
     #importing/initializing for plotting/saving    
-    import matplotlib.pyplot as plt
+    #import matplotlib.pyplot as plt
 #    import matplotlib.patches as mpatches
     from time import sleep
     import csv
-    plt.ion()
+    #plt.ion()
     voltage_list = []
     voltage1_list = []
     t = []
     ii = 0
-    print("{:>5}\t{:>5}".format('P0','P1'))
+    #print("{:>5}\t{:>5}".format('P0','P1'))
 
-    #create subplots and set axis
-    fig, (ax1, ax2) = plt.subplots(nrows=2, num=1)
-    fig.suptitle('Aquaponic Sensors')
-    ax1.set_ylabel('pH (V)')
-    ax1.set_ylim([2,4])
-    ax2.set_ylabel('Temperature Voltage (V)')
-    ax2.set_ylim([0,5])
-    ax2.set_xlabel('Time (s)')
+    #create subplots and set axis (not needed after GUI works)
+#    fig, (ax1, ax2) = plt.subplots(nrows=2, num=1)
+#    fig.suptitle('Aquaponic Sensors')
+#    ax1.set_ylabel('pH (V)')
+#    ax1.set_ylim([2,4])
+#    ax2.set_ylabel('Temperature Voltage (V)')
+#    ax2.set_ylim([0,5])
+#    ax2.set_xlabel('Time (s)')
 
     #import date and time for timestamp
     from datetime import datetime
@@ -41,7 +41,7 @@ def DataLogger(file_name):
         while True:
             voltage = round(getData()[0], 3)
             voltage1 = round(getData()[1], 3)
-            print("{:>5}\t{:>5}".format(voltage, voltage1)) #could remove
+            #print("{:>5}\t{:>5}".format(voltage, voltage1))
         #append new output to existing lists
             voltage_list.append(voltage)
             voltage1_list.append(voltage1)
@@ -55,13 +55,13 @@ def DataLogger(file_name):
                 writer.writerow([dt_string, next(reversed(t)), voltage, voltage1])
                 file.flush()
                 #plot the lists
-                ax1.plot(t, voltage_list, 'tab:blue')
-                ax2.plot(t, voltage1_list, 'tab:red')
+                #ax1.plot(t, voltage_list, 'tab:blue')
+                #ax2.plot(t, voltage1_list, 'tab:red')
 #make legend (only for plotting mult lines on single graph)
         #label1 = mpatches.Patch(color='red', label='Voltage 1')
         #label2 = mpatches.Patch(color='blue', label='Voltage 2')
         #plt.legend(handles=[label1, label2], bbox_to_anchor=(0., 1.01, 1., .102), loc='lower left',
            #ncol=2, mode="expand", borderaxespad=0.)
 #actually draws plot
-                plt.draw()
-                plt.pause(0.0001) #some weird thing that makes the plot update, doesn't work without this pause
+                #plt.draw()
+                #plt.pause(0.0001) #some weird thing that makes the plot update, doesn't work without this pause
