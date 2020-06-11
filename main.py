@@ -17,13 +17,5 @@ if(__name__ == '__main__'):
     #start the two processes
     p1.start()
     p2.start()
-    
     p1.join()
     p2.join()
-    
-#p1 = Process(target=start_GUI)
-#p1.start()
-#p2 = Process(target=start_data_logging)
-#p2.start()
-#p1.join()
-#p2.join()
