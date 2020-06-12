@@ -12,6 +12,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 #font types
+TITLE_FONT = ("Verdana", 14,) #"bold")
 LARGE_FONT = ("Verdana", 12)
 MEDIUM_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
@@ -48,17 +49,34 @@ def animate(ii):
     #plot graphs
     plot1.clear()
     plot2.clear()
-    timeframe = int(-15)
+    timeframe = int(-240)
     plot1.plot(tList[timeframe:], vList[timeframe:], 'r')
     plot2.plot(tList[timeframe:], v1List[timeframe:], 'b')
+    listofzeros = [0] * len(tList)
     #add labels and config axis
     plot1.set_title("Aquaponic Sensors")
     plot1.set_ylabel("pH (v)")
     plot1.set_ylim(2,4)
+    #show half the length of our timeframe, set functionality to let user scroll
+    #to next half later
+    plot1.set_xlim(tList[int(timeframe/2)], tList[-1])
+    plot2.set_xlim(tList[int(timeframe/2)], tList[-1])
+    #slant the x axis tick labels for extra coolness
+    for label in plot1.xaxis.get_ticklabels():
+        label.set_rotation(10)
+    for label in plot2.xaxis.get_ticklabels():
+        label.set_rotation(10)
+    #make sure the xticks aren't overlapping
+    plot1.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
+    plot2.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
+    plot1.autoscale(enable=False) #doesn't do anything now
     plot2.set_ylabel("Temperature (v)")
-    plot2.set_xlabel("Time")
     plot2.set_ylim(0,5)
-
+    #fill the graphs
+    plot1.fill_between(tList[timeframe:], vList[timeframe:], where=(vList[timeframe:] > listofzeros[timeframe:]),
+                       facecolor = 'r', edgecolor = 'r', alpha = 0.5)
+    plot2.fill_between(tList[timeframe:], v1List[timeframe:], where=(v1List[timeframe:] > listofzeros[timeframe:]),
+                       facecolor = 'b', edgecolor = 'b', alpha = 0.5)
 #initialization
 class AllWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -109,7 +127,7 @@ class AllWindow(tk.Tk):
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
-        label = tk.Label(self, text="Dashboard", font = LARGE_FONT)
+        label = tk.Label(self, text="Dashboard", font = TITLE_FONT)
         label.pack(pady=10, padx=10)
         
         #quit button
@@ -140,10 +158,10 @@ class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
     #text labels
-        Title = tk.Label(self, text="Control Panel", font = LARGE_FONT)
+        Title = tk.Label(self, text="Control Panel", font = TITLE_FONT)
         Title.pack(pady=10, padx=10)
-        ChannelTitle = tk.Label(self, text="Channel Controls", font = MEDIUM_FONT)
-        ChannelTitle.place(x=110, y=90)
+        ChannelTitle = tk.Label(self, text="Channel Overrides", font = MEDIUM_FONT)
+        ChannelTitle.place(x=108, y=90)
     #channel labels
         Channel_1 = tk.Label(self, text="1", font = SMALL_FONT)
         Channel_1.place(x=38, y=122)
@@ -404,7 +422,7 @@ class ControlPanel(tk.Frame):
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Settings", font = LARGE_FONT)
+        label = tk.Label(self, text="Settings", font = TITLE_FONT)
         label.pack(pady=10, padx=10)
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
@@ -417,7 +435,7 @@ class Settings(tk.Frame):
 class VideoStream(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Video Stream", font = LARGE_FONT)
+        label = tk.Label(self, text="Video Stream", font = TITLE_FONT)
         label.pack(pady=10, padx=10)
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
@@ -425,7 +443,7 @@ class VideoStream(tk.Frame):
         navibutton1.pack()
 
 app = AllWindow()
-app.geometry('1025x690')
+app.geometry('1025x672')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
