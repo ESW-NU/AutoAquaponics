@@ -25,17 +25,18 @@ def DataLogger(file_name):
     #import date and time for timestamp
     from datetime import datetime
 
-    #clear csv file on flash drive
+    #clear csv file on flash drive, comment out if not needed
     loc = "/media/pi/68D2-7E93/" + file_name
-    f = open(loc, "w")
-    f.truncate()
-    f.close()
+    #f = open(loc, "w")
+    #f.truncate()
+    #f.close()
 
     #save data into test.csv on flash drive by appending new row
     with open(loc,'a+',newline='') as file:
         writer = csv.writer(file)
+        #comment out these headings 
         #writer.writerow(["Date and Time","P0 (V)", "P1 (V)"])
-        file.flush()
+        #file.flush()
         #define output of both channels
         while True:
             voltage = round(getData()[0], 3)

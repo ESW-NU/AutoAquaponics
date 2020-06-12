@@ -33,30 +33,34 @@ style.use("seaborn-darkgrid")
 f = Figure(figsize=(10,5), dpi=100)
 plot1 = f.add_subplot(211)
 plot2 = f.add_subplot(212)
+tList = []
+vList = []
+v1List = []
+timeframe = int(-240)
 def animate(ii):
     pullData = open("/media/pi/68D2-7E93/test.csv","r").read()
     dataList = pullData.split('\n')
-    tList = []
-    vList = []
-    v1List = []
+    
     for eachLine in dataList:
         if len(eachLine) >1:
             timedate, voltage, voltage1 = eachLine.split(',')
             tList.append(datetime.datetime.strptime(timedate, "%m/%d/%Y %H:%M:%S"))
             vList.append(float(voltage))
             v1List.append(float(voltage1))
-    
     #plot graphs
     plot1.clear()
     plot2.clear()
-    timeframe = int(-240)
     plot1.plot(tList[timeframe:], vList[timeframe:], 'r')
     plot2.plot(tList[timeframe:], v1List[timeframe:], 'b')
+    #this is to get the reference to fill the graph, can change to more meaningful
+    #values later so we can change graph fill color based on water parameter
     listofzeros = [0] * len(tList)
     #add labels and config axis
     plot1.set_title("Aquaponic Sensors")
     plot1.set_ylabel("pH (v)")
     plot1.set_ylim(2,4)
+    plot2.set_ylabel("Temperature (v)")
+    plot2.set_ylim(0,5)
     #show half the length of our timeframe, set functionality to let user scroll
     #to next half later
     plot1.set_xlim(tList[int(timeframe/2)], tList[-1])
@@ -70,12 +74,12 @@ def animate(ii):
     plot1.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
     plot2.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
     plot1.autoscale(enable=False) #doesn't do anything now
-    plot2.set_ylabel("Temperature (v)")
-    plot2.set_ylim(0,5)
     #fill the graphs
-    plot1.fill_between(tList[timeframe:], vList[timeframe:], where=(vList[timeframe:] > listofzeros[timeframe:]),
+    plot1.fill_between(tList[timeframe:], vList[timeframe:],
+                       where=(vList[timeframe:] > listofzeros[timeframe:]),
                        facecolor = 'r', edgecolor = 'r', alpha = 0.5)
-    plot2.fill_between(tList[timeframe:], v1List[timeframe:], where=(v1List[timeframe:] > listofzeros[timeframe:]),
+    plot2.fill_between(tList[timeframe:], v1List[timeframe:],
+                       where=(v1List[timeframe:] > listofzeros[timeframe:]),
                        facecolor = 'b', edgecolor = 'b', alpha = 0.5)
 #initialization
 class AllWindow(tk.Tk):
@@ -110,6 +114,8 @@ class AllWindow(tk.Tk):
         #remember to add page to this list when making new ones
         for F in (HomePage, ControlPanel, Settings, VideoStream):
             frame = F(container, self)
+            #set background color for the pages
+            frame.config(bg='white')
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
         self.show_frame(HomePage)
@@ -127,9 +133,13 @@ class AllWindow(tk.Tk):
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
-        label = tk.Label(self, text="Dashboard", font = TITLE_FONT)
+        label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
         label.pack(pady=10, padx=10)
-        
+        #Updating text boxes showing latest water parameter
+        #self.pHtext = tk.StringVar()
+        #self.GetValues()
+        #pHLevel = tk.Label(self, textvariable=self.pHtext, bg='white', font = TITLE_FONT)
+        #pHLevel.place(x=20, y=30)
         #quit button
         quitButton = tk.Button(self, text="QUIT", fg='red',
                                 command=quit)
@@ -151,49 +161,55 @@ class HomePage(tk.Frame):
         toolbar.update()
         canvas._tkcanvas.pack()
         canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand = True)
-        
+#    def GetValues(self):
+#        pullData = open("/media/pi/68D2-7E93/test.csv","r").read()
+#        dataList = pullData.split('\n')
+#        for eachLine in dataList:
+#            if len(eachLine) >1:
+#                timedate, voltage, voltage1 = eachLine.split(',')
+#                self.pHtext.set(str(voltage))
 
 #add control panel page
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
     #text labels
-        Title = tk.Label(self, text="Control Panel", font = TITLE_FONT)
+        Title = tk.Label(self, text="Control Panel", bg= 'white', font = TITLE_FONT)
         Title.pack(pady=10, padx=10)
-        ChannelTitle = tk.Label(self, text="Channel Overrides", font = MEDIUM_FONT)
+        ChannelTitle = tk.Label(self, text="Channel Overrides", bg='white', font = MEDIUM_FONT)
         ChannelTitle.place(x=108, y=90)
     #channel labels
-        Channel_1 = tk.Label(self, text="1", font = SMALL_FONT)
+        Channel_1 = tk.Label(self, text="1", bg='white', font = SMALL_FONT)
         Channel_1.place(x=38, y=122)
-        Channel_2 = tk.Label(self, text="2", font = SMALL_FONT)
+        Channel_2 = tk.Label(self, text="2", bg='white', font = SMALL_FONT)
         Channel_2.place(x=38, y=157)
-        Channel_3 = tk.Label(self, text="3", font = SMALL_FONT)
+        Channel_3 = tk.Label(self, text="3", bg='white', font = SMALL_FONT)
         Channel_3.place(x=38, y=192)
-        Channel_4 = tk.Label(self, text="4", font = SMALL_FONT)
+        Channel_4 = tk.Label(self, text="4", bg='white', font = SMALL_FONT)
         Channel_4.place(x=38, y=227)
-        Channel_5 = tk.Label(self, text="5", font = SMALL_FONT)
+        Channel_5 = tk.Label(self, text="5", bg='white', font = SMALL_FONT)
         Channel_5.place(x=38, y=262)
-        Channel_6 = tk.Label(self, text="6", font = SMALL_FONT)
+        Channel_6 = tk.Label(self, text="6", bg='white', font = SMALL_FONT)
         Channel_6.place(x=38, y=297)
-        Channel_7 = tk.Label(self, text="7", font = SMALL_FONT)
+        Channel_7 = tk.Label(self, text="7", bg='white', font = SMALL_FONT)
         Channel_7.place(x=38, y=332)
-        Channel_8 = tk.Label(self, text="8", font = SMALL_FONT)
+        Channel_8 = tk.Label(self, text="8", bg='white', font = SMALL_FONT)
         Channel_8.place(x=38, y=367)
-        Channel_9 = tk.Label(self, text="9", font = SMALL_FONT)
+        Channel_9 = tk.Label(self, text="9", bg='white', font = SMALL_FONT)
         Channel_9.place(x=283, y=122)
-        Channel_10 = tk.Label(self, text="10", font = SMALL_FONT)
+        Channel_10 = tk.Label(self, text="10", bg='white', font = SMALL_FONT)
         Channel_10.place(x=283, y=157)
-        Channel_11 = tk.Label(self, text="11", font = SMALL_FONT)
+        Channel_11 = tk.Label(self, text="11", bg='white', font = SMALL_FONT)
         Channel_11.place(x=283, y=192)
-        Channel_12 = tk.Label(self, text="12", font = SMALL_FONT)
+        Channel_12 = tk.Label(self, text="12", bg='white', font = SMALL_FONT)
         Channel_12.place(x=283, y=227)
-        Channel_13 = tk.Label(self, text="13", font = SMALL_FONT)
+        Channel_13 = tk.Label(self, text="13", bg='white', font = SMALL_FONT)
         Channel_13.place(x=283, y=262)
-        Channel_14 = tk.Label(self, text="14", font = SMALL_FONT)
+        Channel_14 = tk.Label(self, text="14", bg='white', font = SMALL_FONT)
         Channel_14.place(x=283, y=297)
-        Channel_15 = tk.Label(self, text="15", font = SMALL_FONT)
+        Channel_15 = tk.Label(self, text="15", bg='white', font = SMALL_FONT)
         Channel_15.place(x=283, y=332)
-        Channel_16 = tk.Label(self, text="16", font = SMALL_FONT)
+        Channel_16 = tk.Label(self, text="16", bg='white', font = SMALL_FONT)
         Channel_16.place(x=283, y=367)
     #relay control buttons
         #relays 1-8
@@ -422,7 +438,7 @@ class ControlPanel(tk.Frame):
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Settings", font = TITLE_FONT)
+        label = tk.Label(self, text="Settings", bg='white', font = TITLE_FONT)
         label.pack(pady=10, padx=10)
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
@@ -435,7 +451,7 @@ class Settings(tk.Frame):
 class VideoStream(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Video Stream", font = TITLE_FONT)
+        label = tk.Label(self, text="Video Stream", bg='white', font = TITLE_FONT)
         label.pack(pady=10, padx=10)
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
