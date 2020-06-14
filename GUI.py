@@ -37,6 +37,7 @@ timeframe = int(-240)
 def animate(ii):
     pullData = open("/media/pi/68D2-7E93/test.csv","r").read()
     dataList = pullData.split('\n')
+    dataList = dataList[timeframe:]
     tList = []
     vList = []
     v1List = []
@@ -50,6 +51,7 @@ def animate(ii):
             tList = tList[timeframe:]
             vList = vList[timeframe:]
             v1List = v1List[timeframe:]
+            dataList = dataList[timeframe:]
     #plot graphs
     plot1.clear()
     plot2.clear()

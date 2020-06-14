@@ -1,5 +1,3 @@
-#Stop code with Ctrl+C in shell, the stop button deletes
-#the graph and csv file for some reason
 def getData():
 #import necessary modules and initialize I2C bus
     import board

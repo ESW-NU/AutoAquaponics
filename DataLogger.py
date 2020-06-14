@@ -10,7 +10,6 @@ def DataLogger(file_name):
     #plt.ion()
     voltage_list = []
     voltage1_list = []
-    ii = 0
     #print("{:>5}\t{:>5}".format('P0','P1'))
 
     #create subplots and set axis (not needed after GUI works)
@@ -37,7 +36,7 @@ def DataLogger(file_name):
         #comment out these headings 
         #writer.writerow(["Date and Time","P0 (V)", "P1 (V)"])
         #file.flush()
-        #define output of both channels
+        #define output of both channels, round to 3 decimals
         while True:
             voltage = round(getData()[0], 3)
             voltage1 = round(getData()[1], 3)
