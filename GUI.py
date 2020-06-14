@@ -33,25 +33,28 @@ style.use("seaborn-darkgrid")
 f = Figure(figsize=(10,5), dpi=100)
 plot1 = f.add_subplot(211)
 plot2 = f.add_subplot(212)
-tList = []
-vList = []
-v1List = []
 timeframe = int(-240)
 def animate(ii):
     pullData = open("/media/pi/68D2-7E93/test.csv","r").read()
     dataList = pullData.split('\n')
-    
+    tList = []
+    vList = []
+    v1List = []
     for eachLine in dataList:
         if len(eachLine) >1:
             timedate, voltage, voltage1 = eachLine.split(',')
             tList.append(datetime.datetime.strptime(timedate, "%m/%d/%Y %H:%M:%S"))
             vList.append(float(voltage))
             v1List.append(float(voltage1))
+            #keep the lists to a reasonable length to save memory
+            tList = tList[timeframe:]
+            vList = vList[timeframe:]
+            v1List = v1List[timeframe:]
     #plot graphs
     plot1.clear()
     plot2.clear()
-    plot1.plot(tList[timeframe:], vList[timeframe:], 'r')
-    plot2.plot(tList[timeframe:], v1List[timeframe:], 'b')
+    plot1.plot(tList, vList, 'r')
+    plot2.plot(tList, v1List, 'b')
     #this is to get the reference to fill the graph, can change to more meaningful
     #values later so we can change graph fill color based on water parameter
     listofzeros = [0] * len(tList)
@@ -161,6 +164,7 @@ class HomePage(tk.Frame):
         toolbar.update()
         canvas._tkcanvas.pack()
         canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand = True)
+#function to update live text, doesn't work yet
 #    def GetValues(self):
 #        pullData = open("/media/pi/68D2-7E93/test.csv","r").read()
 #        dataList = pullData.split('\n')
