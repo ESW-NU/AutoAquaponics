@@ -37,6 +37,7 @@ timeframe = int(-240)
 def animate(ii):
     pullData = open("/media/pi/68D2-7E93/test.csv","r").read()
     dataList = pullData.split('\n')
+    open("/media/pi/68D2-7E93/test.csv","r").close()
     dataList = dataList[timeframe:]
     tList = []
     vList = []
@@ -51,12 +52,11 @@ def animate(ii):
             tList = tList[timeframe:]
             vList = vList[timeframe:]
             v1List = v1List[timeframe:]
-            dataList = dataList[timeframe:]
     #plot graphs
     plot1.clear()
     plot2.clear()
-    plot1.plot(tList, vList, 'r')
-    plot2.plot(tList, v1List, 'b')
+    #plot1.plot(tList, vList, 'r')
+    #plot2.plot(tList, v1List, 'b')
     #this is to get the reference to fill the graph, can change to more meaningful
     #values later so we can change graph fill color based on water parameter
     listofzeros = [0] * len(tList)
@@ -80,12 +80,13 @@ def animate(ii):
     plot2.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
     plot1.autoscale(enable=False) #doesn't do anything now
     #fill the graphs
-    plot1.fill_between(tList[timeframe:], vList[timeframe:],
-                       where=(vList[timeframe:] > listofzeros[timeframe:]),
+    plot1.fill_between(tList, vList,
+                       where=(vList > listofzeros),
                        facecolor = 'r', edgecolor = 'r', alpha = 0.5)
-    plot2.fill_between(tList[timeframe:], v1List[timeframe:],
-                       where=(v1List[timeframe:] > listofzeros[timeframe:]),
+    plot2.fill_between(tList, v1List,
+                       where=(v1List > listofzeros),
                        facecolor = 'b', edgecolor = 'b', alpha = 0.5)
+    
 #initialization
 class AllWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
