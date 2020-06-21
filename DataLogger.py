@@ -8,8 +8,11 @@ def DataLogger(file_name):
     from time import sleep
     import csv
     #plt.ion()
+    raw_voltage_list = []
+    raw_voltage1_list = []
     voltage_list = []
     voltage1_list = []
+    ii = 0
     #print("{:>5}\t{:>5}".format('P0','P1'))
 
     #create subplots and set axis (not needed after GUI works)
@@ -38,31 +41,38 @@ def DataLogger(file_name):
         #file.flush()
         #define output of both channels, round to 3 decimals
         while True:
-            voltage = round(getData()[0], 3)
-            voltage1 = round(getData()[1], 3)
+            raw_voltage = getData()[0]
+            raw_voltage1 = getData()[1]
             #print("{:>5}\t{:>5}".format(voltage, voltage1))
         #append new output to existing lists
-            voltage_list.append(voltage)
-            voltage1_list.append(voltage1)
-        #keep lists short to prevent using too much memory
-            voltage_list = voltage_list[-20:]
-            voltage1_list = voltage_list[-20:]
-            #append data to csv file & plot
-            #if ii/5 == int(ii/5):
-            now = datetime.now()
-            dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
-            writer.writerow([dt_string, voltage, voltage1])
-            file.flush()
-        #wait 5 seconds before restarting loop
-            sleep(5)
-                #plot the lists
-                #ax1.plot(t, voltage_list, 'tab:blue')
-                #ax2.plot(t, voltage1_list, 'tab:red')
-#make legend (only for plotting mult lines on single graph)
-        #label1 = mpatches.Patch(color='red', label='Voltage 1')
-        #label2 = mpatches.Patch(color='blue', label='Voltage 2')
-        #plt.legend(handles=[label1, label2], bbox_to_anchor=(0., 1.01, 1., .102), loc='lower left',
-           #ncol=2, mode="expand", borderaxespad=0.)
-#actually draws plot
-                #plt.draw()
-                #plt.pause(0.0001) #some weird thing that makes the plot update, doesn't work without this pause
+            raw_voltage_list.append(raw_voltage)
+            raw_voltage1_list.append(raw_voltage1)
+            ii = ii+1
+            sleep(1)
+            #add the denoised data to voltage list evey 5s
+            if ii % 5 == 0:
+                voltage = round(sum(raw_voltage_list)/len(raw_voltage_list),3)
+                voltage1 = round(sum(raw_voltage1_list)/len(raw_voltage1_list),3)
+                voltage_list.append(voltage)
+                voltage1_list.append(voltage1)
+            #keep lists short to prevent using too much memory
+                raw_voltage_list = raw_voltage_list[-5:]
+                raw_voltage1_list = raw_voltage1_list[-5:]
+                voltage_list = voltage_list[-20:]
+                voltage1_list = voltage_list[-20:]
+                #append data to csv file & plot
+                now = datetime.now()
+                dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
+                writer.writerow([dt_string, voltage, voltage1])
+                file.flush()
+                    #plot the lists
+                    #ax1.plot(t, voltage_list, 'tab:blue')
+                    #ax2.plot(t, voltage1_list, 'tab:red')
+    #make legend (only for plotting mult lines on single graph)
+            #label1 = mpatches.Patch(color='red', label='Voltage 1')
+            #label2 = mpatches.Patch(color='blue', label='Voltage 2')
+            #plt.legend(handles=[label1, label2], bbox_to_anchor=(0., 1.01, 1., .102), loc='lower left',
+               #ncol=2, mode="expand", borderaxespad=0.)
+    #actually draws plot
+                    #plt.draw()
+                    #plt.pause(0.0001) #some weird thing that makes the plot update, doesn't work without this pause
