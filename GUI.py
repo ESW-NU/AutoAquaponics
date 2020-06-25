@@ -1,5 +1,5 @@
 import datetime
-
+import gc
 #import led info, replace with relay info
 from gpiozero import PWMLED
 LED1 = PWMLED(17)
@@ -24,7 +24,7 @@ matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
-
+gc.enable()
 #import animation to make graph live
 import matplotlib.animation as animation
 from matplotlib import style
@@ -86,6 +86,7 @@ def animate(ii):
     plot2.fill_between(tList, v1List,
                        where=(v1List > listofzeros),
                        facecolor = 'b', edgecolor = 'b', alpha = 0.5)
+    gc.collect()
     
 #initialization
 class AllWindow(tk.Tk):
