@@ -1,8 +1,7 @@
 import datetime
-import gc
 #import led info, replace with relay info
-from gpiozero import PWMLED
-LED1 = PWMLED(17)
+#from gpiozero import PWMLED
+#LED1 = PWMLED(17)
 
 #import DataLogger.py
 from DataLogger import DataLogger
@@ -24,6 +23,9 @@ matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
+import csv
+#import/enable garbage collector to clear memory
+import gc
 gc.enable()
 #import animation to make graph live
 import matplotlib.animation as animation
@@ -33,11 +35,22 @@ style.use("seaborn-darkgrid")
 f = Figure(figsize=(10,5), dpi=100)
 plot1 = f.add_subplot(211)
 plot2 = f.add_subplot(212)
-timeframe = int(-240)
+#set file path
+file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test.csv"
 def animate(ii):
-    pullData = open("/media/pi/68D2-7E93/test.csv","r").read()
+    pullData = open(file_path,"r").read()
     dataList = pullData.split('\n')
-    open("/media/pi/68D2-7E93/test.csv","r").close()
+    open(file_path,"r").close()
+    #setting timeframe and making sure GUI runs on short CSVs too
+    input_file = open(file_path, "r")
+    reader_file = csv.reader(input_file)
+    dataLen = len(list(reader_file))
+    if dataLen < 240:
+        timeframe = -dataLen
+    else:
+        timeframe = int(-240)
+    input_file.close()
+    #make all the x and y variable lists
     dataList = dataList[timeframe:]
     tList = []
     vList = []
@@ -86,6 +99,7 @@ def animate(ii):
     plot2.fill_between(tList, v1List,
                        where=(v1List > listofzeros),
                        facecolor = 'b', edgecolor = 'b', alpha = 0.5)
+    #collect garbage
     gc.collect()
     
 #initialization
@@ -296,13 +310,14 @@ class ControlPanel(tk.Frame):
         #fcns triggered by control button
         #fcn to turn LED on or off
     def channel_1(self):
-        if LED1.value == 0:
-            LED1.value = 1
+        #if LED1.value == 0:
+        #    LED1.value = 1
+        if self.channelButton1.cget('bg') == "red":
         #change light button color
             self.channelButton1.configure(bg= "green")
             self.channelButton1.configure(text = "Channel ON")
         else:
-            LED1.value = 0
+            #LED1.value = 0
         #change light button color to red if light off
             self.channelButton1.configure(bg= "red")
             self.channelButton1.configure(text = "Channel OFF")
