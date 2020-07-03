@@ -2,13 +2,14 @@ def fakeDataLogger(file_name):
     import random
     from time import sleep
     import csv
+    import os
     from datetime import datetime
     raw_voltage_list = []
     raw_voltage1_list = []
     voltage_list = []
     voltage1_list = []
     ii = 0
-    loc = "/media/pi/68D2-7E93/" + file_name
+    loc = os.path.expanduser("~/Desktop/") + file_name
     with open(loc,'a+',newline='') as file:
             writer = csv.writer(file)
             #define output of both channels, round to 3 decimals

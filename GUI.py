@@ -1,4 +1,5 @@
 import datetime
+import os
 #import led info, replace with relay info
 #from gpiozero import PWMLED
 #LED1 = PWMLED(17)
@@ -36,7 +37,7 @@ f = Figure(figsize=(10,5), dpi=100)
 plot1 = f.add_subplot(211)
 plot2 = f.add_subplot(212)
 #set file path
-file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test.csv"
+file_path = os.path.expanduser("~/Desktop/test.csv")
 def animate(ii):
     pullData = open(file_path,"r").read()
     dataList = pullData.split('\n')

@@ -1,5 +1,6 @@
 from time import sleep
 import csv
+import os
 from fakeDataLogger import fakeDataLogger
 from multiprocessing import Process
 global IS_ALIVE
@@ -9,7 +10,7 @@ def start_GUI():
     import GUI
 
 def start_data_logging():
-    fakeDataLogger("test2.csv")
+    fakeDataLogger("test.csv")
 
 if(__name__ == '__main__'):
     p1 = Process(target=start_data_logging)
@@ -19,7 +20,7 @@ if(__name__ == '__main__'):
     #start data logging
     p1.start()
     #create CSV file if it doesn't already exist
-    file_name = "/Users/Bill Yen/Desktop/NU Urban Ag/test2.csv"
+    file_name = os.path.expanduser("~/Desktop/test.csv")
     create_file = open(file_name, "a+")
     create_file.close()
     #check length of CSV and wait for data logger to populate if it's too small
