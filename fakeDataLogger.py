@@ -1,3 +1,4 @@
+#test
 def fakeDataLogger(file_name):
     import random
     from time import sleep
