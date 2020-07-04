@@ -219,51 +219,51 @@ class HomePage(tk.Frame):
                             width=10, height=1, anchor=W, justify=LEFT)
         flowrate_label.place(x=5, y=307)
         #updating live texts
-        leak_data = tk.Label(self, text="Leakage", fg="white", bg=pHcolor,
+        leak_data = tk.Label(self, text="Leakage", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         leak_data.place(x=91, y=65)
-        waterlvl_data = tk.Label(self, text="Water Level", fg="white", bg=pHcolor,
+        waterlvl_data = tk.Label(self, text="Water Level", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         waterlvl_data.place(x=91, y=87)
-        pH_data = tk.Label(self, text="pH", fg="white", bg=pHcolor,
+        pH_data = tk.Label(self, text="pH", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         pH_data.place(x=91, y=109)
-        wtemp_data = tk.Label(self, text="Water Temp", fg="white", bg=pHcolor,
+        wtemp_data = tk.Label(self, text="Water Temp", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         wtemp_data.place(x=91, y=131)
-        atemp_data = tk.Label(self, text="Air Temp", fg="white", bg=pHcolor,
+        atemp_data = tk.Label(self, text="Air Temp", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         atemp_data.place(x=91, y=153)
-        NO3_data = tk.Label(self, text="Nitrate", fg="white", bg=pHcolor,
+        NO3_data = tk.Label(self, text="Nitrate", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         NO3_data.place(x=91, y=175)
-        TDS_data = tk.Label(self, text="TDS", fg="white", bg=pHcolor,
+        TDS_data = tk.Label(self, text="TDS", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         TDS_data.place(x=91, y=197)
-        DO_data = tk.Label(self, text="DO", fg="white", bg=pHcolor,
+        DO_data = tk.Label(self, text="DO", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         DO_data.place(x=91, y=219)
-        NH3_data = tk.Label(self, text="Ammonia", fg="white", bg=pHcolor,
+        NH3_data = tk.Label(self, text="Ammonia", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         NH3_data.place(x=91, y=241)
-        PO4_data = tk.Label(self, text="Phosphate", fg="white", bg=pHcolor,
+        PO4_data = tk.Label(self, text="Phosphate", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         PO4_data.place(x=91, y=263)
-        humidity_data = tk.Label(self, text="Humidity", fg="white", bg=pHcolor,
+        humidity_data = tk.Label(self, text="Humidity", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         humidity_data.place(x=91, y=285)
-        flowrate_data = tk.Label(self, text="Flow Rate", fg="white", bg=pHcolor,
+        flowrate_data = tk.Label(self, text="Flow Rate", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         flowrate_data.place(x=91, y=307)
