@@ -278,6 +278,7 @@ class HomePage(tk.Frame):
                     pH_data.config(text = voltage)
                     wtemp_data.config(text = voltage1)
             open(file_path,"r").close()
+            gc.collect()
             self.after(5000, GetValues)
         self.after(5000, GetValues)
 
