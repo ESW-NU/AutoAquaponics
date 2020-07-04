@@ -32,11 +32,11 @@ import matplotlib.animation as animation
 from matplotlib import style
 style.use("seaborn-darkgrid")
 #animate function
-f = Figure(figsize=(10,5), dpi=100)
+f = Figure(figsize=(9.8,6), dpi=100)
 plot1 = f.add_subplot(211)
 plot2 = f.add_subplot(212)
 #set file path
-file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test.csv"
+file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
 def animate(ii):
     pullData = open(file_path,"r").read()
     dataList = pullData.split('\n')
@@ -91,7 +91,6 @@ def animate(ii):
     #make sure the xticks aren't overlapping
     plot1.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
     plot2.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
-    plot1.autoscale(enable=False) #doesn't do anything now
     #fill the graphs
     plot1.fill_between(tList, vList,
                        where=(vList > listofzeros),
@@ -101,18 +100,18 @@ def animate(ii):
                        facecolor = 'b', edgecolor = 'b', alpha = 0.5)
     #collect garbage
     gc.collect()
-    
+
 #initialization
 class AllWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         #add title
         tk.Tk.wm_title(self, "NU Aquaponics")
-        container = tk.Frame(self)      
-        container.pack(side="top", fill="both", expand=True)      
+        container = tk.Frame(self)
+        container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-        
+
         #create navigation menu
         menubar = tk.Menu(container)
         navimenu = tk.Menu(menubar, tearoff=0)
@@ -127,9 +126,9 @@ class AllWindow(tk.Tk):
         navimenu.add_command(label="Quit", command=self.die)
         #actually add the bar
         menubar.add_cascade(label="Menu", menu=navimenu)
-        
+
         tk.Tk.config(self, menu=menubar)
-        
+
         #show the frames
         self.frames = {}
         #remember to add page to this list when making new ones
@@ -140,56 +139,147 @@ class AllWindow(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
         self.show_frame(HomePage)
-    
-    def show_frame(self, cont):       
+
+    def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
-        
+
     #end program fcn triggered by quit button
     def die(self):
         exit()
 
-    
+
 #add home page
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
-        label.pack(pady=10, padx=10)
-        #Updating text boxes showing latest water parameter
-        #self.pHtext = tk.StringVar()
-        #self.GetValues()
-        #pHLevel = tk.Label(self, textvariable=self.pHtext, bg='white', font = TITLE_FONT)
-        #pHLevel.place(x=20, y=30)
-        #quit button
-        quitButton = tk.Button(self, text="QUIT", fg='red',
-                                command=quit)
-        quitButton.pack()
-        #navigation button
-        navibutton1 = ttk.Button(self, text="Control Panel",
-                            command=lambda: controller.show_frame(ControlPanel))
-        navibutton1.pack()
-        navibutton2 = ttk.Button(self, text="Settings",
-                            command=lambda: controller.show_frame(Settings))
-        navibutton2.pack()
-        
+        label.place(x=460, y=10)
         #bring up canvas
         canvas = FigureCanvasTkAgg(f, self)
         canvas.draw()
-        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand = True)
+        #embed graph into canvas
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
         #add navigation bar
         toolbar = NavigationToolbar2Tk(canvas, self)
         toolbar.update()
-        canvas._tkcanvas.pack()
-        canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand = True)
-#function to update live text, doesn't work yet
-#    def GetValues(self):
-#        pullData = open("/media/pi/68D2-7E93/test.csv","r").read()
-#        dataList = pullData.split('\n')
-#        for eachLine in dataList:
-#            if len(eachLine) >1:
-#                timedate, voltage, voltage1 = eachLine.split(',')
-#                self.pHtext.set(str(voltage))
+        #place graph canvas at specific location
+        canvas._tkcanvas.place(x=110, y=35)
+        #color variables
+        pHcolor = "green"
+        #data table labels
+        table_title = tk.Label(self, text="Data Summary", bg="white", font = LARGE_FONT)
+        table_title.place(x=22, y=40)
+        leak_label = tk.Label(self, text="Leakage", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        leak_label.place(x=5, y=65)
+        waterlvl_label = tk.Label(self, text="Water Level", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        waterlvl_label.place(x=5, y=87)
+        pH_label = tk.Label(self, text="pH", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        pH_label.place(x=5, y=109)
+        wtemp_label = tk.Label(self, text="Water Temp", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        wtemp_label.place(x=5, y=131)
+        atemp_label = tk.Label(self, text="Air Temp", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        atemp_label.place(x=5, y=153)
+        NO3_label = tk.Label(self, text="Nitrate", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        NO3_label.place(x=5, y=175)
+        TDS_label = tk.Label(self, text="TDS", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        TDS_label.place(x=5, y=197)
+        DO_label = tk.Label(self, text="DO", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        DO_label.place(x=5, y=219)
+        NH3_label = tk.Label(self, text="Ammonia", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        NH3_label.place(x=5, y=241)
+        PO4_label = tk.Label(self, text="Phosphate", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        PO4_label.place(x=5, y=263)
+        humidity_label = tk.Label(self, text="Humidity", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        humidity_label.place(x=5, y=285)
+        flowrate_label = tk.Label(self, text="Flow Rate", fg="white", bg=pHcolor,
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1, anchor=W, justify=LEFT)
+        flowrate_label.place(x=5, y=307)
+        #updating live texts
+        leak_data = tk.Label(self, text="Leakage", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        leak_data.place(x=91, y=65)
+        waterlvl_data = tk.Label(self, text="Water Level", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        waterlvl_data.place(x=91, y=87)
+        pH_data = tk.Label(self, text="pH", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        pH_data.place(x=91, y=109)
+        wtemp_data = tk.Label(self, text="Water Temp", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        wtemp_data.place(x=91, y=131)
+        atemp_data = tk.Label(self, text="Air Temp", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        atemp_data.place(x=91, y=153)
+        NO3_data = tk.Label(self, text="Nitrate", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        NO3_data.place(x=91, y=175)
+        TDS_data = tk.Label(self, text="TDS", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        TDS_data.place(x=91, y=197)
+        DO_data = tk.Label(self, text="DO", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        DO_data.place(x=91, y=219)
+        NH3_data = tk.Label(self, text="Ammonia", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        NH3_data.place(x=91, y=241)
+        PO4_data = tk.Label(self, text="Phosphate", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        PO4_data.place(x=91, y=263)
+        humidity_data = tk.Label(self, text="Humidity", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        humidity_data.place(x=91, y=285)
+        flowrate_data = tk.Label(self, text="Flow Rate", fg="black", bg="white",
+                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                            width=10, height=1)
+        flowrate_data.place(x=91, y=307)
+#function to update live text
+        def GetValues():
+            pullData = open(file_path,"r").read()
+            dataList = pullData.split('\n')
+            for eachLine in dataList:
+                if len(eachLine) >1:
+                    #add to this list of data read as we add more sensors
+                    timedate, voltage, voltage1 = eachLine.split(',')
+                    pH_data.config(text = voltage)
+                    wtemp_data.config(text = voltage1)
+            open(file_path,"r").close()
+            self.after(5000, GetValues)
+        self.after(5000, GetValues)
 
 #add control panel page
 class ControlPanel(tk.Frame):
@@ -300,13 +390,12 @@ class ControlPanel(tk.Frame):
                                          bg= "red", fg= "white",
                                          command=self.channel_16)
         self.channelButton16.place(x=170, y=360)
-        
+
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-        
-        
+
         #fcns triggered by control button
         #fcn to turn LED on or off
     def channel_1(self):
@@ -456,7 +545,7 @@ class ControlPanel(tk.Frame):
         #change light button color to red if light off
             self.channelButton16.configure(bg= "red")
             self.channelButton16.configure(text = "Channel OFF")
-            
+
 #add settings page
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
@@ -486,6 +575,6 @@ app.geometry('1025x672')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
-ani = animation.FuncAnimation(f, animate, interval=1000)
+ani = animation.FuncAnimation(f, animate, interval=5000)
 #mainloop
 app.mainloop()
