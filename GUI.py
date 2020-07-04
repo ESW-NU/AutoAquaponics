@@ -166,104 +166,104 @@ class HomePage(tk.Frame):
         #place graph canvas at specific location
         canvas._tkcanvas.place(x=110, y=35)
         #color variables
-        pHcolor = "green"
+        pHcolor = "white"
         #data table labels
         table_title = tk.Label(self, text="Data Summary", bg="white", font = LARGE_FONT)
-        table_title.place(x=22, y=40)
-        leak_label = tk.Label(self, text="Leakage", fg="white", bg=pHcolor,
+        table_title.place(x=28, y=40)
+        leak_label = tk.Label(self, text="Leakage", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         leak_label.place(x=5, y=65)
-        waterlvl_label = tk.Label(self, text="Water Level", fg="white", bg=pHcolor,
+        waterlvl_label = tk.Label(self, text="Water Level", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         waterlvl_label.place(x=5, y=87)
-        pH_label = tk.Label(self, text="pH", fg="white", bg=pHcolor,
+        pH_label = tk.Label(self, text="pH", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         pH_label.place(x=5, y=109)
-        wtemp_label = tk.Label(self, text="Water Temp", fg="white", bg=pHcolor,
+        wtemp_label = tk.Label(self, text="Water Temp", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         wtemp_label.place(x=5, y=131)
-        atemp_label = tk.Label(self, text="Air Temp", fg="white", bg=pHcolor,
+        atemp_label = tk.Label(self, text="Air Temp", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         atemp_label.place(x=5, y=153)
-        NO3_label = tk.Label(self, text="Nitrate", fg="white", bg=pHcolor,
+        NO3_label = tk.Label(self, text="Nitrate", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         NO3_label.place(x=5, y=175)
-        TDS_label = tk.Label(self, text="TDS", fg="white", bg=pHcolor,
+        TDS_label = tk.Label(self, text="TDS", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         TDS_label.place(x=5, y=197)
-        DO_label = tk.Label(self, text="DO", fg="white", bg=pHcolor,
+        DO_label = tk.Label(self, text="DO", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         DO_label.place(x=5, y=219)
-        NH3_label = tk.Label(self, text="Ammonia", fg="white", bg=pHcolor,
+        NH3_label = tk.Label(self, text="Ammonia", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         NH3_label.place(x=5, y=241)
-        PO4_label = tk.Label(self, text="Phosphate", fg="white", bg=pHcolor,
+        PO4_label = tk.Label(self, text="Phosphate", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         PO4_label.place(x=5, y=263)
-        humidity_label = tk.Label(self, text="Humidity", fg="white", bg=pHcolor,
+        humidity_label = tk.Label(self, text="Humidity", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         humidity_label.place(x=5, y=285)
-        flowrate_label = tk.Label(self, text="Flow Rate", fg="white", bg=pHcolor,
+        flowrate_label = tk.Label(self, text="Flow Rate", fg="black", bg=pHcolor,
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
         flowrate_label.place(x=5, y=307)
         #updating live texts
-        leak_data = tk.Label(self, text="Leakage", fg="black", bg="white",
+        leak_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         leak_data.place(x=91, y=65)
-        waterlvl_data = tk.Label(self, text="Water Level", fg="black", bg="white",
+        waterlvl_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         waterlvl_data.place(x=91, y=87)
-        pH_data = tk.Label(self, text="pH", fg="black", bg="white",
+        pH_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         pH_data.place(x=91, y=109)
-        wtemp_data = tk.Label(self, text="Water Temp", fg="black", bg="white",
+        wtemp_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         wtemp_data.place(x=91, y=131)
-        atemp_data = tk.Label(self, text="Air Temp", fg="black", bg="white",
+        atemp_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         atemp_data.place(x=91, y=153)
-        NO3_data = tk.Label(self, text="Nitrate", fg="black", bg="white",
+        NO3_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         NO3_data.place(x=91, y=175)
-        TDS_data = tk.Label(self, text="TDS", fg="black", bg="white",
+        TDS_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         TDS_data.place(x=91, y=197)
-        DO_data = tk.Label(self, text="DO", fg="black", bg="white",
+        DO_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         DO_data.place(x=91, y=219)
-        NH3_data = tk.Label(self, text="Ammonia", fg="black", bg="white",
+        NH3_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         NH3_data.place(x=91, y=241)
-        PO4_data = tk.Label(self, text="Phosphate", fg="black", bg="white",
+        PO4_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         PO4_data.place(x=91, y=263)
-        humidity_data = tk.Label(self, text="Humidity", fg="black", bg="white",
+        humidity_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         humidity_data.place(x=91, y=285)
-        flowrate_data = tk.Label(self, text="Flow Rate", fg="black", bg="white",
+        flowrate_data = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
         flowrate_data.place(x=91, y=307)
@@ -278,6 +278,7 @@ class HomePage(tk.Frame):
                     pH_data.config(text = voltage)
                     wtemp_data.config(text = voltage1)
             open(file_path,"r").close()
+            gc.collect()
             self.after(5000, GetValues)
         self.after(5000, GetValues)
 
@@ -327,67 +328,83 @@ class ControlPanel(tk.Frame):
         #relays 1-8
         self.channelButton1 = tk.Button(self, text="Channel OFF",
                                         bg= "red", fg= "white",
+                                        width=10, height=1,
                                         command=self.channel_1)
         self.channelButton1.place(x=50, y=115)
         self.channelButton2 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_2)
         self.channelButton2.place(x=50, y=150)
         self.channelButton3 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_3)
         self.channelButton3.place(x=50, y=185)
         self.channelButton4 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_4)
         self.channelButton4.place(x=50, y=220)
         self.channelButton5 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_5)
         self.channelButton5.place(x=50, y=255)
         self.channelButton6 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_6)
         self.channelButton6.place(x=50, y=290)
         self.channelButton7 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_7)
         self.channelButton7.place(x=50, y=325)
         self.channelButton8 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_8)
         self.channelButton8.place(x=50, y=360)
         #relays 9-16
         self.channelButton9 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_9)
         self.channelButton9.place(x=170, y=115)
         self.channelButton10 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_10)
         self.channelButton10.place(x=170, y=150)
         self.channelButton11 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_11)
         self.channelButton11.place(x=170, y=185)
         self.channelButton12 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_12)
         self.channelButton12.place(x=170, y=220)
         self.channelButton13 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_13)
         self.channelButton13.place(x=170, y=255)
         self.channelButton14 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_14)
         self.channelButton14.place(x=170, y=290)
         self.channelButton15 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_15)
         self.channelButton15.place(x=170, y=325)
         self.channelButton16 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
+                                         width=10, height=1,
                                          command=self.channel_16)
         self.channelButton16.place(x=170, y=360)
 
