@@ -10,8 +10,10 @@ class Logger:
 
     def collect_data(self):
         #collect data and assign to class variable
-        self.data_dict['val1'] = (datetime.now(), random.choice([2.322,2.444,2.533,2.666]))
-        self.data_dict['val2'] = (datetime.now(), random.choice([2.322,2.444,2.533,2.666]))
+        self.data_dict['pH'] = (datetime.now(), random.choice([2.322,2.444,2.533,2.666]))
+
+    def print_data(self):
+        print(self.data_dict['val1'])
 
     def log_data(self):
         #log the data into a sqlite database 
@@ -21,8 +23,10 @@ class Logger:
         for table, data in self.data_dict.items():
             cnt = len(data) - 1
             params = '?' + ',?'*cnt
-            cursor.execute(f"INSERT INTO {TABLES} VALUES({params})",data)
-            conn.commit
+            cursor.execute(f"INSERT INTO {table} VALUES({params})",data)
+            conn.commit()
+
+        conn.close()
                 
 
 def main():
