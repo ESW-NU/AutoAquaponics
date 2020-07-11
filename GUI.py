@@ -1,4 +1,5 @@
 import datetime
+from typing import Container
 #import led info, replace with relay info
 #from gpiozero import PWMLED
 #LED1 = PWMLED(17)
@@ -31,12 +32,26 @@ gc.enable()
 import matplotlib.animation as animation
 from matplotlib import style
 style.use("seaborn-darkgrid")
-#animate function
-f = Figure(figsize=(9.8,6), dpi=100)
-plot1 = f.add_subplot(211)
-plot2 = f.add_subplot(212)
+#import vertical scroll bar
+from vertical_scroll_frame import VerticalScrolledFrame
+#create figure for plots and set figure size/layout
+f = Figure(figsize=(8.6,32), dpi=100)
+f.subplots_adjust(top=0.985, bottom=0.015)
+#plots
+plot1 = f.add_subplot(11,1,1)
+plot2 = f.add_subplot(11,1,2)
+plot3 = f.add_subplot(11,1,3)
+plot4 = f.add_subplot(11,1,4)
+plot5 = f.add_subplot(11,1,5)
+plot6 = f.add_subplot(11,1,6)
+plot7 = f.add_subplot(11,1,7)
+plot8 = f.add_subplot(11,1,8)
+plot9 = f.add_subplot(11,1,9)
+plot10 = f.add_subplot(11,1,10)
+plot11 = f.add_subplot(11,1,11)
 #set file path
 file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
+#animate function
 def animate(ii):
     pullData = open(file_path,"r").read()
     dataList = pullData.split('\n')
@@ -153,18 +168,32 @@ class AllWindow(tk.Tk):
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
+        scframe = VerticalScrolledFrame(self)
+        scframe.place(x=130, y=20)
+        #btn = tk.Button(scframe.interior, height=1, width=20, text="hello")
+        #btn.pack(padx=10, pady=5, side=tk.TOP)
+        #bring up canvas
+        '''
+        graphframe=tk.Frame(self, width=500, height=1000)
+        graphframe.columnconfigure(0,weight=1)
+        graphframe.rowconfigure(0,weight=1)
+        graphframe.place(x=460, y=30)
+        graphframe.vbar=Scrollbar(graphframe,orient=VERTICAL)
+        '''
+        canvas = FigureCanvasTkAgg(f, scframe.interior)
+        canvas.draw()
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
         label.place(x=460, y=10)
-        #bring up canvas
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.draw()
         #embed graph into canvas
+        #canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
+        #canvas.get_tk_widget().config(width=300, height=700)
         #add navigation bar
         toolbar = NavigationToolbar2Tk(canvas, self)
         toolbar.update()
         #place graph canvas at specific location
-        canvas._tkcanvas.place(x=110, y=35)
+        #canvas._tkcanvas(scframe.interior)
+        #canvas._tkcanvas.place(x=110, y=35)
         #color variables
         pHcolor = "white"
         #data table labels
@@ -412,6 +441,36 @@ class ControlPanel(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
+        OptionList = [
+        "00:00",
+        "01:00",
+        "02:00",
+        "03:00",
+        "04:00",
+        "05:00",
+        "06:00",
+        "07:00",
+        "08:00",
+        "09:00",
+        "10:00",
+        "11:00",
+        "12:00",
+        "13:00",
+        "14:00",
+        "15:00",
+        "16:00",
+        "17:00",
+        "18:00",
+        "19:00",
+        "20:00",
+        "21:00",
+        "22:00",
+        "23:00",
+        ]
+
+        dropon1=tk.OptionMenu(self, "Turn On", *OptionList)
+        dropon1.config(width=10, font=SMALL_FONT)
+        dropon1.place(x=570,y=122)
 
         #fcns triggered by control button
         #fcn to turn LED on or off
