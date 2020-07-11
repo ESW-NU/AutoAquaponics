@@ -35,20 +35,20 @@ style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
 #create figure for plots and set figure size/layout
-f = Figure(figsize=(8.6,32), dpi=100)
+f = Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015)
 #plots
-plot1 = f.add_subplot(11,2,1)
-plot2 = f.add_subplot(11,2,2)
-plot3 = f.add_subplot(11,2,3)
-plot4 = f.add_subplot(11,2,4)
-plot5 = f.add_subplot(11,2,5)
-plot6 = f.add_subplot(11,2,6)
-plot7 = f.add_subplot(11,2,7)
-plot8 = f.add_subplot(11,2,8)
-plot9 = f.add_subplot(11,2,9)
-plot10 = f.add_subplot(11,2,10)
-plot11 = f.add_subplot(11,2,11)
+plot1 = f.add_subplot(6,2,1)
+plot2 = f.add_subplot(6,2,2)
+plot3 = f.add_subplot(6,2,3)
+plot4 = f.add_subplot(6,2,4)
+plot5 = f.add_subplot(6,2,5)
+plot6 = f.add_subplot(6,2,6)
+plot7 = f.add_subplot(6,2,7)
+plot8 = f.add_subplot(6,2,8)
+plot9 = f.add_subplot(6,2,9)
+plot10 = f.add_subplot(6,2,10)
+plot11 = f.add_subplot(6,2,11)
 #set file path
 file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
 #animate function
