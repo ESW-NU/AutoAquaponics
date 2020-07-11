@@ -1,3 +1,8 @@
+'''
+Code below found from GitHub in {vertical_scroll_frame.py}
+{https://github.com/CS196Illinois/Finance/tree/master/MVP}
+Used to create vertical scroll bar on Dashboard
+'''
 import tkinter as tk
 
 class VerticalScrolledFrame(tk.Frame):
@@ -14,7 +19,7 @@ class VerticalScrolledFrame(tk.Frame):
         vscrollbar.pack(fill=tk.Y, side=tk.RIGHT, expand=tk.FALSE)
         canvas = tk.Canvas(self, bd=5, highlightthickness=0,bg="white",
                         yscrollcommand=vscrollbar.set)
-        canvas.config(width=100, height=600)
+        canvas.config(width=100, height=580)
         canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.TRUE)
         vscrollbar.config(command=canvas.yview)
 
