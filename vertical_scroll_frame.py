@@ -1,7 +1,7 @@
 '''
-//Code below found from GitHub in {vertical_scroll_frame.py}
-//{https://github.com/CS196Illinois/Finance/tree/master/MVP}
-//Used to create vertical scroll bar on Dashboard
+Code below found from GitHub in {vertical_scroll_frame.py}
+{https://github.com/CS196Illinois/Finance/tree/master/MVP}
+Used to create vertical scroll bar on Dashboard
 '''
 import tkinter as tk
 
