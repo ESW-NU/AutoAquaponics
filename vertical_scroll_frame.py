@@ -26,6 +26,7 @@ class VerticalScrolledFrame(tk.Frame):
         # reset the view
         canvas.xview_moveto(0)
         canvas.yview_moveto(0)
+        canvas.canvasheight = 580
 
         # create a frame inside the canvas which will be scrolled with it
         self.interior = interior = tk.Frame(canvas)
@@ -49,3 +50,35 @@ class VerticalScrolledFrame(tk.Frame):
                 # update the inner frame's width to fill the canvas
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
         canvas.bind('<Configure>', _configure_canvas)
+
+        self.offset_y = 0
+        self.prevy = 0
+        self.scrollposition = 1
+
+        def on_press(event):
+            self.offset_y = event.y_root
+            if self.scrollposition < 1:
+                self.scrollposition = 1
+            elif self.scrollposition > self.canvasheight:
+                self.scrollposition = self.canvasheight
+            canvas.yview_moveto(self.scrollposition / self.canvasheight)
+
+        def on_touch_scroll(event):
+            nowy = event.y_root
+
+            sectionmoved = 15
+            if nowy > self.prevy:
+                event.delta = -sectionmoved
+            elif nowy < self.prevy:
+                event.delta = sectionmoved
+            else:
+                event.delta = 0
+            self.prevy= nowy
+
+            self.scrollposition += event.delta
+            canvas.yview_moveto(self.scrollposition/ self.canvasheight)
+
+        self.bind("<Enter>", lambda _: self.bind_all('<Button-1>', on_press), '+')
+        self.bind("<Leave>", lambda _: self.unbind_all('<Button-1>'), '+')
+        self.bind("<Enter>", lambda _: self.bind_all('<B1-Motion>', on_touch_scroll), '+')
+        self.bind("<Leave>", lambda _: self.unbind_all('<B1-Motion>'), '+')
