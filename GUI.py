@@ -36,19 +36,19 @@ style.use("seaborn-darkgrid")
 from vertical_scroll_frame import VerticalScrolledFrame
 #create figure for plots and set figure size/layout
 f = Figure(figsize=(8.6,32), dpi=100)
-f.subplots_adjust(top=0.985, bottom=0.015)
+f.subplots_adjust(top=0.993, bottom=0.015)
 #plots
-plot1 = f.add_subplot(11,1,1)
-plot2 = f.add_subplot(11,1,2)
-plot3 = f.add_subplot(11,1,3)
-plot4 = f.add_subplot(11,1,4)
-plot5 = f.add_subplot(11,1,5)
-plot6 = f.add_subplot(11,1,6)
-plot7 = f.add_subplot(11,1,7)
-plot8 = f.add_subplot(11,1,8)
-plot9 = f.add_subplot(11,1,9)
-plot10 = f.add_subplot(11,1,10)
-plot11 = f.add_subplot(11,1,11)
+plot1 = f.add_subplot(11,2,1)
+plot2 = f.add_subplot(11,2,2)
+plot3 = f.add_subplot(11,2,3)
+plot4 = f.add_subplot(11,2,4)
+plot5 = f.add_subplot(11,2,5)
+plot6 = f.add_subplot(11,2,6)
+plot7 = f.add_subplot(11,2,7)
+plot8 = f.add_subplot(11,2,8)
+plot9 = f.add_subplot(11,2,9)
+plot10 = f.add_subplot(11,2,10)
+plot11 = f.add_subplot(11,2,11)
 #set file path
 file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
 #animate function
@@ -89,7 +89,6 @@ def animate(ii):
     #values later so we can change graph fill color based on water parameter
     listofzeros = [0] * len(tList)
     #add labels and config axis
-    plot1.set_title("Aquaponic Sensors")
     plot1.set_ylabel("pH (v)")
     plot1.set_ylim(2,4)
     plot2.set_ylabel("Temperature (v)")
@@ -126,7 +125,6 @@ class AllWindow(tk.Tk):
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-
         #create navigation menu
         menubar = tk.Menu(container)
         navimenu = tk.Menu(menubar, tearoff=0)
@@ -168,32 +166,20 @@ class AllWindow(tk.Tk):
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
+        #bring up vertical scroll frame and place it
         scframe = VerticalScrolledFrame(self)
-        scframe.place(x=130, y=20)
-        #btn = tk.Button(scframe.interior, height=1, width=20, text="hello")
-        #btn.pack(padx=10, pady=5, side=tk.TOP)
-        #bring up canvas
-        '''
-        graphframe=tk.Frame(self, width=500, height=1000)
-        graphframe.columnconfigure(0,weight=1)
-        graphframe.rowconfigure(0,weight=1)
-        graphframe.place(x=460, y=30)
-        graphframe.vbar=Scrollbar(graphframe,orient=VERTICAL)
-        '''
+        scframe.place(x=130, y=40)
+        #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
         canvas.draw()
+        #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
         label.place(x=460, y=10)
         #embed graph into canvas
-        #canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
-        #canvas.get_tk_widget().config(width=300, height=700)
         #add navigation bar
         toolbar = NavigationToolbar2Tk(canvas, self)
         toolbar.update()
-        #place graph canvas at specific location
-        #canvas._tkcanvas(scframe.interior)
-        #canvas._tkcanvas.place(x=110, y=35)
         #color variables
         pHcolor = "white"
         #data table labels
