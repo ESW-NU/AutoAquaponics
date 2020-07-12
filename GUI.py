@@ -1,3 +1,4 @@
+#asdf
 import datetime
 from typing import Container
 #import led info, replace with relay info
@@ -457,7 +458,7 @@ class ControlPanel(tk.Frame):
         dropon1=tk.OptionMenu(self, "Turn On", *OptionList)
         dropon1.config(width=10, font=SMALL_FONT)
         dropon1.place(x=570,y=122)
-
+        #asdf
         #fcns triggered by control button
         #fcn to turn LED on or off
     def channel_1(self):
