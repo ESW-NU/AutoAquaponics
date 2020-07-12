@@ -773,144 +773,207 @@ class ControlPanel(tk.Frame):
         #change light button color
             self.channelButton1.configure(bg= "green")
             self.channelButton1.configure(text = "Channel ON")
-        else:
+        elif self.channelButton1.cget('bg') == "green":
             #LED1.value = 0
         #change light button color to red if light off
+            self.channelButton1.configure(bg= "purple")
+            self.channelButton1.configure(text = "Timer ON")
+        elif self.channelButton1.cget('bg') == "purple":
             self.channelButton1.configure(bg= "red")
             self.channelButton1.configure(text = "Channel OFF")
     def channel_2(self):
         if self.channelButton2.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton2.configure(bg= "green")
             self.channelButton2.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton2.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton2.configure(bg= "purple")
+            self.channelButton2.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton2.cget('bg') == "purple":
             self.channelButton2.configure(bg= "red")
             self.channelButton2.configure(text = "Channel OFF")
     def channel_3(self):
         if self.channelButton3.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton3.configure(bg= "green")
             self.channelButton3.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton3.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton3.configure(bg= "purple")
+            self.channelButton3.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton3.cget('bg') == "purple":
             self.channelButton3.configure(bg= "red")
             self.channelButton3.configure(text = "Channel OFF")
     def channel_4(self):
         if self.channelButton4.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton4.configure(bg= "green")
             self.channelButton4.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton4.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton4.configure(bg= "purple")
+            self.channelButton4.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton4.cget('bg') == "purple":
             self.channelButton4.configure(bg= "red")
             self.channelButton4.configure(text = "Channel OFF")
     def channel_5(self):
         if self.channelButton5.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton5.configure(bg= "green")
             self.channelButton5.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton5.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton5.configure(bg= "purple")
+            self.channelButton5.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton5.cget('bg') == "purple":
             self.channelButton5.configure(bg= "red")
             self.channelButton5.configure(text = "Channel OFF")
     def channel_6(self):
         if self.channelButton6.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton6.configure(bg= "green")
             self.channelButton6.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton6.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton6.configure(bg= "purple")
+            self.channelButton6.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton6.cget('bg') == "purple":
             self.channelButton6.configure(bg= "red")
             self.channelButton6.configure(text = "Channel OFF")
     def channel_7(self):
         if self.channelButton7.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton7.configure(bg= "green")
             self.channelButton7.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton7.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton7.configure(bg= "purple")
+            self.channelButton7.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton7.cget('bg') == "purple":
             self.channelButton7.configure(bg= "red")
             self.channelButton7.configure(text = "Channel OFF")
     def channel_8(self):
         if self.channelButton8.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton8.configure(bg= "green")
             self.channelButton8.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton8.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton8.configure(bg= "purple")
+            self.channelButton8.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton8.cget('bg') == "purple":
             self.channelButton8.configure(bg= "red")
             self.channelButton8.configure(text = "Channel OFF")
     def channel_9(self):
         if self.channelButton9.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton9.configure(bg= "green")
             self.channelButton9.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton9.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton9.configure(bg= "purple")
+            self.channelButton9.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton9.cget('bg') == "purple":
             self.channelButton9.configure(bg= "red")
             self.channelButton9.configure(text = "Channel OFF")
     def channel_10(self):
         if self.channelButton10.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton10.configure(bg= "green")
             self.channelButton10.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton10.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton10.configure(bg= "purple")
+            self.channelButton10.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton10.cget('bg') == "purple":
             self.channelButton10.configure(bg= "red")
             self.channelButton10.configure(text = "Channel OFF")
     def channel_11(self):
         if self.channelButton11.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton11.configure(bg= "green")
             self.channelButton11.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton11.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton11.configure(bg= "purple")
+            self.channelButton11.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton11.cget('bg') == "purple":
             self.channelButton11.configure(bg= "red")
             self.channelButton11.configure(text = "Channel OFF")
     def channel_12(self):
         if self.channelButton12.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton12.configure(bg= "green")
             self.channelButton12.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton12.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton12.configure(bg= "purple")
+            self.channelButton12.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton12.cget('bg') == "purple":
             self.channelButton12.configure(bg= "red")
             self.channelButton12.configure(text = "Channel OFF")
     def channel_13(self):
         if self.channelButton13.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton13.configure(bg= "green")
             self.channelButton13.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton13.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton13.configure(bg= "purple")
+            self.channelButton13.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton13.cget('bg') == "purple":
             self.channelButton13.configure(bg= "red")
             self.channelButton13.configure(text = "Channel OFF")
     def channel_14(self):
         if self.channelButton14.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton14.configure(bg= "green")
             self.channelButton14.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton14.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton14.configure(bg= "purple")
+            self.channelButton14.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton14.cget('bg') == "purple":
             self.channelButton14.configure(bg= "red")
             self.channelButton14.configure(text = "Channel OFF")
     def channel_15(self):
         if self.channelButton15.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton15.configure(bg= "green")
             self.channelButton15.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton15.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton15.configure(bg= "purple")
+            self.channelButton15.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton15.cget('bg') == "purple":
             self.channelButton15.configure(bg= "red")
             self.channelButton15.configure(text = "Channel OFF")
     def channel_16(self):
         if self.channelButton16.cget('bg') == "red":
-        #change light button color
+        #change channel button color to green when channel is forced on
             self.channelButton16.configure(bg= "green")
             self.channelButton16.configure(text = "Channel ON")
-        else:
-        #change light button color to red if light off
+        elif self.channelButton16.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton16.configure(bg= "purple")
+            self.channelButton16.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton16.cget('bg') == "purple":
             self.channelButton16.configure(bg= "red")
             self.channelButton16.configure(text = "Channel OFF")
 
