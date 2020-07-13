@@ -326,7 +326,7 @@ class ControlPanel(tk.Frame):
         Channel_7 = tk.Label(self, text="7", bg='white', font = SMALL_FONT)
         Channel_7.grid(row = 10, column=1)
         Channel_8 = tk.Label(self, text="8", bg='white', font = SMALL_FONT)
-        Channel_8.grid(row = 11, column=1)
+        Channel_8.grid(row = 11, column=1, pady=(0,20))
         Channel_9 = tk.Label(self, text="9", bg='white', font = SMALL_FONT)
         Channel_9.grid(row = 4, column=7, padx=(40,0))
         Channel_10 = tk.Label(self, text="10", bg='white', font = SMALL_FONT)
@@ -342,7 +342,7 @@ class ControlPanel(tk.Frame):
         Channel_15 = tk.Label(self, text="15", bg='white', font = SMALL_FONT)
         Channel_15.grid(row = 10, column=7, padx=(40,0))
         Channel_16 = tk.Label(self, text="16", bg='white', font = SMALL_FONT)
-        Channel_16.grid(row = 11, column=7, padx=(40,0))
+        Channel_16.grid(row = 11, column=7, padx=(40,0), pady=(0,20))
     #relay control buttons
         #relays 1-8
         self.channelButton1 = tk.Button(self, text="Channel OFF",
@@ -559,7 +559,7 @@ class ControlPanel(tk.Frame):
         round(float(self.off9.get()),2), round(float(self.off10.get()),2), round(float(self.off11.get()),2), round(float(self.off12.get()),2),
         round(float(self.off13.get()),2), round(float(self.off14.get()),2), round(float(self.off15.get()),2), round(float(self.off16.get()),2)]
         #write two rows of data into csv, erase past info
-        with open(config_path, 'w') as file:
+        with open(config_path, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerows([on_config,off_config])
             file.flush()
@@ -619,22 +619,22 @@ class ControlPanel(tk.Frame):
             self.on14.insert(0, config_settings[0][13])
             self.on15.insert(0, config_settings[0][14])
             self.on16.insert(0, config_settings[0][15])
-            self.off1.insert(0, config_settings[2][0])
-            self.off2.insert(0, config_settings[2][1])
-            self.off3.insert(0, config_settings[2][2])
-            self.off4.insert(0, config_settings[2][3])
-            self.off5.insert(0, config_settings[2][4])
-            self.off6.insert(0, config_settings[2][5])
-            self.off7.insert(0, config_settings[2][6])
-            self.off8.insert(0, config_settings[2][7])
-            self.off9.insert(0, config_settings[2][8])
-            self.off10.insert(0, config_settings[2][9])
-            self.off11.insert(0, config_settings[2][10])
-            self.off12.insert(0, config_settings[2][11])
-            self.off13.insert(0, config_settings[2][12])
-            self.off14.insert(0, config_settings[2][13])
-            self.off15.insert(0, config_settings[2][14])
-            self.off16.insert(0, config_settings[2][15])
+            self.off1.insert(0, config_settings[1][0])
+            self.off2.insert(0, config_settings[1][1])
+            self.off3.insert(0, config_settings[1][2])
+            self.off4.insert(0, config_settings[1][3])
+            self.off5.insert(0, config_settings[1][4])
+            self.off6.insert(0, config_settings[1][5])
+            self.off7.insert(0, config_settings[1][6])
+            self.off8.insert(0, config_settings[1][7])
+            self.off9.insert(0, config_settings[1][8])
+            self.off10.insert(0, config_settings[1][9])
+            self.off11.insert(0, config_settings[1][10])
+            self.off12.insert(0, config_settings[1][11])
+            self.off13.insert(0, config_settings[1][12])
+            self.off14.insert(0, config_settings[1][13])
+            self.off15.insert(0, config_settings[1][14])
+            self.off16.insert(0, config_settings[1][15])
             open(config_path,"r").close()
             gc.collect()
         #fcns triggered by control button
