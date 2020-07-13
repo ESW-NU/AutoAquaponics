@@ -32,6 +32,10 @@ from matplotlib import style
 style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
+#set file path
+file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
+#set path for file that stores Settings/Control Panel config
+config_path = "/Users/Bill Yen/Desktop/NU Urban Ag/config.csv"
 #create figure for plots and set figure size/layout
 f = Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015)
@@ -47,8 +51,6 @@ plot8 = f.add_subplot(6,2,8)
 plot9 = f.add_subplot(6,2,9)
 plot10 = f.add_subplot(6,2,10)
 plot11 = f.add_subplot(6,2,11)
-#set file path
-file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
 #animate function
 def animate(ii):
     pullData = open(file_path,"r").read()
@@ -302,129 +304,131 @@ class ControlPanel(tk.Frame):
         navibutton1.grid(row = 1, columnspan = 14)
 
     #Save button
-        saveButton=ttk.Button(self, text="Save")
-        saveButton.grid(row=2, columnspan=14, pady=(0,20))
+        self.saveButton= ttk.Button(self, text="Save", command=self.popup)
+        self.saveButton.grid(row=2, columnspan=14, pady=(0,0))
+    #Discard button
+        self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
+        self.discardButton.grid(row=3, columnspan=14, pady=(0,20))
 
     #channel labels
         Channel_1 = tk.Label(self, text="1", bg='white', font = SMALL_FONT)
-        Channel_1.grid(row = 3, column=1)
+        Channel_1.grid(row = 4, column=1)
         Channel_2 = tk.Label(self, text="2", bg='white', font = SMALL_FONT)
-        Channel_2.grid(row = 4, column=1)
+        Channel_2.grid(row = 5, column=1)
         Channel_3 = tk.Label(self, text="3", bg='white', font = SMALL_FONT)
-        Channel_3.grid(row = 5, column=1)
+        Channel_3.grid(row = 6, column=1)
         Channel_4 = tk.Label(self, text="4", bg='white', font = SMALL_FONT)
-        Channel_4.grid(row = 6, column=1)
+        Channel_4.grid(row = 7, column=1)
         Channel_5 = tk.Label(self, text="5", bg='white', font = SMALL_FONT)
-        Channel_5.grid(row = 7, column=1)
+        Channel_5.grid(row = 8, column=1)
         Channel_6 = tk.Label(self, text="6", bg='white', font = SMALL_FONT)
-        Channel_6.grid(row = 8, column=1)
+        Channel_6.grid(row = 9, column=1)
         Channel_7 = tk.Label(self, text="7", bg='white', font = SMALL_FONT)
-        Channel_7.grid(row = 9, column=1)
+        Channel_7.grid(row = 10, column=1)
         Channel_8 = tk.Label(self, text="8", bg='white', font = SMALL_FONT)
-        Channel_8.grid(row = 10, column=1)
+        Channel_8.grid(row = 11, column=1)
         Channel_9 = tk.Label(self, text="9", bg='white', font = SMALL_FONT)
-        Channel_9.grid(row = 3, column=7, padx=(40,0))
+        Channel_9.grid(row = 4, column=7, padx=(40,0))
         Channel_10 = tk.Label(self, text="10", bg='white', font = SMALL_FONT)
-        Channel_10.grid(row = 4, column=7, padx=(40,0))
+        Channel_10.grid(row = 5, column=7, padx=(40,0))
         Channel_11 = tk.Label(self, text="11", bg='white', font = SMALL_FONT)
-        Channel_11.grid(row = 5, column=7, padx=(40,0))
+        Channel_11.grid(row = 6, column=7, padx=(40,0))
         Channel_12 = tk.Label(self, text="12", bg='white', font = SMALL_FONT)
-        Channel_12.grid(row = 6, column=7, padx=(40,0))
+        Channel_12.grid(row = 7, column=7, padx=(40,0))
         Channel_13 = tk.Label(self, text="13", bg='white', font = SMALL_FONT)
-        Channel_13.grid(row = 7, column=7, padx=(40,0))
+        Channel_13.grid(row = 8, column=7, padx=(40,0))
         Channel_14 = tk.Label(self, text="14", bg='white', font = SMALL_FONT)
-        Channel_14.grid(row = 8, column=7, padx=(40,0))
+        Channel_14.grid(row = 9, column=7, padx=(40,0))
         Channel_15 = tk.Label(self, text="15", bg='white', font = SMALL_FONT)
-        Channel_15.grid(row = 9, column=7, padx=(40,0))
+        Channel_15.grid(row = 10, column=7, padx=(40,0))
         Channel_16 = tk.Label(self, text="16", bg='white', font = SMALL_FONT)
-        Channel_16.grid(row = 10, column=7, padx=(40,0))
+        Channel_16.grid(row = 11, column=7, padx=(40,0))
     #relay control buttons
         #relays 1-8
         self.channelButton1 = tk.Button(self, text="Channel OFF",
                                         bg= "red", fg= "white",
                                         width=10, height=1,
                                         command=self.channel_1)
-        self.channelButton1.grid(row = 3, column=2)
+        self.channelButton1.grid(row = 4, column=2)
         self.channelButton2 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_2)
-        self.channelButton2.grid(row = 4, column=2)
+        self.channelButton2.grid(row = 5, column=2)
         self.channelButton3 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_3)
-        self.channelButton3.grid(row = 5, column=2)
+        self.channelButton3.grid(row = 6, column=2)
         self.channelButton4 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_4)
-        self.channelButton4.grid(row = 6, column=2)
+        self.channelButton4.grid(row = 7, column=2)
         self.channelButton5 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_5)
-        self.channelButton5.grid(row = 7, column=2)
+        self.channelButton5.grid(row = 8, column=2)
         self.channelButton6 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_6)
-        self.channelButton6.grid(row = 8, column=2)
+        self.channelButton6.grid(row = 9, column=2)
         self.channelButton7 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_7)
-        self.channelButton7.grid(row = 9, column=2)
+        self.channelButton7.grid(row = 10, column=2)
         self.channelButton8 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_8)
-        self.channelButton8.grid(row = 10, column=2)
+        self.channelButton8.grid(row = 11, column=2, pady=(0,20))
         #relays 9-16
         self.channelButton9 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_9)
-        self.channelButton9.grid(row = 3, column=8)
+        self.channelButton9.grid(row = 4, column=8)
         self.channelButton10 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_10)
-        self.channelButton10.grid(row = 4, column=8)
+        self.channelButton10.grid(row = 5, column=8)
         self.channelButton11 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_11)
-        self.channelButton11.grid(row = 5, column=8)
+        self.channelButton11.grid(row = 6, column=8)
         self.channelButton12 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_12)
-        self.channelButton12.grid(row = 6, column=8)
+        self.channelButton12.grid(row = 7, column=8)
         self.channelButton13 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_13)
-        self.channelButton13.grid(row = 7, column=8)
+        self.channelButton13.grid(row = 8, column=8)
         self.channelButton14 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_14)
-        self.channelButton14.grid(row = 8, column=8)
+        self.channelButton14.grid(row = 9, column=8)
         self.channelButton15 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_15)
-        self.channelButton15.grid(row = 9, column=8)
+        self.channelButton15.grid(row = 10, column=8)
         self.channelButton16 = tk.Button(self, text="Channel OFF",
                                          bg= "red", fg= "white",
                                          width=10, height=1,
                                          command=self.channel_16)
-        self.channelButton16.grid(row = 10, column=8)
+        self.channelButton16.grid(row = 11, column=8, pady=(0,20))
 
     #Entry widgets for Channel OverWrite Times
         #Labels for each:
-        tk.Label(self, text="Turn on for:", bg="white").grid(row=3, column=3)
         tk.Label(self, text="Turn on for:", bg="white").grid(row=4, column=3)
         tk.Label(self, text="Turn on for:", bg="white").grid(row=5, column=3)
         tk.Label(self, text="Turn on for:", bg="white").grid(row=6, column=3)
@@ -432,7 +436,7 @@ class ControlPanel(tk.Frame):
         tk.Label(self, text="Turn on for:", bg="white").grid(row=8, column=3)
         tk.Label(self, text="Turn on for:", bg="white").grid(row=9, column=3)
         tk.Label(self, text="Turn on for:", bg="white").grid(row=10, column=3)
-        tk.Label(self, text="Turn on for:", bg="white").grid(row=3, column=9)
+        tk.Label(self, text="Turn on for:", bg="white").grid(row=11, column=3, pady=(0,10))
         tk.Label(self, text="Turn on for:", bg="white").grid(row=4, column=9)
         tk.Label(self, text="Turn on for:", bg="white").grid(row=5, column=9)
         tk.Label(self, text="Turn on for:", bg="white").grid(row=6, column=9)
@@ -440,8 +444,8 @@ class ControlPanel(tk.Frame):
         tk.Label(self, text="Turn on for:", bg="white").grid(row=8, column=9)
         tk.Label(self, text="Turn on for:", bg="white").grid(row=9, column=9)
         tk.Label(self, text="Turn on for:", bg="white").grid(row=10, column=9)
+        tk.Label(self, text="Turn on for:", bg="white").grid(row=11, column=9, pady=(0,10))
 
-        tk.Label(self, text="Turn off for:", bg="white").grid(row=3, column=5)
         tk.Label(self, text="Turn off for:", bg="white").grid(row=4, column=5)
         tk.Label(self, text="Turn off for:", bg="white").grid(row=5, column=5)
         tk.Label(self, text="Turn off for:", bg="white").grid(row=6, column=5)
@@ -449,7 +453,7 @@ class ControlPanel(tk.Frame):
         tk.Label(self, text="Turn off for:", bg="white").grid(row=8, column=5)
         tk.Label(self, text="Turn off for:", bg="white").grid(row=9, column=5)
         tk.Label(self, text="Turn off for:", bg="white").grid(row=10, column=5)
-        tk.Label(self, text="Turn off for:", bg="white").grid(row=3, column=11)
+        tk.Label(self, text="Turn off for:", bg="white").grid(row=11, column=5, pady=(0,10))
         tk.Label(self, text="Turn off for:", bg="white").grid(row=4, column=11)
         tk.Label(self, text="Turn off for:", bg="white").grid(row=5, column=11)
         tk.Label(self, text="Turn off for:", bg="white").grid(row=6, column=11)
@@ -457,80 +461,183 @@ class ControlPanel(tk.Frame):
         tk.Label(self, text="Turn off for:", bg="white").grid(row=8, column=11)
         tk.Label(self, text="Turn off for:", bg="white").grid(row=9, column=11)
         tk.Label(self, text="Turn off for:", bg="white").grid(row=10, column=11)
+        tk.Label(self, text="Turn off for:", bg="white").grid(row=11, column=11, pady=(0,10))
 
         #Entries
-        on1=tk.Entry(self, width = 10)
-        on1.grid(row = 3, column = 4)
-        on2=tk.Entry(self, width = 10)
-        on2.grid(row = 4, column = 4)
-        on3=tk.Entry(self, width = 10)
-        on3.grid(row = 5, column = 4)
-        on4=tk.Entry(self, width = 10)
-        on4.grid(row = 6, column = 4)
-        on5=tk.Entry(self, width = 10)
-        on5.grid(row = 7, column = 4)
-        on6=tk.Entry(self, width = 10)
-        on6.grid(row = 8, column = 4)
-        on7=tk.Entry(self, width = 10)
-        on7.grid(row = 9, column = 4)
-        on8=tk.Entry(self, width = 10)
-        on8.grid(row = 10, column =4)
-        on9=tk.Entry(self, width = 10)
-        on9.grid(row=3, column=10)
-        on10=tk.Entry(self, width = 10)
-        on10.grid(row=4, column=10)
-        on11=tk.Entry(self, width = 10)
-        on11.grid(row=5, column=10)
-        on12=tk.Entry(self, width = 10)
-        on12.grid(row=6, column=10)
-        on13=tk.Entry(self, width = 10)
-        on13.grid(row=7, column=10)
-        on14=tk.Entry(self, width = 10)
-        on14.grid(row=8, column=10)
-        on15=tk.Entry(self, width = 10)
-        on15.grid(row=9, column=10)
-        on16=tk.Entry(self, width = 10)
-        on16.grid(row=10, column=10)
-        off1=tk.Entry(self, width = 10)
-        off1.grid(row=3, column = 6)
-        off2=tk.Entry(self, width = 10)
-        off2.grid(row=4, column = 6)
-        off3=tk.Entry(self, width = 10)
-        off3.grid(row=5, column = 6)
-        off4=tk.Entry(self, width = 10)
-        off4.grid(row=6, column = 6)
-        off5=tk.Entry(self, width = 10)
-        off5.grid(row=7, column = 6)
-        off6=tk.Entry(self, width = 10)
-        off6.grid(row=8, column = 6)
-        off7=tk.Entry(self, width = 10)
-        off7.grid(row=9, column = 6)
-        off8=tk.Entry(self, width = 10)
-        off8.grid(row=10, column =6)
-        off9=tk.Entry(self, width = 10)
-        off9.grid(row=3, column = 12)
-        off10=tk.Entry(self, width = 10)
-        off10.grid(row=4, column=12)
-        off11=tk.Entry(self, width = 10)
-        off11.grid(row=5, column=12)
-        off12=tk.Entry(self, width = 10)
-        off12.grid(row=6, column=12)
-        off13=tk.Entry(self, width = 10)
-        off13.grid(row=7, column=12)
-        off14=tk.Entry(self, width = 10)
-        off14.grid(row=8, column=12)
-        off15=tk.Entry(self, width = 10)
-        off15.grid(row=9, column=12)
-        off16=tk.Entry(self, width = 10)
-        off16.grid(row=10, column= 12)
-
-        tk.Label(self, text="(Input time in hours!)", bg="white").grid(row=11, columnspan=14)
+        self.on1 = tk.Entry(self, width = 10)
+        self.on1.grid(row = 4, column = 4)
+        self.on2=tk.Entry(self, width = 10)
+        self.on2.grid(row = 5, column = 4)
+        self.on3=tk.Entry(self, width = 10)
+        self.on3.grid(row = 6, column = 4)
+        self.on4=tk.Entry(self, width = 10)
+        self.on4.grid(row = 7, column = 4)
+        self.on5=tk.Entry(self, width = 10)
+        self.on5.grid(row = 8, column = 4)
+        self.on6=tk.Entry(self, width = 10)
+        self.on6.grid(row = 9, column = 4)
+        self.on7=tk.Entry(self, width = 10)
+        self.on7.grid(row = 10, column = 4)
+        self.on8=tk.Entry(self, width = 10)
+        self.on8.grid(row = 11, column =4, pady=(0,10))
+        self.on9=tk.Entry(self, width = 10)
+        self.on9.grid(row=4, column=10)
+        self.on10=tk.Entry(self, width = 10)
+        self.on10.grid(row=5, column=10)
+        self.on11=tk.Entry(self, width = 10)
+        self.on11.grid(row=6, column=10)
+        self.on12=tk.Entry(self, width = 10)
+        self.on12.grid(row=7, column=10)
+        self.on13=tk.Entry(self, width = 10)
+        self.on13.grid(row=8, column=10)
+        self.on14=tk.Entry(self, width = 10)
+        self.on14.grid(row=9, column=10)
+        self.on15=tk.Entry(self, width = 10)
+        self.on15.grid(row=10, column=10)
+        self.on16=tk.Entry(self, width = 10)
+        self.on16.grid(row=11, column=10, pady=(0,10))
+        self.off1=tk.Entry(self, width = 10)
+        self.off1.grid(row=4, column = 6)
+        self.off2=tk.Entry(self, width = 10)
+        self.off2.grid(row=5, column = 6)
+        self.off3=tk.Entry(self, width = 10)
+        self.off3.grid(row=6, column = 6)
+        self.off4=tk.Entry(self, width = 10)
+        self.off4.grid(row=7, column = 6)
+        self.off5=tk.Entry(self, width = 10)
+        self.off5.grid(row=8, column = 6)
+        self.off6=tk.Entry(self, width = 10)
+        self.off6.grid(row=9, column = 6)
+        self.off7=tk.Entry(self, width = 10)
+        self.off7.grid(row=10, column = 6)
+        self.off8=tk.Entry(self, width = 10)
+        self.off8.grid(row=11, column =6, pady=(0,10))
+        self.off9=tk.Entry(self, width = 10)
+        self.off9.grid(row=4, column = 12)
+        self.off10=tk.Entry(self, width = 10)
+        self.off10.grid(row=5, column=12)
+        self.off11=tk.Entry(self, width = 10)
+        self.off11.grid(row=6, column=12)
+        self.off12=tk.Entry(self, width = 10)
+        self.off12.grid(row=7, column=12)
+        self.off13=tk.Entry(self, width = 10)
+        self.off13.grid(row=8, column=12)
+        self.off14=tk.Entry(self, width = 10)
+        self.off14.grid(row=9, column=12)
+        self.off15=tk.Entry(self, width = 10)
+        self.off15.grid(row=10, column=12)
+        self.off16=tk.Entry(self, width = 10)
+        self.off16.grid(row=11, column= 12, pady=(0,10))
+        #calls on discard() to initialize entry values
+        self.discard()
+        #Tells user what to input
+        tk.Label(self, text="*Input Time in Hours", bg="white").grid(row=12, columnspan=14)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(13, weight=1)
 
+        #fcn triggered by save button
+    def popup(self):
+        #get the input of all entries as a float value to the hundredth place
+        self.popup = tk.Tk()
+        self.popup.wm_title("Message")
+        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        YesB = ttk.Button(self.popup, text="YES", command = self.save)
+        YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
+        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+        NoB.grid(row=1, column=2, pady = (0,10))
+        self.popup.mainloop()
+    #triggered if user press YES in popup window
+    def save(self):
+        on_config = [round(float(self.on1.get()),2), round(float(self.on2.get()),2), round(float(self.on3.get()),2), round(float(self.on4.get()),2),
+        round(float(self.on5.get()),2), round(float(self.on6.get()),2), round(float(self.on7.get()),2), round(float(self.on8.get()),2),
+        round(float(self.on9.get()),2), round(float(self.on10.get()),2), round(float(self.on11.get()),2), round(float(self.on12.get()),2),
+        round(float(self.on13.get()),2), round(float(self.on14.get()),2), round(float(self.on15.get()),2), round(float(self.on16.get()),2)]
+        off_config = [round(float(self.off1.get()),2), round(float(self.off2.get()),2), round(float(self.off3.get()),2), round(float(self.off4.get()),2),
+        round(float(self.off5.get()),2), round(float(self.off6.get()),2), round(float(self.off7.get()),2), round(float(self.off8.get()),2),
+        round(float(self.off9.get()),2), round(float(self.off10.get()),2), round(float(self.off11.get()),2), round(float(self.off12.get()),2),
+        round(float(self.off13.get()),2), round(float(self.off14.get()),2), round(float(self.off15.get()),2), round(float(self.off16.get()),2)]
+        #write two rows of data into csv, erase past info
+        with open(config_path, 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows([on_config,off_config])
+            file.flush()
+        #destroy popup window after writing file
+        self.popup.destroy()
+        #fcn triggered by discard button
+    def discard(self):
+        #Delete current values
+        self.on1.delete(0, END)
+        self.on2.delete(0, END)
+        self.on3.delete(0, END)
+        self.on4.delete(0, END)
+        self.on5.delete(0, END)
+        self.on6.delete(0, END)
+        self.on7.delete(0, END)
+        self.on8.delete(0, END)
+        self.on9.delete(0, END)
+        self.on10.delete(0, END)
+        self.on11.delete(0, END)
+        self.on12.delete(0, END)
+        self.on13.delete(0, END)
+        self.on14.delete(0, END)
+        self.on15.delete(0, END)
+        self.on16.delete(0, END)
+        self.off1.delete(0, END)
+        self.off2.delete(0, END)
+        self.off3.delete(0, END)
+        self.off4.delete(0, END)
+        self.off5.delete(0, END)
+        self.off6.delete(0, END)
+        self.off7.delete(0, END)
+        self.off8.delete(0, END)
+        self.off9.delete(0, END)
+        self.off10.delete(0, END)
+        self.off11.delete(0, END)
+        self.off12.delete(0, END)
+        self.off13.delete(0, END)
+        self.off14.delete(0, END)
+        self.off15.delete(0, END)
+        self.off16.delete(0, END)
+        #Get last saved values
+        with open(config_path, "r") as file:
+            config_settings = list(csv.reader(file))
+            self.on1.insert(0, config_settings[0][0])
+            self.on2.insert(0, config_settings[0][1])
+            self.on3.insert(0, config_settings[0][2])
+            self.on4.insert(0, config_settings[0][3])
+            self.on5.insert(0, config_settings[0][4])
+            self.on6.insert(0, config_settings[0][5])
+            self.on7.insert(0, config_settings[0][6])
+            self.on8.insert(0, config_settings[0][7])
+            self.on9.insert(0, config_settings[0][8])
+            self.on10.insert(0, config_settings[0][9])
+            self.on11.insert(0, config_settings[0][10])
+            self.on12.insert(0, config_settings[0][11])
+            self.on13.insert(0, config_settings[0][12])
+            self.on14.insert(0, config_settings[0][13])
+            self.on15.insert(0, config_settings[0][14])
+            self.on16.insert(0, config_settings[0][15])
+            self.off1.insert(0, config_settings[2][0])
+            self.off2.insert(0, config_settings[2][1])
+            self.off3.insert(0, config_settings[2][2])
+            self.off4.insert(0, config_settings[2][3])
+            self.off5.insert(0, config_settings[2][4])
+            self.off6.insert(0, config_settings[2][5])
+            self.off7.insert(0, config_settings[2][6])
+            self.off8.insert(0, config_settings[2][7])
+            self.off9.insert(0, config_settings[2][8])
+            self.off10.insert(0, config_settings[2][9])
+            self.off11.insert(0, config_settings[2][10])
+            self.off12.insert(0, config_settings[2][11])
+            self.off13.insert(0, config_settings[2][12])
+            self.off14.insert(0, config_settings[2][13])
+            self.off15.insert(0, config_settings[2][14])
+            self.off16.insert(0, config_settings[2][15])
+            open(config_path,"r").close()
+            gc.collect()
         #fcns triggered by control button
-        #fcn to turn LED on or off
     def channel_1(self):
         #if LED1.value == 0:
         #    LED1.value = 1
