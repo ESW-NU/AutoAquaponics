@@ -1,4 +1,3 @@
-#asdf
 import datetime
 from typing import Container
 #import led info, replace with relay info
@@ -51,7 +50,7 @@ plot9 = f.add_subplot(6,2,9)
 plot10 = f.add_subplot(6,2,10)
 plot11 = f.add_subplot(6,2,11)
 #set file path
-file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
+file_path = "/Users/jazpe/Desktop/AutoAquaponics-master"
 #animate function
 def animate(ii):
     pullData = open(file_path,"r").read()
@@ -428,37 +427,569 @@ class ControlPanel(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
+class ControlPanel(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+    #text labels
+        Title = tk.Label(self, text="Control Panel", bg= 'white', font = TITLE_FONT)
+        Title.pack(pady=10, padx=10)
+        ChannelTitle = tk.Label(self, text="Channel Overrides", bg='white', font = MEDIUM_FONT)
+        ChannelTitle.place(x=108, y=90)
+    
+    #navigation button
+        navibutton1 = ttk.Button(self, text="Back to Dashboard",
+                            command=lambda: controller.show_frame(HomePage))
+        navibutton1.pack()
+            
+    #Save button
+        saveButton=ttk.Button(self, text="Save")
+        saveButton.pack()
+
+    #channel labels
+        Channel_1 = tk.Label(self, text="1", bg='white', font = SMALL_FONT)
+        Channel_1.place(x=38, y=122)
+        Channel_2 = tk.Label(self, text="2", bg='white', font = SMALL_FONT)
+        Channel_2.place(x=38, y=157)
+        Channel_3 = tk.Label(self, text="3", bg='white', font = SMALL_FONT)
+        Channel_3.place(x=38, y=192)
+        Channel_4 = tk.Label(self, text="4", bg='white', font = SMALL_FONT)
+        Channel_4.place(x=38, y=227)
+        Channel_5 = tk.Label(self, text="5", bg='white', font = SMALL_FONT)
+        Channel_5.place(x=38, y=262)
+        Channel_6 = tk.Label(self, text="6", bg='white', font = SMALL_FONT)
+        Channel_6.place(x=38, y=297)
+        Channel_7 = tk.Label(self, text="7", bg='white', font = SMALL_FONT)
+        Channel_7.place(x=38, y=332)
+        Channel_8 = tk.Label(self, text="8", bg='white', font = SMALL_FONT)
+        Channel_8.place(x=38, y=367)
+        Channel_9 = tk.Label(self, text="9", bg='white', font = SMALL_FONT)
+        Channel_9.place(x=385, y=122)
+        Channel_10 = tk.Label(self, text="10", bg='white', font = SMALL_FONT)
+        Channel_10.place(x=385, y=157)
+        Channel_11 = tk.Label(self, text="11", bg='white', font = SMALL_FONT)
+        Channel_11.place(x=385, y=192)
+        Channel_12 = tk.Label(self, text="12", bg='white', font = SMALL_FONT)
+        Channel_12.place(x=385, y=227)
+        Channel_13 = tk.Label(self, text="13", bg='white', font = SMALL_FONT)
+        Channel_13.place(x=385, y=262)
+        Channel_14 = tk.Label(self, text="14", bg='white', font = SMALL_FONT)
+        Channel_14.place(x=385, y=297)
+        Channel_15 = tk.Label(self, text="15", bg='white', font = SMALL_FONT)
+        Channel_15.place(x=385, y=332)
+        Channel_16 = tk.Label(self, text="16", bg='white', font = SMALL_FONT)
+        Channel_16.place(x=385, y=367)
+    #relay control buttons
+        #relays 1-8
+        self.channelButton1 = tk.Button(self, text="Channel OFF",
+                                        bg= "red", fg= "white",
+                                        width=10, height=1,
+                                        command=self.channel_1)
+        self.channelButton1.place(x=50, y=115)
+        self.channelButton2 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_2)
+        self.channelButton2.place(x=50, y=150)
+        self.channelButton3 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_3)
+        self.channelButton3.place(x=50, y=185)
+        self.channelButton4 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_4)
+        self.channelButton4.place(x=50, y=220)
+        self.channelButton5 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_5)
+        self.channelButton5.place(x=50, y=255)
+        self.channelButton6 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_6)
+        self.channelButton6.place(x=50, y=290)
+        self.channelButton7 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_7)
+        self.channelButton7.place(x=50, y=325)
+        self.channelButton8 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_8)
+        self.channelButton8.place(x=50, y=360)
+        #relays 9-16
+        self.channelButton9 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_9)
+        self.channelButton9.place(x=405, y=115)
+        self.channelButton10 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_10)
+        self.channelButton10.place(x=405, y=150)
+        self.channelButton11 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_11)
+        self.channelButton11.place(x=405, y=185)
+        self.channelButton12 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_12)
+        self.channelButton12.place(x=405, y=220)
+        self.channelButton13 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_13)
+        self.channelButton13.place(x=405, y=255)
+        self.channelButton14 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_14)
+        self.channelButton14.place(x=405, y=290)
+        self.channelButton15 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_15)
+        self.channelButton15.place(x=405, y=325)
+        self.channelButton16 = tk.Button(self, text="Channel OFF",
+                                         bg= "red", fg= "white",
+                                         width=10, height=1,
+                                         command=self.channel_16)
+        self.channelButton16.place(x=405, y=360)
+    
+    #Dropdown menus for Channel OverWrite Times
         OptionList = [
-        "00:00",
-        "01:00",
-        "02:00",
-        "03:00",
-        "04:00",
-        "05:00",
-        "06:00",
-        "07:00",
-        "08:00",
-        "09:00",
-        "10:00",
-        "11:00",
-        "12:00",
-        "13:00",
-        "14:00",
-        "15:00",
-        "16:00",
-        "17:00",
-        "18:00",
-        "19:00",
-        "20:00",
-        "21:00",
-        "22:00",
-        "23:00",
+        "Turn on at:", "00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00", "08:00", "09:00",
+        "10:00","11:00", "12:00","13:00", "14:00","15:00","16:00", "17:00", "18:00", "19:00",
+        "20:00","21:00","22:00","23:00",
+        ]
+        OptionList1 = [
+        "Turn off at:", "00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00", "08:00", "09:00",
+        "10:00","11:00", "12:00","13:00", "14:00","15:00","16:00", "17:00", "18:00", "19:00",
+        "20:00","21:00","22:00","23:00",
         ]
 
-        dropon1=tk.OptionMenu(self, "Turn On", *OptionList)
+        variable1on = tk.StringVar(self)
+        variable1on.set(OptionList[0])
+        dropon1=tk.OptionMenu(self, variable1on, *OptionList)
         dropon1.config(width=10, font=SMALL_FONT)
-        dropon1.place(x=570,y=122)
-        #asdf
+        dropon1.place(x=135,y=115)
+
+        variable2on = tk.StringVar(self)
+        variable2on.set(OptionList[0])
+        dropon2=tk.OptionMenu(self, variable2on, *OptionList)
+        dropon2.config(width=10, font=SMALL_FONT)
+        dropon2.place(x=135,y=150)
+
+        variable3on = tk.StringVar(self)
+        variable3on.set(OptionList[0])
+        dropon3=tk.OptionMenu(self, variable3on, *OptionList)
+        dropon3.config(width=10, font=SMALL_FONT)
+        dropon3.place(x=135,y=185)
+
+        variable4on = tk.StringVar(self)
+        variable4on.set(OptionList[0])
+        dropon4=tk.OptionMenu(self, variable4on, *OptionList)
+        dropon4.config(width=10, font=SMALL_FONT)
+        dropon4.place(x=135,y=220)
+
+        variable5on = tk.StringVar(self)
+        variable5on.set(OptionList[0])
+        dropon5=tk.OptionMenu(self, variable5on, *OptionList)
+        dropon5.config(width=10, font=SMALL_FONT)
+        dropon5.place(x=135,y=255)
+        variable6on = tk.StringVar(self)
+        variable6on.set(OptionList[0])
+        dropon6=tk.OptionMenu(self, variable6on, *OptionList)
+        dropon6.config(width=10, font=SMALL_FONT)
+        dropon6.place(x=135,y=290)
+
+        variable7on = tk.StringVar(self)
+        variable7on.set(OptionList[0])
+        dropon7=tk.OptionMenu(self, variable7on, *OptionList)
+        dropon7.config(width=10, font=SMALL_FONT)
+        dropon7.place(x=135,y=325)
+
+        variable8on = tk.StringVar(self)
+        variable8on.set(OptionList[0])
+        dropon8=tk.OptionMenu(self, variable8on, *OptionList)
+        dropon8.config(width=10, font=SMALL_FONT)
+        dropon8.place(x=135,y=360)
+
+        variable9on = tk.StringVar(self)
+        variable9on.set(OptionList[0])
+        dropon9=tk.OptionMenu(self, variable9on, *OptionList)
+        dropon9.config(width=10, font=SMALL_FONT)
+        dropon9.place(x=490,y=115)
+
+        variable10on = tk.StringVar(self)
+        variable10on.set(OptionList[0])
+        dropon10=tk.OptionMenu(self, variable10on, *OptionList)
+        dropon10.config(width=10, font=SMALL_FONT)
+        dropon10.place(x=490,y=150)
+
+        variable11on = tk.StringVar(self)
+        variable11on.set(OptionList[0])
+        dropon11=tk.OptionMenu(self, variable11on, *OptionList)
+        dropon11.config(width=10, font=SMALL_FONT)
+        dropon11.place(x=490,y=185)
+
+        variable12on = tk.StringVar(self)
+        variable12on.set(OptionList[0])
+        dropon12=tk.OptionMenu(self, variable12on, *OptionList)
+        dropon12.config(width=10, font=SMALL_FONT)
+        dropon12.place(x=490,y=220)
+
+        variable13on = tk.StringVar(self)
+        variable13on.set(OptionList[0])
+        dropon13=tk.OptionMenu(self, variable13on, *OptionList)
+        dropon13.config(width=10, font=SMALL_FONT)
+        dropon13.place(x=490,y=255)
+
+        variable14on = tk.StringVar(self)
+        variable14on.set(OptionList[0])
+        dropon14=tk.OptionMenu(self, variable14on, *OptionList)
+        dropon14.config(width=10, font=SMALL_FONT)
+        dropon14.place(x=490,y=290)
+
+        variable15on = tk.StringVar(self)
+        variable15on.set(OptionList[0])
+        dropon15=tk.OptionMenu(self, variable15on, *OptionList)
+        dropon15.config(width=10, font=SMALL_FONT)
+        dropon15.place(x=490,y=325)
+
+        variable16on = tk.StringVar(self)
+        variable16on.set(OptionList[0])
+        dropon16=tk.OptionMenu(self, variable16on, *OptionList)
+        dropon16.config(width=10, font=SMALL_FONT)
+        dropon16.place(x=490,y=360)
+
+        variable1off = tk.StringVar(self)
+        variable1off.set(OptionList1[0])
+        dropoff1=tk.OptionMenu(self, variable1off, *OptionList)
+        dropoff1.config(width=10, font=SMALL_FONT)
+        dropoff1.place(x=250,y=115)
+
+        variable2off = tk.StringVar(self)
+        variable2off.set(OptionList1[0])
+        dropoff2=tk.OptionMenu(self, variable2off, *OptionList)
+        dropoff2.config(width=10, font=SMALL_FONT)
+        dropoff2.place(x=250,y=150)
+
+        variable3off = tk.StringVar(self)
+        variable3off.set(OptionList1[0])
+        dropoff3=tk.OptionMenu(self, variable3off, *OptionList)
+        dropoff3.config(width=10, font=SMALL_FONT)
+        dropoff3.place(x=250,y=185)
+
+        variable4off = tk.StringVar(self)
+        variable4off.set(OptionList1[0])
+        dropoff4=tk.OptionMenu(self, variable4off, *OptionList)
+        dropoff4.config(width=10, font=SMALL_FONT)
+        dropoff4.place(x=250,y=220)
+
+        variable5off = tk.StringVar(self)
+        variable5off.set(OptionList1[0])
+        dropoff5=tk.OptionMenu(self, variable5off, *OptionList)
+        dropoff5.config(width=10, font=SMALL_FONT)
+        dropoff5.place(x=250,y=255)
+
+        variable6off = tk.StringVar(self)
+        variable6off.set(OptionList1[0])
+        dropoff6=tk.OptionMenu(self, variable6off, *OptionList)
+        dropoff6.config(width=10, font=SMALL_FONT)
+        dropoff6.place(x=250,y=290)
+
+        variable7off = tk.StringVar(self)
+        variable7off.set(OptionList1[0])
+        dropoff7=tk.OptionMenu(self, variable7off, *OptionList)
+        dropoff7.config(width=10, font=SMALL_FONT)
+        dropoff7.place(x=250,y=325)
+
+        variable8off = tk.StringVar(self)
+        variable8off.set(OptionList1[0])
+        dropoff8=tk.OptionMenu(self, variable8off, *OptionList)
+        dropoff8.config(width=10, font=SMALL_FONT)
+        dropoff8.place(x=250,y=360)
+
+        variable9off = tk.StringVar(self)
+        variable9off.set(OptionList1[0])
+        dropoff9=tk.OptionMenu(self, variable9off, *OptionList)
+        dropoff9.config(width=10, font=SMALL_FONT)
+        dropoff9.place(x=605,y=115)
+
+        variable10off = tk.StringVar(self)
+        variable10off.set(OptionList1[0])
+        dropoff10=tk.OptionMenu(self, variable10off, *OptionList)
+        dropoff10.config(width=10, font=SMALL_FONT)
+        dropoff10.place(x=605,y=150)
+
+        variable11off = tk.StringVar(self)
+        variable11off.set(OptionList1[0])
+        dropoff11=tk.OptionMenu(self, variable11off, *OptionList)
+        dropoff11.config(width=10, font=SMALL_FONT)
+        dropoff11.place(x=605,y=185)
+
+        variable12off = tk.StringVar(self)
+        variable12off.set(OptionList1[0])
+        dropoff12=tk.OptionMenu(self, variable12off, *OptionList)
+        dropoff12.config(width=10, font=SMALL_FONT)
+        dropoff12.place(x=605,y=220)
+
+        variable13off = tk.StringVar(self)
+        variable13off.set(OptionList1[0])
+        dropoff13=tk.OptionMenu(self, variable13off, *OptionList)
+        dropoff13.config(width=10, font=SMALL_FONT)
+        dropoff13.place(x=605,y=255)
+
+        variable14off = tk.StringVar(self)
+        variable14off.set(OptionList1[0])
+        dropoff14=tk.OptionMenu(self, variable14off, *OptionList)
+        dropoff14.config(width=10, font=SMALL_FONT)
+        dropoff14.place(x=605,y=290)
+
+        variable15off = tk.StringVar(self)
+        variable15off.set(OptionList1[0])
+        dropoff15=tk.OptionMenu(self, variable15off, *OptionList)
+        dropoff15.config(width=10, font=SMALL_FONT)
+        dropoff15.place(x=605,y=325)
+
+        variable16off = tk.StringVar(self)
+        variable16off.set(OptionList1[0])
+        dropoff16=tk.OptionMenu(self, variable16off, *OptionList)
+        dropoff16.config(width=10, font=SMALL_FONT)
+        dropoff16.place(x=605,y=360)
+        #fcns triggered by control button
+        #fcn to turn LED on or off
+    def channel_1(self):
+        #if LED1.value == 0:
+        #    LED1.value = 1
+        if self.channelButton1.cget('bg') == "red":
+        #change light button color
+            self.channelButton1.configure(bg= "green")
+            self.channelButton1.configure(text = "Channel ON")
+        elif self.channelButton1.cget('bg') == "green":
+            #LED1.value = 0
+        #change light button color to red if light off
+            self.channelButton1.configure(bg= "purple")
+            self.channelButton1.configure(text = "Timer ON")
+        elif self.channelButton1.cget('bg') == "purple":
+            self.channelButton1.configure(bg= "red")
+            self.channelButton1.configure(text = "Channel OFF")
+    def channel_2(self):
+        if self.channelButton2.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton2.configure(bg= "green")
+            self.channelButton2.configure(text = "Channel ON")
+        elif self.channelButton2.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton2.configure(bg= "purple")
+            self.channelButton2.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton2.cget('bg') == "purple":
+            self.channelButton2.configure(bg= "red")
+            self.channelButton2.configure(text = "Channel OFF")
+    def channel_3(self):
+        if self.channelButton3.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton3.configure(bg= "green")
+            self.channelButton3.configure(text = "Channel ON")
+        elif self.channelButton3.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton3.configure(bg= "purple")
+            self.channelButton3.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton3.cget('bg') == "purple":
+            self.channelButton3.configure(bg= "red")
+            self.channelButton3.configure(text = "Channel OFF")
+    def channel_4(self):
+        if self.channelButton4.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton4.configure(bg= "green")
+            self.channelButton4.configure(text = "Channel ON")
+        elif self.channelButton4.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton4.configure(bg= "purple")
+            self.channelButton4.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton4.cget('bg') == "purple":
+            self.channelButton4.configure(bg= "red")
+            self.channelButton4.configure(text = "Channel OFF")
+    def channel_5(self):
+        if self.channelButton5.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton5.configure(bg= "green")
+            self.channelButton5.configure(text = "Channel ON")
+        elif self.channelButton5.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton5.configure(bg= "purple")
+            self.channelButton5.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton5.cget('bg') == "purple":
+            self.channelButton5.configure(bg= "red")
+            self.channelButton5.configure(text = "Channel OFF")
+    def channel_6(self):
+        if self.channelButton6.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton6.configure(bg= "green")
+            self.channelButton6.configure(text = "Channel ON")
+        elif self.channelButton6.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton6.configure(bg= "purple")
+            self.channelButton6.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton6.cget('bg') == "purple":
+            self.channelButton6.configure(bg= "red")
+            self.channelButton6.configure(text = "Channel OFF")
+    def channel_7(self):
+        if self.channelButton7.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton7.configure(bg= "green")
+            self.channelButton7.configure(text = "Channel ON")
+        elif self.channelButton7.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton7.configure(bg= "purple")
+            self.channelButton7.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton7.cget('bg') == "purple":
+            self.channelButton7.configure(bg= "red")
+            self.channelButton7.configure(text = "Channel OFF")
+    def channel_8(self):
+        if self.channelButton8.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton8.configure(bg= "green")
+            self.channelButton8.configure(text = "Channel ON")
+        elif self.channelButton8.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton8.configure(bg= "purple")
+            self.channelButton8.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton8.cget('bg') == "purple":
+            self.channelButton8.configure(bg= "red")
+            self.channelButton8.configure(text = "Channel OFF")
+    def channel_9(self):
+        if self.channelButton9.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton9.configure(bg= "green")
+            self.channelButton9.configure(text = "Channel ON")
+        elif self.channelButton9.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton9.configure(bg= "purple")
+            self.channelButton9.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton9.cget('bg') == "purple":
+            self.channelButton9.configure(bg= "red")
+            self.channelButton9.configure(text = "Channel OFF")
+    def channel_10(self):
+        if self.channelButton10.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton10.configure(bg= "green")
+            self.channelButton10.configure(text = "Channel ON")
+        elif self.channelButton10.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton10.configure(bg= "purple")
+            self.channelButton10.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton10.cget('bg') == "purple":
+            self.channelButton10.configure(bg= "red")
+            self.channelButton10.configure(text = "Channel OFF")
+    def channel_11(self):
+        if self.channelButton11.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton11.configure(bg= "green")
+            self.channelButton11.configure(text = "Channel ON")
+        elif self.channelButton11.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton11.configure(bg= "purple")
+            self.channelButton11.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton11.cget('bg') == "purple":
+            self.channelButton11.configure(bg= "red")
+            self.channelButton11.configure(text = "Channel OFF")
+    def channel_12(self):
+        if self.channelButton12.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton12.configure(bg= "green")
+            self.channelButton12.configure(text = "Channel ON")
+        elif self.channelButton12.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton12.configure(bg= "purple")
+            self.channelButton12.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton12.cget('bg') == "purple":
+            self.channelButton12.configure(bg= "red")
+            self.channelButton12.configure(text = "Channel OFF")
+    def channel_13(self):
+        if self.channelButton13.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton13.configure(bg= "green")
+            self.channelButton13.configure(text = "Channel ON")
+        elif self.channelButton13.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton13.configure(bg= "purple")
+            self.channelButton13.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton13.cget('bg') == "purple":
+            self.channelButton13.configure(bg= "red")
+            self.channelButton13.configure(text = "Channel OFF")
+    def channel_14(self):
+        if self.channelButton14.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton14.configure(bg= "green")
+            self.channelButton14.configure(text = "Channel ON")
+        elif self.channelButton14.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton14.configure(bg= "purple")
+            self.channelButton14.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton14.cget('bg') == "purple":
+            self.channelButton14.configure(bg= "red")
+            self.channelButton14.configure(text = "Channel OFF")
+    def channel_15(self):
+        if self.channelButton15.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton15.configure(bg= "green")
+            self.channelButton15.configure(text = "Channel ON")
+        elif self.channelButton15.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton15.configure(bg= "purple")
+            self.channelButton15.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton15.cget('bg') == "purple":
+            self.channelButton15.configure(bg= "red")
+            self.channelButton15.configure(text = "Channel OFF")
+    def channel_16(self):
+        if self.channelButton16.cget('bg') == "red":
+        #change channel button color to green when channel is forced on
+            self.channelButton16.configure(bg= "green")
+            self.channelButton16.configure(text = "Channel ON")
+        elif self.channelButton16.cget('bg') == "green":
+        #change channel button color to purple to run on timer
+            self.channelButton16.configure(bg= "purple")
+            self.channelButton16.configure(text = "Timer ON")
+        #change channel button color to red if channel is forced off
+        elif self.channelButton16.cget('bg') == "purple":
+            self.channelButton16.configure(bg= "red")
+            self.channelButton16.configure(text = "Channel OFF")
+
+#add settings page
+class Settings(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="Settings", bg='white', font = TITLE_FONT)
+        label.pack(pady=10, padx=10)
+        #navigation button
+        navibutton1 = ttk.Button(self, text="Back to Dashboard",
+                            command=lambda: controller.show_frame(HomePage))
+        navibutton1.pack()
+        navibutton2 = ttk.Button(self, text="Go to Control Panel",
+                            command=lambda: controller.show_frame(ControlPanel))
+        navibutton2.pack()
         #fcns triggered by control button
         #fcn to turn LED on or off
     def channel_1(self):
