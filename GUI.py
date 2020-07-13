@@ -50,7 +50,7 @@ plot9 = f.add_subplot(6,2,9)
 plot10 = f.add_subplot(6,2,10)
 plot11 = f.add_subplot(6,2,11)
 #set file path
-file_path = "/Users/jazpe/Desktop/AutoAquaponics-master"
+file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
 #animate function
 def animate(ii):
     pullData = open(file_path,"r").read()
