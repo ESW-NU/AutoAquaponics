@@ -36,14 +36,17 @@ from vertical_scroll_frame import VerticalScrolledFrame
 file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
 #set path for file that stores Settings/Control Panel config
 config_path = "/Users/Bill Yen/Desktop/NU Urban Ag/config.csv"
-#initialize the channel buttons as all off for the first time and create config file
-#if it doesn't already exist
-with open(config_path, "a+") as file:
+#create config file if it doesn't already exist
+create_file = open(config_path, "a+")
+create_file.close()
+#initialize channel_buttons_config
+with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
     if len(config_settings) != 3:
         channel_buttons_config = [-1]*16
     else:
         channel_buttons_config = config_settings[0]
+    file.close()
 #create figure for plots and set figure size/layout
 f = Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015)
