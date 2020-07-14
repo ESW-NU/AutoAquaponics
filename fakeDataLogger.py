@@ -9,7 +9,7 @@ def fakeDataLogger(file_name):
     voltage_list = []
     voltage1_list = []
     ii = 0
-    loc = "/Users/Bill Yen/Desktop/NU Urban Ag/" + file_name
+    loc = "/Users/Chris/Desktop/NU_Urban_Ag/" + file_name
     with open(loc,'a+',newline='') as file:
             writer = csv.writer(file)
             #define output of both channels, round to 3 decimals

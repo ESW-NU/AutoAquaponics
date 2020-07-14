@@ -36,10 +36,9 @@ from vertical_scroll_frame import VerticalScrolledFrame
 #set file path
 file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test4.csv"
 #set path for file that stores Settings/Control Panel config
-config_path = "/Users/Bill Yen/Desktop/NU Urban Ag/config.csv"
+config_path = "/Users/Chris/Desktop/NU_Urban_Ag/config.csv"
 #create config file if it doesn't already exist
-create_file = open(config_path, "a+")
-create_file.close()
+open(config_path, "a").close()
 #initialize channel_buttons_config & entry configs
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
@@ -55,7 +54,6 @@ with open(config_path, "r") as file:
         off_config = config_settings[2]
         upper_config = config_settings[3]
         lower_config = config_settings[4]
-    file.close()
 #create figure for plots and set figure size/layout
 f = Figure(figsize=(8.6,17.5), dpi=100)
 
@@ -75,35 +73,33 @@ plot11 = f.add_subplot(6,2,11)
 axes = f.get_axes()
 
 #animate function
-def animate(ii):
-    pullData = open(file_path,"r").read()
-    dataList = pullData.split('\n')
-    open(file_path,"r").close() 
+def animate(ii): #'with' block for efficiency
+    with open(file_path, "r") as file:
+        pullData = file.read()
+        dataList = pullData.split('\n')
+        reader_file = csv.reader(file)
+        dataLen = len(list(reader_file))
     #setting timeframe and making sure GUI runs on short CSVs too
-    input_file = open(file_path, "r")
-    reader_file = csv.reader(input_file)
-    dataLen = len(list(reader_file))
     if dataLen < 240:
         timeframe = -dataLen
     else:
         timeframe = int(-240)
-    input_file.close()
+
     #make all the x and y variable lists
     dataList = dataList[timeframe:]
     tList = []
-    vList = []
-    v1List = []
+    v_phList = []
+    v_tempList = []
     for eachLine in dataList:
         if len(eachLine) >1:
-            timedate, voltage, voltage1 = eachLine.split(',')
-            tList.append(datetime.datetime.strptime(timedate, "%I:%M:%S %p %m/%d/%Y"))
-            vList.append(float(voltage))
-            v1List.append(float(voltage1))
+            timedate, voltage_ph, voltage_temp = eachLine.split(',')
+            tList.append(datetime.datetime.strptime(timedate, "%m/%d/%Y %H:%M:%S"))
+            v_phList.append(float(voltage_ph))
+            v_tempList.append(float(voltage_temp))
             #keep the lists to a reasonable length to save memory
             tList = tList[timeframe:]
-            vList = vList[timeframe:]
-            v1List = v1List[timeframe:]
-
+            v_phList = v_phList[timeframe:]
+            v_tempList = v_tempList[timeframe:]
     #plot graphs
     plot1.clear()
     plot2.clear()
@@ -142,29 +138,31 @@ def animate(ii):
 
     #fill the graphs
     
-    graph_color = 'b'
-    graph_color1= 'b'
+    graph_color_ph = 'b'
+    graph_color_temp = 'b'
     with open(config_path, "r") as file:
         config_settings = list(csv.reader(file))
-        file.close()
     for eachLine in dataList:
         if len(eachLine) >1:
             #timedate, voltage, voltage1 = eachLine.split(',')
-            if float(voltage) > float(config_settings[3][0]) or float(voltage) < float(config_settings[4][0]):
-                graph_color = 'r'
+            # timedate, voltage_ph, voltage_temp
+            if float(voltage_ph) > float(config_settings[3][0]) or float(voltage_ph) < float(config_settings[4][0]):
+                graph_color_ph = 'r'
             else:
-                graph_color = 'g'
+                graph_color_ph = 'g'
 
-            if float(voltage1) > float(config_settings[3][8]) or float(voltage1) < float(config_settings[4][8]):
-                graph_color1 = 'r'
+            if float(voltage_temp) > float(config_settings[3][8]) or float(voltage_temp) < float(config_settings[4][8]):
+                graph_color_temp = 'r'
             else:
-                graph_color1 = 'g' 
+                graph_color_temp = 'g' 
 
 
-    plot1.fill_between(tList, vList, where=(vList > listofzeros),
-                       facecolor = graph_color, edgecolor = graph_color, alpha = 0.5)
-    plot2.fill_between(tList, v1List, where=(v1List > listofzeros),
-                       facecolor = graph_color1, edgecolor = graph_color1, alpha = 0.5)
+    plot1.fill_between(tList, v_phList,
+                       where=(v_phList > listofzeros),
+                       facecolor = graph_color_ph, edgecolor = graph_color_ph, alpha = 0.5)
+    plot2.fill_between(tList, v_tempList,
+                       where=(v_tempList > listofzeros),
+                       facecolor = graph_color_temp, edgecolor = graph_color_temp, alpha = 0.5)
 
     #collect garbage
     gc.collect()
@@ -331,26 +329,24 @@ class HomePage(tk.Frame):
         flowrate_data.place(x=91, y=307)
 #function to update live text
         def GetValues():
-            pullData = open(file_path,"r").read()
-            dataList = pullData.split('\n')
             with open(config_path, "r") as file:
                 config_settings = list(csv.reader(file))
-                file.close()
-            for eachLine in dataList:
-                if len(eachLine) >1:
-                    #add to this list of data read as we add more sensors
-                    timedate, voltage, voltage1 = eachLine.split(',')
-                    #pH_data.config(text = voltage)
-                    if float(voltage) > float(config_settings[3][0]) or float(voltage) < float(config_settings[4][0]):
-                        pH_data.config(text = voltage, fg="red", bg="white")
-                    else:
-                        pH_data.config(text=voltage, fg = "black", bg="white")
-                    
-                    if float(voltage1) > float(config_settings[3][8]) or float(voltage1) < float(config_settings[4][8]):
-                        wtemp_data.config(text=voltage1, fg="red", bg = "white")
-                    else:
-                        wtemp_data.config(text = voltage1, fg = "black", bg="white")
-            open(file_path,"r").close()
+            with open(file_path, "r") as file:
+                pullData = file.read()
+                dataList = pullData.split('\n')
+                for eachLine in dataList:
+                    if len(eachLine) >1:
+                        #add to this list of data read as we add more sensors
+                        timedate, voltage_ph, voltage_temp = eachLine.split(',')
+                        if float(voltage_ph) > float(config_settings[3][0]) or float(voltage_ph) < float(config_settings[4][0]):
+                            pH_data.config(text = voltage_ph, fg="red", bg="white")
+                        else:
+                            pH_data.config(text=voltage_ph, fg = "black", bg="white")
+                        
+                        if float(voltage_temp) > float(config_settings[3][8]) or float(voltage_temp) < float(config_settings[4][8]):
+                            wtemp_data.config(text=voltage_temp, fg="red", bg = "white")
+                        else:
+                            wtemp_data.config(text = voltage_temp, fg = "black", bg="white")
             gc.collect()
             self.after(5000, GetValues)
         self.after(5000, GetValues)
@@ -376,7 +372,10 @@ class ControlPanel(tk.Frame):
         self.discardButton.grid(row=3, columnspan=14, pady=(0,20))
 
     #channel labels
-        Channel_1 = tk.Label(self, text="1", bg='white', font = SMALL_FONT)
+        def preconfig_label(count: str):
+            return tk.Label(self, text=count, bg='white', font = SMALL_FONT)
+        
+        Channel_1 = preconfig_label("1")
         Channel_1.grid(row = 4, column=1)
         Channel_2 = tk.Label(self, text="2", bg='white', font = SMALL_FONT)
         Channel_2.grid(row = 5, column=1)
