@@ -34,6 +34,6 @@ def fakeDataLogger(file_name):
                     voltage1_list = voltage_list[-20:]
                     #append data to csv file & plot
                     now = datetime.now()
-                    dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
+                    dt_string = now.strftime("%m/%d/%Y %I:%M:%S %p")
                     writer.writerow([dt_string, voltage, voltage1])
                     file.flush()
