@@ -84,7 +84,7 @@ def animate(ii):
     for eachLine in dataList:
         if len(eachLine) >1:
             timedate, voltage, voltage1 = eachLine.split(',')
-            tList.append(datetime.datetime.strptime(timedate, "%m/%d/%Y %H:%M:%S"))
+            tList.append(datetime.datetime.strptime(timedate, "%m/%d/%Y %I:%M:%S %p"))
             vList.append(float(voltage))
             v1List.append(float(voltage1))
             #keep the lists to a reasonable length to save memory
