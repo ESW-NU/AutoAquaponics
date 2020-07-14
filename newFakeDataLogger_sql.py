@@ -1,3 +1,4 @@
+from random import choice
 import sqlite3
 import random
 from datetime import datetime
@@ -7,6 +8,7 @@ import os
 cwd0 = os.getcwd()
 tgt_dir = "C:/Users/markg/Repositories/AutoAquaponics" 
 db_name = 'database.db'
+tablename = datetime.now().strftime("%m/%d/%Y")
 
 class Logger:
     def __init__(self,tgt_path,database):
@@ -17,7 +19,12 @@ class Logger:
 
     def collect_data(self):
         #collect data and assign to class variable
-        self.data_dict['pH'] = (datetime.now(), random.choice([2.322,2.444,2.533,2.666]),random.choice([3,4,5,6]))
+        choice = [2.322,2.444,2.533,2.666]
+        self.data_dict['table1'] = (datetime.now(), random.choice(choice),random.choice(choice),
+                                                    random.choice(choice),random.choice(choice),
+                                                    random.choice(choice),random.choice(choice),
+                                                    random.choice(choice),random.choice(choice),
+                                                    random.choice(choice),random.choice(choice)) #TO DO: make this less janky haha
         print(self.data_dict)
 
     def log_data(self):
@@ -33,7 +40,11 @@ class Logger:
         #if doesnt exist, create a table "pH" with three floating pt. ("Real") values for a timestamp and two voltages
         if newdb:
             print('ALERT: No prior database named ' + self.dbname + '. Created a new database in the target directory')
-            c.execute("""CREATE TABLE pH(time REAL, V0 REAL, V1 REAL) """)
+            c.execute("""CREATE TABLE table1(time REAL, pH REAL, 
+                                            Water_Temp REAL, Air_Temp REAL, 
+                                            Nitrate REAL, TDS REAL, DO REAL, 
+                                            Ammonia REAL, Phosphate REAL, 
+                                            Humidity REAL, Flow_rt REAL) """)
         
         #pushing values into the db
         for table, data in self.data_dict.items():
@@ -47,13 +58,12 @@ class Logger:
     
 
 def main():
-    cntr = 0
 
-    while cntr<6:
-        cntr = cntr+1
+    #this would be a while True for the real logger, with 
+    while True:
         logger = Logger(tgt_dir,'database.db')
         logger.collect_data()
         logger.log_data()
-        sleep(1)
+        sleep(5)
 
 main()
