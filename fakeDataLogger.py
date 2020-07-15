@@ -2,6 +2,7 @@ def fakeDataLogger(file_name):
     import random
     from time import sleep
     import csv
+    import os
     from datetime import datetime
     raw_voltage_list = []
     raw_voltage1_list = []

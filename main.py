@@ -1,5 +1,6 @@
 from time import sleep
 import csv
+import os
 from fakeDataLogger import fakeDataLogger
 from multiprocessing import Process
 global IS_ALIVE
