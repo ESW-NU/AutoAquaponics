@@ -1,9 +1,6 @@
 import datetime
-<<<<<<< HEAD
 import os
-=======
 from typing import Container
->>>>>>> 82f6043ec3c4081c2c265e0943f8aaea41e513e5
 #import led info, replace with relay info
 #from gpiozero import PWMLED
 #LED1 = PWMLED(17)
@@ -37,9 +34,7 @@ style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
 #set file path
-<<<<<<< HEAD
 file_path = os.path.expanduser("~/Desktop/test.csv")
-=======
 file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
 #set path for file that stores Settings/Control Panel config
 config_path = "/Users/Bill Yen/Desktop/NU Urban Ag/config.csv"
@@ -70,7 +65,6 @@ plot9 = f.add_subplot(6,2,9)
 plot10 = f.add_subplot(6,2,10)
 plot11 = f.add_subplot(6,2,11)
 #animate function
->>>>>>> 82f6043ec3c4081c2c265e0943f8aaea41e513e5
 def animate(ii):
     pullData = open(file_path,"r").read()
     dataList = pullData.split('\n')
