@@ -109,11 +109,10 @@ def animate(ii):
         ax.xaxis_date()
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))  
         [tk.set_visible(True) for tk in ax.get_xticklabels()]
-        [label.set_rotation(10) for label in ax.xaxis.get_ticklabels()]
-#     plot1.xaxis_date()
-#     plot1.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%I:%M:%S %p'))    
-#     [tk.set_visible(True) for tk in plot1.get_xticklabels()]
-    
+        [label.set_rotation(10) for label in ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
+        ax.set_xlim(tList[int(timeframe/2)], tList[-1])
+        ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))  #make sure the xticks aren't overlapping
+
     
     plot1.set_ylabel("pH (v)")
     plot1.set_ylim(2,4)
@@ -121,20 +120,7 @@ def animate(ii):
     plot2.set_ylim(0,5)
     #show half the length of our timeframe, set functionality to let user scroll
     #to next half later
-    plot1.set_xlim(tList[int(timeframe/2)], tList[-1])
-    plot2.set_xlim(tList[int(timeframe/2)], tList[-1])
-    #slant the x axis tick labels for extra coolness
-    for label in plot1.xaxis.get_ticklabels():
-        label.set_rotation(10)
-    for label in plot2.xaxis.get_ticklabels():
-        label.set_rotation(10)
     
-       
-
-
-    #make sure the xticks aren't overlapping
-    plot1.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
-    plot2.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
     
     #fill the graphs
     plot1.fill_between(tList, vList,
