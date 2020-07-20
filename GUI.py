@@ -22,6 +22,7 @@ matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
+import matplotlib.dates as mdates
 import csv
 #import/enable garbage collector to clear memory
 import gc
@@ -33,9 +34,9 @@ style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
 #set file path
-file_path = "/Users/jazpe/Desktop/AutoAquaponics/test3.csv"
+file_path = r"C:/Users/corma/Desktop/ESW-NU/urbanAg/test4.csv"
 #set path for file that stores Settings/Control Panel config
-config_path = "/Users/jazpe/Desktop/AutoAquaponics/config.csv"
+config_path = r"C:/Users/corma/Desktop/ESW-NU/urbanAg/congif.csv"
 #create config file if it doesn't already exist
 create_file = open(config_path, "a+")
 create_file.close()
@@ -49,6 +50,7 @@ with open(config_path, "r") as file:
     file.close()
 #create figure for plots and set figure size/layout
 f = Figure(figsize=(8.6,17.5), dpi=100)
+
 f.subplots_adjust(top=0.993, bottom=0.015)
 #plots
 plot1 = f.add_subplot(6,2,1)
@@ -62,11 +64,13 @@ plot8 = f.add_subplot(6,2,8)
 plot9 = f.add_subplot(6,2,9)
 plot10 = f.add_subplot(6,2,10)
 plot11 = f.add_subplot(6,2,11)
+axes = f.get_axes()
+
 #animate function
 def animate(ii):
     pullData = open(file_path,"r").read()
     dataList = pullData.split('\n')
-    open(file_path,"r").close()
+    open(file_path,"r").close() 
     #setting timeframe and making sure GUI runs on short CSVs too
     input_file = open(file_path, "r")
     reader_file = csv.reader(input_file)
@@ -84,7 +88,7 @@ def animate(ii):
     for eachLine in dataList:
         if len(eachLine) >1:
             timedate, voltage, voltage1 = eachLine.split(',')
-            tList.append(datetime.datetime.strptime(timedate, "%m/%d/%Y %I:%M:%S %p"))
+            tList.append(datetime.datetime.strptime(timedate, "%I:%M:%S %p %m/%d/%Y"))
             vList.append(float(voltage))
             v1List.append(float(voltage1))
             #keep the lists to a reasonable length to save memory
@@ -101,6 +105,16 @@ def animate(ii):
     #values later so we can change graph fill color based on water parameter
     listofzeros = [0] * len(tList)
     #add labels and config axis
+
+    for ax in axes:
+        ax.xaxis_date()
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))  
+        [tk.set_visible(True) for tk in ax.get_xticklabels()]
+        [label.set_rotation(10) for label in ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
+        ax.set_xlim(tList[int(timeframe/2)], tList[-1])
+        ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))  #make sure the xticks aren't overlapping
+
+    
     plot1.set_ylabel("pH (v)")
     plot1.set_ylim(2,4)
     plot2.set_ylabel("Temperature (v)")
@@ -140,6 +154,15 @@ def animate(ii):
                        facecolor = graph_color, edgecolor = graph_color, alpha = 0.5)
     plot2.fill_between(tList, v1List, where=(v1List > listofzeros),
                        facecolor = graph_color1, edgecolor = graph_color1, alpha = 0.5)
+
+    if v1List > config_settings[3][8] or v1List < config_settings[4][8]:
+        plot2.fill_between(tList, v1List,
+                       where=(v1List > listofzeros),
+                       facecolor = 'r', edgecolor = 'r', alpha = 0.5)
+    else:
+        plot2.fill_between(tList, v1List,
+                       where=(v1List > listofzeros),
+                       facecolor = 'g', edgecolor = 'g', alpha = 0.5)
 
     #collect garbage
     gc.collect()
@@ -642,7 +665,7 @@ class ControlPanel(tk.Frame):
         #Get last saved values
         with open(config_path, "r") as file:
             config_settings = list(csv.reader(file))
-            if len(config_settings) != 3:
+            if len(config_settings) != 5:
                 #initialize the file by creating and writing to csv
                 with open(config_path, 'w', newline='') as file:
                     writer = csv.writer(file)
@@ -1258,7 +1281,7 @@ class Settings(tk.Frame):
     #Discard button
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.place(x=480, y=430)
-    
+        self.discard() #run discard to initialize values
     # Save Button 
 
     def popup(self):
@@ -1336,7 +1359,7 @@ class Settings(tk.Frame):
         #Get last saved values
         with open(config_path, "r") as file:
             config_settings = list(csv.reader(file))
-            if len(config_settings) != 3:
+            if len(config_settings) != 5:
                 #initialize the file by creating and writing to csv
                 with open(config_path, 'w', newline='') as file:
                     writer = csv.writer(file)
