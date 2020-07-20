@@ -155,15 +155,6 @@ def animate(ii):
     plot2.fill_between(tList, v1List, where=(v1List > listofzeros),
                        facecolor = graph_color1, edgecolor = graph_color1, alpha = 0.5)
 
-    if v1List > config_settings[3][8] or v1List < config_settings[4][8]:
-        plot2.fill_between(tList, v1List,
-                       where=(v1List > listofzeros),
-                       facecolor = 'r', edgecolor = 'r', alpha = 0.5)
-    else:
-        plot2.fill_between(tList, v1List,
-                       where=(v1List > listofzeros),
-                       facecolor = 'g', edgecolor = 'g', alpha = 0.5)
-
     #collect garbage
     gc.collect()
 #initialization
@@ -339,12 +330,12 @@ class HomePage(tk.Frame):
                     if float(voltage) > float(config_settings[3][0]) or float(voltage) < float(config_settings[4][0]):
                         pH_data.config(text = voltage, fg="red", bg="white")
                     else:
-                        pH_data.config(text=voltage, fg = "green", bg="white")
+                        pH_data.config(text=voltage, fg = "black", bg="white")
                     
                     if float(voltage1) > float(config_settings[3][8]) or float(voltage1) < float(config_settings[4][8]):
                         wtemp_data.config(text=voltage1, fg="red", bg = "white")
                     else:
-                        wtemp_data.config(text = voltage1, fg = "green", bg="white")
+                        wtemp_data.config(text = voltage1, fg = "black", bg="white")
             open(file_path,"r").close()
             gc.collect()
             self.after(5000, GetValues)
