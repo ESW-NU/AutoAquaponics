@@ -34,16 +34,16 @@ style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
 #set file path
-file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test4.csv"
+file_path = "/Users/jazpe/Desktop/AutoAquaponics/test3.csv"
 #set path for file that stores Settings/Control Panel config
-config_path = "/Users/Bill Yen/Desktop/NU Urban Ag/config.csv"
+config_path = "/Users/jazpe/Desktop/AutoAquaponics/config.csv"
 #create config file if it doesn't already exist
 create_file = open(config_path, "a+")
 create_file.close()
 #initialize channel_buttons_config
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
-    if len(config_settings) != 3:
+    if len(config_settings) != 5:
         channel_buttons_config = [-1]*16
     else:
         channel_buttons_config = config_settings[0]
@@ -123,14 +123,23 @@ def animate(ii):
     
     
     #fill the graphs
-    plot1.fill_between(tList, vList,
+    if vList > config_settings[3][0] or vList < config_settings[4][0]:
+        plot1.fill_between(tList, vList,
                        where=(vList > listofzeros),
                        facecolor = 'r', edgecolor = 'r', alpha = 0.5)
-    plot2.fill_between(tList, v1List,
+    else:
+        plot1.fill_between(tList, vList,
+                       where=(vList > listofzeros),
+                       facecolor = 'g', edgecolor = 'g', alpha = 0.5)
+
+    if v1List > config_settings[3][8] or v1List < config_settings[4][8]:
+        plot2.fill_between(tList, v1List,
                        where=(v1List > listofzeros),
-                       facecolor = 'b', edgecolor = 'b', alpha = 0.5)
-    
-  
+                       facecolor = 'r', edgecolor = 'r', alpha = 0.5)
+    else:
+        plot2.fill_between(tList, v1List,
+                       where=(v1List > listofzeros),
+                       facecolor = 'g', edgecolor = 'g', alpha = 0.5)
     #collect garbage
     gc.collect()
 #initialization
@@ -302,8 +311,16 @@ class HomePage(tk.Frame):
                 if len(eachLine) >1:
                     #add to this list of data read as we add more sensors
                     timedate, voltage, voltage1 = eachLine.split(',')
-                    pH_data.config(text = voltage)
-                    wtemp_data.config(text = voltage1)
+                    #pH_data.config(text = voltage)
+                    if voltage > config_settings[3][0] or voltage < config_settings[4][0]:
+                        pH_data.config(text = voltage, fg="red", bg="white")
+                    else:
+                        pH_data.config(text=voltage, fg = "green", bg="white")
+                    
+                    if voltage1 > config_settings[3][8] or voltage1 < config_settings[4][8]:
+                        wtemp_data.config(text=voltage1, fg="red", bg = "white")
+                    else:
+                        wtemp_data.config(text = voltage1, fg = "green", bg="white")
             open(file_path,"r").close()
             gc.collect()
             self.after(5000, GetValues)
@@ -582,7 +599,7 @@ class ControlPanel(tk.Frame):
         #write two rows of data into csv, erase past info
         with open(config_path, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerows([channel_buttons_config,on_config,off_config])
+            writer.writerows([channel_buttons_config,on_config,off_config, [0]*11, [0]*11])
             file.flush()
         #destroy popup window after writing file
         self.popup.destroy()
@@ -628,8 +645,8 @@ class ControlPanel(tk.Frame):
                 #initialize the file by creating and writing to csv
                 with open(config_path, 'w', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerows([channel_buttons_config,[0]*16,[0]*16])
-                    config_settings = [channel_buttons_config,[0]*16,[0]*16]
+                    writer.writerows([channel_buttons_config,[0]*16,[0]*16, [0]*11, [0]*11])
+                    config_settings = [channel_buttons_config,[0]*16,[0]*16, [0]*11, [0]*11]
                     file.flush()
                     file.close()
             self.on1.insert(0, config_settings[1][0])
@@ -1206,7 +1223,7 @@ class Settings(tk.Frame):
         Water_Temperature_upper = DoubleVar()
         self.Water_Temperature_lower_label = Label(self,text="Lower limit Water Temperature (celsius):")
         self.Water_Temperature_lower_entry = Entry(self,textvariable = Water_Temperature_lower)
-        self.Water_Temperature_upper_label = Label(self,text="Upper limit Air Temperature (celsius):")
+        self.Water_Temperature_upper_label = Label(self,text="Upper limit Water Temperature (celsius):")
         self.Water_Temperature_upper_entry = Entry(self,textvariable = Water_Temperature_upper)
         self.Water_Temperature_lower_label.place(x=46,y=300)
         self.Water_Temperature_lower_entry.place(x=300,y=300)
@@ -1234,71 +1251,134 @@ class Settings(tk.Frame):
         self.Flow_Rate_lower_entry.place(x=300,y=350)
         self.Flow_Rate_upper_label.place(x=553,y=350)
         self.Flow_Rate_upper_entry.place(x=735,y=350)
-
+    #Save button
+        self.saveButton= ttk.Button(self, text="Save", command=self.popup)
+        self.saveButton.place(x=480, y= 400)
+    #Discard button
+        self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
+        self.discardButton.place(x=480, y=430)
     
     # Save Button 
-        def save_Entry_Widget():
-            pH_lower_saved = pH_lower.get()
-            pH_upper_saved = pH_upper.get()
-            TDS_lower_saved = TDS_lower.get()
-            TDS_upper_saved = TDS_upper.get()
-            DO_lower_saved = DO_lower.get()
-            DO_upper_saved = DO_upper.get()
-            Phosphate_lower_saved = Phosphate_lower.get()
-            Phosphate_upper_saved = Phosphate_upper.get()
-            Nitrate_lower_saved = Nitrate_lower.get()
-            Nitrate_upper_saved = Nitrate_upper.get()
-            Ammonia_lower_saved = Ammonia_lower.get()
-            Ammonia_upper_saved = Ammonia_upper.get()
-            Air_Temperature_lower_saved = Air_Temperature_lower.get()
-            Air_Temperature_upper_saved = Air_Temperature_upper.get()
-            Air_Humidity_lower_saved = Air_Humidity_lower.get()
-            Air_Humidity_upper_saved = Air_Humidity_upper.get()
-            Water_Temperature_lower_saved = Water_Temperature_lower.get()
-            Water_Temperature_upper_saved = Water_Temperature_upper.get()
-            Water_Level_lower_saved = Water_Level_lower.get()
-            Water_Level_upper_saved = Water_Level_upper.get()
-            Flow_Rate_lower_saved = Flow_Rate_lower.get()
-            Flow_Rate_upper_saved = Flow_Rate_upper.get()
 
-            file = open("entrywidget.txt","w")
-            file.write("pH Range:")
-            file.write(str(pH_lower_saved))
-            file.write(str(pH_lower_saved))
-            file.write("TDS Range:")
-            file.write(str(TDS_lower_saved))
-            file.write(str(TDS_upper_saved))
-            file.write("DO Range:")
-            file.write(str(DO_lower_saved))
-            file.write(str(DO_upper_saved))
-            file.write("Phosphate Range:")
-            file.write(str(Phosphate_lower_saved))
-            file.write(str(Phosphate_upper_saved))
-            file.write("Nitrate Range:")
-            file.write(str(Nitrate_lower_saved))
-            file.write(str(Nitrate_upper_saved))
-            file.write("Ammonia Range:")
-            file.write(str(Ammonia_lower_saved))
-            file.write(str(Ammonia_upper_saved))
-            file.write("Air Temperature Range:")
-            file.write(str(Air_Temperature_lower_saved))
-            file.write(str(Air_Temperature_upper_saved))
-            file.write("Air Humidity Range:")
-            file.write(str(Air_Humidity_lower_saved))
-            file.write(str(Air_Humidity_upper_saved))
-            file.write("Water Temperature Range:")
-            file.write(str(Water_Temperature_lower_saved))
-            file.write(str(Water_Temperature_upper_saved))
-            file.write("Water Level Range:")
-            file.write(str(Water_Level_lower_saved))
-            file.write(str(Water_Level_upper_saved))
-            file.write("Flow Rate Range Range:")
-            file.write(str(DO_lower_saved))
-            file.write(str(DO_upper_saved))
+    def popup(self):
+        #get the input of all entries as a float value to the hundredth place
+        self.popup = tk.Tk()
+        self.popup.wm_title("Message")
+        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        YesB = ttk.Button(self.popup, text="YES", command = self.save)
+        YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
+        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+        NoB.grid(row=1, column=2, pady = (0,10))
+        self.popup.mainloop()
+    #triggered if user press YES in popup window
+    def save(self):
+        upper_config = [
+            round(float(self.pH_upper_entry.get()),2), 
+            round(float(self.TDS_upper_entry.get()),2),
+            round(float(self.DO_upper_entry.get()),2), 
+            round(float(self.Phosphate_upper_entry.get()),2), 
+            round(float(self.Nitrate_upper_entry.get()),2), 
+            round(float(self.Ammonia_upper_entry.get()),2), 
+            round(float(self.Air_Temperature_upper_entry.get()),2), 
+            round(float(self.Air_Humidity_upper_entry.get()),2),
+            round(float(self.Water_Temperature_upper_entry.get()),2),
+            round(float(self.Water_Level_upper_entry.get()),2),
+            round(float(self.Flow_Rate_upper_entry.get()),2),
+            ]
+        lower_config = [
+            round(float(self.pH_lower_entry.get()),2), 
+            round(float(self.TDS_lower_entry.get()),2), 
+            round(float(self.DO_lower_entry.get()),2),
+            round(float(self.Phosphate_lower_entry.get()),2), 
+            round(float(self.Nitrate_lower_entry.get()),2), 
+            round(float(self.Ammonia_lower_entry.get()),2), 
+            round(float(self.Air_Temperature_lower_entry.get()),2), 
+            round(float(self.Air_Humidity_lower_entry.get()),2),
+            round(float(self.Water_Temperature_lower_entry.get()),2),
+            round(float(self.Water_Level_lower_entry.get()),2),
+            round(float(self.Flow_Rate_lower_entry.get()),2),
+            ]
+        #write two rows of data into csv, erase past info
+        with open(config_path, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows([[0]*16, [0]*16, [0]*16, upper_config, lower_config])
+            #(This might overwrite old values, double check!)n
+            file.flush()
+        #destroy popup window after writing file
+        self.popup.destroy()
+        #fcn triggered by discard button
+    def discard(self):
+        #Delete current values
+        self.pH_lower_entry.delete(0, END)
+        self.TDS_lower_entry.delete(0, END)
+        self.DO_lower_entry.delete(0, END)
+        self.Phosphate_lower_entry.delete(0, END)
+        self.Nitrate_lower_entry.delete(0, END)
+        self.Ammonia_lower_entry.delete(0, END)
+        self.Air_Temperature_lower_entry.delete(0, END)
+        self.Air_Humidity_lower_entry.delete(0, END)
+        self.Water_Level_lower_entry.delete(0, END)
+        self.Water_Temperature_lower_entry.delete(0, END)
+        self.Flow_Rate_lower_entry.delete(0, END)
+        self.pH_upper_entry.delete(0, END)
+        self.TDS_upper_entry.delete(0, END)
+        self.DO_upper_entry.delete(0, END)
+        self.Phosphate_upper_entry.delete(0, END)
+        self.Nitrate_upper_entry.delete(0, END)
+        self.Ammonia_upper_entry.delete(0, END)
+        self.Air_Temperature_upper_entry.delete(0, END)
+        self.Air_Humidity_upper_entry.delete(0, END)
+        self.Water_Level_upper_entry.delete(0, END)
+        self.Water_Temperature_upper_entry.delete(0, END)
+        self.Flow_Rate_upper_entry.delete(0, END)
+        #Get last saved values
+        with open(config_path, "r") as file:
+            config_settings = list(csv.reader(file))
+            if len(config_settings) != 3:
+                #initialize the file by creating and writing to csv
+                with open(config_path, 'w', newline='') as file:
+                    writer = csv.writer(file)
+                    writer.writerows([channel_buttons_config,[0]*16,[0]*16])
+                    config_settings = [channel_buttons_config,[0]*16,[0]*16]
+                    file.flush()
+                    file.close()
+            self.pH_upper_entry.insert(0, config_settings[3][0])
+            self.TDS_upper_entry.insert(0, config_settings[3][1])
+            self.DO_upper_entry.insert(0, config_settings[3][2])
+            self.Phosphate_upper_entry.insert(0, config_settings[3][3])
+            self.Nitrate_upper_entry.insert(0, config_settings[3][4])
+            self.Ammonia_upper_entry.insert(0, config_settings[3][5])
+            self.Air_Temperature_upper_entry.insert(0, config_settings[3][6])
+            self.Air_Humidity_upper_entry.insert(0, config_settings[3][7])
+            self.Water_Temperature_upper_entry.insert(0, config_settings[3][8])
+            self.Water_Level_upper_entry.insert(0, config_settings[3][9])
+            self.Flow_Rate_upper_entry.insert(0, config_settings[3][10])
+            self.pH_lower_entry.insert(0, config_settings[4][0])
+            self.TDS_lower_entry.insert(0, config_settings[4][1])
+            self.DO_lower_entry.insert(0, config_settings[4][2])
+            self.Phosphate_lower_entry.insert(0, config_settings[4][3])
+            self.Nitrate_lower_entry.insert(0, config_settings[4][4])
+            self.Ammonia_lower_entry.insert(0, config_settings[4][5])
+            self.Air_Temperature_lower_entry.insert(0, config_settings[4][6])
+            self.Air_Humidity_lower_entry.insert(0, config_settings[4][7])
+            self.Water_Temperature_lower_entry.insert(0, config_settings[4][8])
+            self.Water_Level_lower_entry.insert(0, config_settings[4][9])
+            self.Flow_Rate_lower_entry.insert(0, config_settings[4][10])
             file.close()
-        
-        self.save_button = Button(self,text="Save Settings",command=save_Entry_Widget())
-        self.save_button.place(x=450, y=410)
+            gc.collect()
+    #save channel button settings
+    def channel_buttons_save(self):
+        with open(config_path, "r") as file:
+            config_settings = list(csv.reader(file))
+            config_settings[0] = channel_buttons_config
+            file.close()
+            with open(config_path, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(config_settings)
+                file.flush()
+                file.close()
+                gc.collect()
         
 #add Video Stream page
 class VideoStream(tk.Frame):
