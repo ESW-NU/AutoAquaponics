@@ -2,13 +2,14 @@ def fakeDataLogger(file_name):
     import random
     from time import sleep
     import csv
+    import os
     from datetime import datetime
     raw_voltage_list = []
     raw_voltage1_list = []
     voltage_list = []
     voltage1_list = []
     ii = 0
-    loc = r"C:/Users/corma/Desktop/ESW-NU/urbanAg/" + file_name
+    loc = "/Users/Bill Yen/Desktop/NU Urban Ag/" + file_name
     with open(loc,'a+',newline='') as file:
             writer = csv.writer(file)
             #define output of both channels, round to 3 decimals
@@ -34,6 +35,6 @@ def fakeDataLogger(file_name):
                     voltage1_list = voltage_list[-20:]
                     #append data to csv file & plot
                     now = datetime.now()
-                    dt_string = now.strftime("%I:%M:%S %p %m/%d/%Y")
+                    dt_string = now.strftime("%m/%d/%Y %I:%M:%S %p")
                     writer.writerow([dt_string, voltage, voltage1])
                     file.flush()
