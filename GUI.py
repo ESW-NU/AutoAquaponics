@@ -40,13 +40,21 @@ config_path = "/Users/Bill Yen/Desktop/NU Urban Ag/config.csv"
 #create config file if it doesn't already exist
 create_file = open(config_path, "a+")
 create_file.close()
-#initialize channel_buttons_config
+#initialize channel_buttons_config & entry configs
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
     if len(config_settings) != 5:
         channel_buttons_config = [-1]*16
+        on_config = [0]*16
+        off_config = [0]*16
+        lower_config = [0]*11
+        upper_config = [0]*11
     else:
         channel_buttons_config = config_settings[0]
+        on_config = config_settings[1]
+        off_config = config_settings[2]
+        lower_config = config_settings[3]
+        upper_config = config_settings[4]
     file.close()
 #create figure for plots and set figure size/layout
 f = Figure(figsize=(8.6,17.5), dpi=100)
@@ -136,9 +144,12 @@ def animate(ii):
     
     graph_color = 'b'
     graph_color1= 'b'
+    with open(config_path, "r") as file:
+        config_settings = list(csv.reader(file))
+        file.close()
     for eachLine in dataList:
         if len(eachLine) >1:
-            timedate, voltage, voltage1 = eachLine.split(',')
+            #timedate, voltage, voltage1 = eachLine.split(',')
             if float(voltage) > float(config_settings[3][0]) or float(voltage) < float(config_settings[4][0]):
                 graph_color = 'r'
             else:
@@ -322,6 +333,9 @@ class HomePage(tk.Frame):
         def GetValues():
             pullData = open(file_path,"r").read()
             dataList = pullData.split('\n')
+            with open(config_path, "r") as file:
+                config_settings = list(csv.reader(file))
+                file.close()
             for eachLine in dataList:
                 if len(eachLine) >1:
                     #add to this list of data read as we add more sensors
@@ -614,7 +628,7 @@ class ControlPanel(tk.Frame):
         #write two rows of data into csv, erase past info
         with open(config_path, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerows([channel_buttons_config,on_config,off_config, [0]*11, [0]*11])
+            writer.writerows([channel_buttons_config,on_config,off_config, upper_config, lower_config])
             file.flush()
         #destroy popup window after writing file
         self.popup.destroy()
@@ -660,8 +674,8 @@ class ControlPanel(tk.Frame):
                 #initialize the file by creating and writing to csv
                 with open(config_path, 'w', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerows([channel_buttons_config,[0]*16,[0]*16, [0]*11, [0]*11])
-                    config_settings = [channel_buttons_config,[0]*16,[0]*16, [0]*11, [0]*11]
+                    writer.writerows([channel_buttons_config,on_config,off_config, lower_config, upper_config])
+                    config_settings = [channel_buttons_config,on_config,off_config, lower_config, upper_config]
                     file.flush()
                     file.close()
             self.on1.insert(0, config_settings[1][0])
@@ -1317,7 +1331,7 @@ class Settings(tk.Frame):
         #write two rows of data into csv, erase past info
         with open(config_path, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerows([[0]*16, [0]*16, [0]*16, upper_config, lower_config])
+            writer.writerows([channel_buttons_config, on_config, off_config, upper_config, lower_config])
             #(This might overwrite old values, double check!)n
             file.flush()
         #destroy popup window after writing file
@@ -1354,8 +1368,8 @@ class Settings(tk.Frame):
                 #initialize the file by creating and writing to csv
                 with open(config_path, 'w', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerows([channel_buttons_config,[0]*16,[0]*16])
-                    config_settings = [channel_buttons_config,[0]*16,[0]*16]
+                    writer.writerows([channel_buttons_config,on_config,off_config, lower_config, upper_config])
+                    config_settings = [channel_buttons_config,on_config,off_config, lower_config, upper_config]
                     file.flush()
                     file.close()
             self.pH_upper_entry.insert(0, config_settings[3][0])
