@@ -29,6 +29,7 @@ if(__name__ == '__main__'):
     dataLen = len(list(reader_file))
     if dataLen < 2:
         sleep(10.1)
+        print("Loading data....")
     input_file.close()
     #start GUI
     p2.start()
