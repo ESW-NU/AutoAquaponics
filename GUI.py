@@ -34,9 +34,9 @@ style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
 #set file path
-file_path = "/Users/jazpe/Desktop/AutoAquaponics/test3.csv"
+file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test3.csv"
 #set path for file that stores Settings/Control Panel config
-config_path = "/Users/jazpe/Desktop/AutoAquaponics/config.csv"
+config_path = "/Users/Bill Yen/Desktop/NU Urban Ag/config.csv"
 #create config file if it doesn't already exist
 create_file = open(config_path, "a+")
 create_file.close()
@@ -641,7 +641,7 @@ class ControlPanel(tk.Frame):
         #Get last saved values
         with open(config_path, "r") as file:
             config_settings = list(csv.reader(file))
-            if len(config_settings) != 3:
+            if len(config_settings) != 5:
                 #initialize the file by creating and writing to csv
                 with open(config_path, 'w', newline='') as file:
                     writer = csv.writer(file)
@@ -1257,7 +1257,7 @@ class Settings(tk.Frame):
     #Discard button
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.place(x=480, y=430)
-    
+        self.discard() #run discard to initialize values
     # Save Button 
 
     def popup(self):
@@ -1335,7 +1335,7 @@ class Settings(tk.Frame):
         #Get last saved values
         with open(config_path, "r") as file:
             config_settings = list(csv.reader(file))
-            if len(config_settings) != 3:
+            if len(config_settings) != 5:
                 #initialize the file by creating and writing to csv
                 with open(config_path, 'w', newline='') as file:
                     writer = csv.writer(file)
