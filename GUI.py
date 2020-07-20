@@ -95,6 +95,7 @@ def animate(ii):
             tList = tList[timeframe:]
             vList = vList[timeframe:]
             v1List = v1List[timeframe:]
+
     #plot graphs
     plot1.clear()
     plot2.clear()
@@ -120,17 +121,39 @@ def animate(ii):
     plot2.set_ylim(0,5)
     #show half the length of our timeframe, set functionality to let user scroll
     #to next half later
-    
-    
+    plot1.set_xlim(tList[int(timeframe/2)], tList[-1])
+    plot2.set_xlim(tList[int(timeframe/2)], tList[-1])
+    #slant the x axis tick labels for extra coolness
+    for label in plot1.xaxis.get_ticklabels():
+        label.set_rotation(10)
+    for label in plot2.xaxis.get_ticklabels():
+        label.set_rotation(10)
+    #make sure the xticks aren't overlapping
+    plot1.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
+    plot2.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
+
     #fill the graphs
-    if vList > config_settings[3][0] or vList < config_settings[4][0]:
-        plot1.fill_between(tList, vList,
-                       where=(vList > listofzeros),
-                       facecolor = 'r', edgecolor = 'r', alpha = 0.5)
-    else:
-        plot1.fill_between(tList, vList,
-                       where=(vList > listofzeros),
-                       facecolor = 'g', edgecolor = 'g', alpha = 0.5)
+    
+    graph_color = 'b'
+    graph_color1= 'b'
+    for eachLine in dataList:
+        if len(eachLine) >1:
+            timedate, voltage, voltage1 = eachLine.split(',')
+            if float(voltage) > float(config_settings[3][0]) or float(voltage) < float(config_settings[4][0]):
+                graph_color = 'r'
+            else:
+                graph_color = 'g'
+
+            if float(voltage1) > float(config_settings[3][8]) or float(voltage1) < float(config_settings[4][8]):
+                graph_color1 = 'r'
+            else:
+                graph_color1 = 'g' 
+
+
+    plot1.fill_between(tList, vList, where=(vList > listofzeros),
+                       facecolor = graph_color, edgecolor = graph_color, alpha = 0.5)
+    plot2.fill_between(tList, v1List, where=(v1List > listofzeros),
+                       facecolor = graph_color1, edgecolor = graph_color1, alpha = 0.5)
 
     if v1List > config_settings[3][8] or v1List < config_settings[4][8]:
         plot2.fill_between(tList, v1List,
@@ -313,12 +336,12 @@ class HomePage(tk.Frame):
                     #add to this list of data read as we add more sensors
                     timedate, voltage, voltage1 = eachLine.split(',')
                     #pH_data.config(text = voltage)
-                    if voltage > config_settings[3][0] or voltage < config_settings[4][0]:
+                    if float(voltage) > float(config_settings[3][0]) or float(voltage) < float(config_settings[4][0]):
                         pH_data.config(text = voltage, fg="red", bg="white")
                     else:
                         pH_data.config(text=voltage, fg = "green", bg="white")
                     
-                    if voltage1 > config_settings[3][8] or voltage1 < config_settings[4][8]:
+                    if float(voltage1) > float(config_settings[3][8]) or float(voltage1) < float(config_settings[4][8]):
                         wtemp_data.config(text=voltage1, fg="red", bg = "white")
                     else:
                         wtemp_data.config(text = voltage1, fg = "green", bg="white")
