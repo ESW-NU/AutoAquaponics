@@ -10,7 +10,8 @@ def start_GUI():
     import GUI
 
 def start_data_logging():
-    fakeDataLogger("test.csv")
+
+    fakeDataLogger("test3.csv")
 
 if(__name__ == '__main__'):
     p1 = Process(target=start_data_logging)

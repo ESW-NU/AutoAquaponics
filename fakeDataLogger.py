@@ -9,7 +9,9 @@ def fakeDataLogger(file_name):
     voltage_list = []
     voltage1_list = []
     ii = 0
+
     loc = os.path.expanduser("~/Desktop/") + file_name
+
     with open(loc,'a+',newline='') as file:
             writer = csv.writer(file)
             #define output of both channels, round to 3 decimals
@@ -35,6 +37,6 @@ def fakeDataLogger(file_name):
                     voltage1_list = voltage_list[-20:]
                     #append data to csv file & plot
                     now = datetime.now()
-                    dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
+                    dt_string = now.strftime("%m/%d/%Y %I:%M:%S %p")
                     writer.writerow([dt_string, voltage, voltage1])
                     file.flush()
