@@ -1196,7 +1196,7 @@ class Settings(tk.Frame):
         Water_Temperature_upper = DoubleVar()
         self.Water_Temperature_lower_label = Label(self,text="Min Water Temp (Celsius):",bg='white')
         self.Water_Temperature_lower_entry = Entry(self,textvariable = Water_Temperature_lower)
-        self.Water_Temperature_upper_label = Label(self,text="Max Air Temp (Celsius):",bg='white')
+        self.Water_Temperature_upper_label = Label(self,text="Max Water Temp (Celsius):",bg='white')
         self.Water_Temperature_upper_entry = Entry(self,textvariable = Water_Temperature_upper)
         self.Water_Temperature_lower_label.place(x=151,y=350)
         self.Water_Temperature_lower_entry.place(x=325,y=350)
