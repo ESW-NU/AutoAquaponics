@@ -1,1 +1,0 @@
-pH Range:0.00.0TDS Range:0.00.0DO Range:0.00.0Phosphate Range:0.00.0Nitrate Range:0.00.0Ammonia Range:0.00.0Air Temperature Range:0.00.0Air Humidity Range:0.00.0Water Temperature Range:0.00.0Water Level Range:0.00.0Flow Rate Range Range:0.00.0
