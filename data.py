@@ -1,6 +1,7 @@
 import random
 import sqlite3
 import random
+import numpy as np
 from datetime import datetime
 from time import sleep
 import os
@@ -24,16 +25,21 @@ class Logger:
         self.name_dict = {}
         self.dbname = database
         
-        #by default (daily table mode), the name of the table is a date timestamp of the format "_MM_DD_YYYY"
+        #date timestamp of the format "_MM_DD_YYYY" for use in table = 'DAILY'
         self.datef = "_" + datetime.now().strftime("%m/%d/%Y").replace("/","_")
 
         #change to target directory
         os.chdir(tgt_path)
 
-    def collect_data(self,table,datain,datanames):
+    def collect_data(self,table,datain,datanames,mtime=0,mnum=1):
         #daily table mode 
         if table == 'DAILY':
             table = self.datef
+
+        #time-controlled data collection
+        if mtime != 0:
+            #
+
 
         #collect data, datanames and assign to data dictionary
         self.data_dict[table] = datain
@@ -87,6 +93,10 @@ class Logger:
         #close sqlite connection
         conn.close()
     
+class Reader:
+     def __init__(self,tgt_path,database):
+        bloop = 0
+        self.blep = bloop
 
 def main():
     #this would be a while True for the real logger, with 
