@@ -47,14 +47,14 @@ with open(config_path, "r") as file:
         channel_buttons_config = [-1]*16
         on_config = [0]*16
         off_config = [0]*16
-        lower_config = [0]*11
         upper_config = [0]*11
+        lower_config = [0]*11
     else:
         channel_buttons_config = config_settings[0]
         on_config = config_settings[1]
         off_config = config_settings[2]
-        lower_config = config_settings[3]
-        upper_config = config_settings[4]
+        upper_config = config_settings[3]
+        lower_config = config_settings[4]
     file.close()
 #create figure for plots and set figure size/layout
 f = Figure(figsize=(8.6,17.5), dpi=100)
@@ -617,6 +617,11 @@ class ControlPanel(tk.Frame):
         self.popup.mainloop()
     #triggered if user press YES in popup window
     def save(self):
+        #make sure that the variables are the updated ones in the csv instead of just the initial versions of them
+        with open(config_path, "r") as file:
+            config_settings = list(csv.reader(file))
+            upper_config = config_settings[3]
+            lower_config = config_settings[4]
         on_config = [round(float(self.on1.get()),2), round(float(self.on2.get()),2), round(float(self.on3.get()),2), round(float(self.on4.get()),2),
         round(float(self.on5.get()),2), round(float(self.on6.get()),2), round(float(self.on7.get()),2), round(float(self.on8.get()),2),
         round(float(self.on9.get()),2), round(float(self.on10.get()),2), round(float(self.on11.get()),2), round(float(self.on12.get()),2),
@@ -674,8 +679,8 @@ class ControlPanel(tk.Frame):
                 #initialize the file by creating and writing to csv
                 with open(config_path, 'w', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerows([channel_buttons_config,on_config,off_config, lower_config, upper_config])
-                    config_settings = [channel_buttons_config,on_config,off_config, lower_config, upper_config]
+                    writer.writerows([channel_buttons_config,on_config,off_config, upper_config, lower_config])
+                    config_settings = [channel_buttons_config,on_config,off_config, upper_config, lower_config]
                     file.flush()
                     file.close()
             self.on1.insert(0, config_settings[1][0])
@@ -1304,6 +1309,12 @@ class Settings(tk.Frame):
         self.popup.mainloop()
     #triggered if user press YES in popup window
     def save(self):
+        #make sure that the variables are the updated ones in the csv instead of just the initial versions of them
+        with open(config_path, "r") as file:
+            config_settings =list(csv.reader(file))
+            channel_buttons_config = config_settings[0]
+            on_config = config_settings[1]
+            off_config = config_settings[2]
         upper_config = [
             round(float(self.pH_upper_entry.get()),2), 
             round(float(self.TDS_upper_entry.get()),2),
