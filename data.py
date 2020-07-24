@@ -12,12 +12,12 @@ db_name = 'testdb.db'
 
 #input data (data coming from outside the logger, to be logged)
 data_names = ('time','pH','Water_Temp','Air_Temp','Nitrate','TDS','DO','Ammonia','Phosphate','Humidity','Flow_rt')
-choice = [2.322,2.444,2.533,2.666]
+choice = [0,1,2,3,4,5,6,7,8,9]
 def data_in():
-    return (datetime.now(), random.choice(choice),random.choice(choice),
+    return (random.choice(choice),random.choice(choice),random.choice(choice),
             random.choice(choice),random.choice(choice),random.choice(choice),
             random.choice(choice),random.choice(choice),random.choice(choice),
-            random.choice(choice),random.choice(choice))
+            random.choice(choice))
 
 class Logger:
     def __init__(self,tgt_path,database):
@@ -31,18 +31,30 @@ class Logger:
         #change to target directory
         os.chdir(tgt_path)
 
-    def collect_data(self,table,datain,datanames,mtime=0,mnum=1):
+    def collect_data(self,table,dataget,datanames,mtime=0,mnum=1):
         #daily table mode 
         if table == 'DAILY':
             table = self.datef
 
-        #time-controlled data collection
-        if mtime != 0:
-            #
+        #time-controlled data collection (Running average. mtime = time between measurements
+        #                                                  mnum = number of measurements)
+        #data is stored in a numpy array...
+        data_arr = np.zeros((1,len(datanames)-1))   #initialize the array. This doensn't include the timestamp
+        ct = 0
+        while ct < mnum:
+            tup_arr = np.asarray([dataget]) #put the getdata() into array form
+            data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
+            ct += 1
+            sleep(mtime)
 
+        #averaging the columns of the array
+        data_avg = tuple(data_arr.sum(axis=0)/mnum)
+
+        #adding the timestamp
+        data_log = (datetime.now(),*data_avg)
 
         #collect data, datanames and assign to data dictionary
-        self.data_dict[table] = datain
+        self.data_dict[table] = data_log
         self.name_dict[table] = datanames
         print(self.data_dict)
 
@@ -68,7 +80,7 @@ class Logger:
         
         ## LOGGING
         #translating datatype from python to sqlite3
-        types = {"int":"""INTEGER""","float":"""REAL""","str":"""TEXT""","datetime":"""REAL"""}
+        types = {"int":"""INTEGER""","float":"""REAL""","float64":"""REAL""","str":"""TEXT""","datetime":"""REAL"""}
         
         #generating a string for table generation
         names = """("""
@@ -103,10 +115,8 @@ def main():
     cnt = 0
     while cnt<5:
         logger = Logger(tgt_dir,db_name)
-        logger.collect_data('DAILY',data_in(),data_names)
+        logger.collect_data('DAILY',data_in(),data_names,mtime=1,mnum=5)
         logger.log_data('DAILY')
         cnt = cnt+1
-        
-        sleep(1)
 
 main()
