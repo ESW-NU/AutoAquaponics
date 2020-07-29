@@ -42,7 +42,8 @@ class Logger:
         data_arr = np.zeros((1,len(datanames)-1))   #initialize the array. This doensn't include the timestamp
         ct = 0
         while ct < mnum:
-            tup_arr = np.asarray([dataget]) #put the getdata() into array form
+            tup_arr = np.asarray([dataget()]) #put the getdata() into array form
+            print(tup_arr)
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
             sleep(mtime)
@@ -106,17 +107,51 @@ class Logger:
         conn.close()
     
 class Reader:
-     def __init__(self,tgt_path,database):
+    def __init__(self,tgt_path,database):
         bloop = 0
         self.blep = bloop
+        self.dbname = database
+
+        #change to target directory
+        os.chdir(tgt_path)
+
+    def read_data(self,table):
+        ## INITIALIZING DATABASE
+        #first, keeping note of whether a database exists yet in the directory
+        if os.path.isfile(self.dbname):
+            newdb = False
+        else:
+            newdb = True 
+        
+        #sqlite connection and cursor... (this will make a new database dbname.db if none exists)
+        conn = sqlite3.connect(self.dbname)
+        c = conn.cursor()
+        
+        #Create an alert for when a new database is being made
+        if newdb:
+            print('ALERT: No prior database named ' + self.dbname + '. Created a new database in the target directory')
+        
+        #Query the database...
+        c.execute("""SELECT * FROM """+table)
+        
+        #return a list...
+        print(c.fetchall())
+        
+        
+        #close sqlite connection
+        conn.close()
 
 def main():
     #this would be a while True for the real logger, with 
     cnt = 0
     while cnt<5:
         logger = Logger(tgt_dir,db_name)
-        logger.collect_data('DAILY',data_in(),data_names,mtime=1,mnum=5)
+        logger.collect_data('DAILY',data_in,data_names,mtime=1,mnum=5)
         logger.log_data('DAILY')
         cnt = cnt+1
+    
+    reader = Reader(tgt_dir,db_name)
+    reader.read_data('_07_28_2020')
+
 
 main()
