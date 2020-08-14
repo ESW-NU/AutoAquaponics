@@ -34,9 +34,9 @@ style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
 #set file path
-file_path = r"C:/Users/corma/Desktop/ESW-NU/urbanAg/test4.csv"
+file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test4.csv"
 #set path for file that stores Settings/Control Panel config
-config_path = r"C:/Users/corma/Desktop/ESW-NU/urbanAg/congif.csv"
+config_path = "/Users/Bill Yen/Desktop/NU Urban Ag/config.csv"
 #create config file if it doesn't already exist
 create_file = open(config_path, "a+")
 create_file.close()
