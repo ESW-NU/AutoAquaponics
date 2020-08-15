@@ -1,4 +1,8 @@
+from main import user_settings
+config_path, testfile_path = user_settings()
+
 def fakeDataLogger(file_name):
+    from os import path
     import random
     from time import sleep
     import csv
@@ -9,7 +13,7 @@ def fakeDataLogger(file_name):
     voltage_list = []
     voltage1_list = []
     ii = 0
-    loc = "/Users/Chris/Desktop/NU_Urban_Ag/" + file_name
+    loc = testfile_path
     with open(loc,'a+',newline='') as file:
             writer = csv.writer(file)
             #define output of both channels, round to 3 decimals

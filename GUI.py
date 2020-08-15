@@ -33,12 +33,10 @@ from matplotlib import style
 style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
-#set file path
-file_path = "/Users/Bill Yen/Desktop/NU Urban Ag/test4.csv"
-#set path for file that stores Settings/Control Panel config
-config_path = "/Users/Chris/Desktop/NU_Urban_Ag/config.csv"
-#create config file if it doesn't already exist
-open(config_path, "a").close()
+
+from main import user_settings
+config_path, file_path = user_settings()
+
 #initialize channel_buttons_config & entry configs
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
