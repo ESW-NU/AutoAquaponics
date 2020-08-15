@@ -73,8 +73,8 @@ if(__name__ == '__main__'):
         reader_file = csv.reader(input_file)
         dataLen = len(list(reader_file))
         if dataLen < 2:
-            sleep(10.1)
             print("Loading data....")
+            sleep(10.1)
     #start GUI
     p2.start()
     p1.join()
