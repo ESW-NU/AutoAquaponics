@@ -684,7 +684,7 @@ class Settings(tk.Frame):
         self.popup.mainloop()
     #triggered if user press YES in popup window
     def save(self):
-        with open(config_path, 'r', newline='') as file:3
+        with open(config_path, 'r', newline='') as file:
             config_settings = list(csv.reader(file))
             channel_buttons_config = config_settings[0]
             on_config = config_settings[1]
