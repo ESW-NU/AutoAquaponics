@@ -8,8 +8,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-numbers = {'2029266579' : "T-Mobile", "2243459408" : "AT&T"} 
-#'8479879824' : "AT&T", 
+# numbers = {'2029266579' : "T-Mobile", '8479879824' : "AT&T", "2243459408" : "AT&T"} 
 
 def sendtext(message, **numbers):
     
