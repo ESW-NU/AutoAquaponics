@@ -8,8 +8,10 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-numbers = {'2029266579' : "T-Mobile", "2243459408" : "AT&T"} 
-#'8479879824' : "AT&T", 
+# call this function by typing the lines below (replace values in numbers with your actual number/carrier)
+# the "numbers" list can have any number of key-value pairs in there
+#   numbers = {'2029266579' : "T-Mobile", "2243459408" : "AT&T"}
+#   sendtext("your text message", **numbers) 
 
 def sendtext(message, **numbers):
     
@@ -75,4 +77,3 @@ def sendtext(message, **numbers):
         
         server.sendmail(email,sms_gateway,sms)
 
-# sendtext("test message  ", **numbers)
