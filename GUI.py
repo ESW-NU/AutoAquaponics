@@ -168,7 +168,7 @@ class AllWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         #add title
-        tk.Tk.wm_title(self, "NU Aquaponics")
+        tk.Tk.wm_title(self, "AutoAquaponics")
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
