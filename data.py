@@ -119,7 +119,7 @@ class Logger:
         ct = 0
         while ct < nsamp:
             tup_arr = np.asarray([dataget()]) #put the getdata() into array form
-            #print(tup_arr)
+            print(tup_arr)
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
             sleep(tsamp)
@@ -234,8 +234,8 @@ def main():
 
     logger.close()
 
-    # reader = Reader(tgt_dir,db_name)
-    # reader.get_timeset('gloop')
-    # reader.close()
+    reader = Reader(tgt_dir,db_name)
+    reader.get_timeset('moop')
+    reader.close()
 
 main()
