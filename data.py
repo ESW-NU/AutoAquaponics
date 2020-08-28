@@ -48,24 +48,24 @@ class Logger:
             newdb = True 
         
         #sqlite connection and cursor... (this will make a new database dbname.db if none exists)
-        conn = sqlite3.connect(self.dbname)
-        c = conn.cursor()
+        self.conn = sqlite3.connect(self.dbname)
+        self.c = self.conn.cursor()
 
         #SCANNING THE DATABASE
         #Getting a list of the current tables
-        c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        for n in c.fetchall():
+        self.c.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        for n in self.c.fetchall():
             self.dbtables.append(n[0])
 
         #Create an alert for when a new database is being made
         if newdb:
             print('ALERT: No prior database named ' + self.dbname + '. Created a new database in the target directory')
 
-        # c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        # print(c.fetchall())
-
-        #close the connection
-        conn.close()
+        self.c.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        for table in self.c.fetchall():
+            #print(table[0])
+            #c.execute(f'PRAGMA table_info({table[0]})')
+            self.table_dict[table[0]] = ((),()) #TO DO: READ EXISTING COLUMN NAMES AND TYPES
 
     def table(self,newtable):
         #check that the length of the column names == length of the column types
@@ -76,14 +76,13 @@ class Logger:
         #elif list(newtable.keys())[0] == 'DAILY':
         #    # implement DAILY TABLE!
         else: print('ALERT: You must input a table dictionary')
-        
-        #sqlite connection and cursor
-        conn = sqlite3.connect(self.dbname)
-        c = conn.cursor()
 
         ## MAKING A TABLE IF IT DOESN'T EXIST
         #translating datatypes from python to sqlite3
-        types = {"int":"""INTEGER""","float":"""REAL""","float64":"""REAL""","str":"""TEXT""","datetime":"""REAL"""}
+        types = {   "int":"""INTEGER""","float":"""REAL""",
+                    "float64":"""REAL""","str":"""TEXT""",
+                    "datetime":"""REAL""", "INTEGER":"""INTEGER""",
+                    "REAL":"""REAL""","TEXT":"""TEXT"""}
         
         #generating a string for table generation (LOOPING OVER EACH DICTIONARY ITEM)
         for table,info in newtable.items():
@@ -97,13 +96,10 @@ class Logger:
             names = names[:-2] + """)""" #deletes the last ', ' and adds ')'
             
             #Create table if not yet defined, with the following columns...
-            c.execute("""CREATE TABLE IF NOT EXISTS """ + table + names)
+            self.c.execute("""CREATE TABLE IF NOT EXISTS """ + table + names)
 
             # add table(s) to the table dictionary...
             self.table_dict[table] = info
-
-        #close sqlite connection
-        conn.close()
 
     def collect_data(self,table,dataget,tsamp=0,nsamp=1):
         #daily table mode 
@@ -174,30 +170,25 @@ class Logger:
         conn.close()
 
     def log_data(self):
-        #sqlite connection and cursor
-        conn = sqlite3.connect(self.dbname)
-        c = conn.cursor()
         
         ## LOGGING
         for tbl, data in self.data_dict.items(): #FOR ALL DATA IN DICT
             cnt = len(data) - 1
             params = '?' + ',?'*cnt
-            c.execute(f"INSERT INTO {tbl} VALUES({params})",data) #pushes values into database (dictionary format)
-            conn.commit()
+            self.c.execute(f"INSERT INTO {tbl} VALUES({params})",data) #pushes values into database (dictionary format)
+            self.conn.commit()
 
+    def close(self):
         #close sqlite connection
-        conn.close()
+        self.conn.close()
     
 class Reader:
     def __init__(self,tgt_path,database):
-        bloop = 0
-        self.blep = bloop
         self.dbname = database
 
         #change to target directory
         os.chdir(tgt_path)
 
-    def read_data(self,table):
         ## INITIALIZING DATABASE
         #first, keeping note of whether a database exists yet in the directory
         if os.path.isfile(self.dbname):
@@ -205,40 +196,46 @@ class Reader:
         else:
             newdb = True 
         
-        #sqlite connection and cursor... (this will make a new database dbname.db if none exists)
-        conn = sqlite3.connect(self.dbname)
-        c = conn.cursor()
-        
         #Create an alert for when a new database is being made
         if newdb:
             print('ALERT: No prior database named ' + self.dbname + '. Created a new database in the target directory')
-        
+
+        #sqlite connection and cursor
+        self.conn = sqlite3.connect(self.dbname)
+        self.c = self.conn.cursor()
+
+    def table_vals(self,table):
         #Query the database...
-        c.execute("""SELECT * FROM """ + table)
+        self.c.execute("""SELECT * FROM """ + table)
         
         #return a list...
-        print(c.fetchall())
-        
-        
+        print(self.c.fetchall())
+    
+    def get_timeset(self,table,num = 1,timeval = None):
+        self.c.execute(f"""SELECT * FROM {table} ORDER BY time DESC LIMIT {num}""")
+        print(self.c.fetchall())
+
+    def close(self):
         #close sqlite connection
-        conn.close()
+        self.conn.close()
 
 def main():
 
-    gloop_table = {'gloop':(data_names,data_types)}
+    # gloop_table = {'gloop':(data_names,data_types)}
 
-    cnt = 0
-    while cnt<5: #would be a while true statement if I wasn't testing
+    # cnt = 0
+    # while cnt<5: #would be a while true statement if I wasn't testing
         
-        logger = Logger(tgt_dir,db_name) 
-        logger.table(gloop_table) #make (empty) table flooptable
-        logger.collect_data('gloop',data_in,tsamp=1,nsamp=5)
-        logger.log_data()
+    #     logger = Logger(tgt_dir,db_name) 
+    #     logger.table(gloop_table) 
+    #     logger.collect_data('gloop',data_in,tsamp=1,nsamp=5)
+    #     logger.log_data()
+    #     logger.close()
         
-        cnt = cnt+1
+    #     cnt = cnt+1
 
-    #reader = Reader(tgt_dir,db_name)
-    #reader.read_data('_07_28_2020')
-
+    reader = Reader(tgt_dir,db_name)
+    reader.get_timeset('gloop')
+    reader.close()
 
 main()
