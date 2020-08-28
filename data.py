@@ -119,7 +119,7 @@ class Logger:
         ct = 0
         while ct < nsamp:
             tup_arr = np.asarray([dataget()]) #put the getdata() into array form
-            print(tup_arr)
+            #print(tup_arr)
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
             sleep(tsamp)
@@ -221,21 +221,21 @@ class Reader:
 
 def main():
 
-    # gloop_table = {'gloop':(data_names,data_types)}
+    moop_table = {'moop':(data_names,data_types)}
+    logger = Logger(tgt_dir,db_name) 
+    logger.table(moop_table) 
 
-    # cnt = 0
-    # while cnt<5: #would be a while true statement if I wasn't testing
+    cnt = 0
+    while cnt<5: #would be a while true statement if I wasn't testing
         
-    #     logger = Logger(tgt_dir,db_name) 
-    #     logger.table(gloop_table) 
-    #     logger.collect_data('gloop',data_in,tsamp=1,nsamp=5)
-    #     logger.log_data()
-    #     logger.close()
-        
-    #     cnt = cnt+1
+        logger.collect_data('moop',data_in,tsamp=1,nsamp=5)
+        logger.log_data() #TO DO: TAKE OUT OF LOOP
+        cnt = cnt+1
 
-    reader = Reader(tgt_dir,db_name)
-    reader.get_timeset('gloop')
-    reader.close()
+    logger.close()
+
+    # reader = Reader(tgt_dir,db_name)
+    # reader.get_timeset('gloop')
+    # reader.close()
 
 main()
