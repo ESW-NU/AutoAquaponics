@@ -130,7 +130,7 @@ class Logger:
         #adding the timestamp
         data_log = (datetime.now(),*data_avg)
 
-        #collect data, datanames and assign to data dictionary
+        #collect data, datanames and assign to data dict
         self.data_dict[table] = data_log
         print(self.data_dict)
 
