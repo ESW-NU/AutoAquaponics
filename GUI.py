@@ -48,12 +48,6 @@ with open(config_path, "r") as file:
             writer.writerows([channel_buttons_config,on_config,off_config, upper_config, lower_config])
             config_settings = [channel_buttons_config,on_config,off_config, upper_config, lower_config]
             file.flush()
-    else:
-        channel_buttons_config = config_settings[0]
-        on_config = config_settings[1]
-        off_config = config_settings[2]
-        upper_config = config_settings[3]
-        lower_config = config_settings[4]
 #create figure for plots and set figure size/layout
 f = figure.Figure(figsize=(8.6,17.5), dpi=100)
 
@@ -73,7 +67,9 @@ plot11 = f.add_subplot(6,2,11)
 axes = f.get_axes()
 
 #animate function
-def animate(ii): #'with' block for efficiency
+def animate(ii):
+    with open(config_path, "r") as file:
+         config_settings = list(csv.reader(file))
     with open(file_path, "r") as file:
         pullData = file.read()
         dataList = pullData.split('\n')
@@ -90,6 +86,8 @@ def animate(ii): #'with' block for efficiency
     tList = []
     v_phList = []
     v_tempList = []
+    graph_color_ph = 'b'
+    graph_color_temp = 'b'
     for eachLine in dataList:
         if len(eachLine) > 1:
             timedate, voltage_ph, voltage_temp = eachLine.split(',')
@@ -100,16 +98,20 @@ def animate(ii): #'with' block for efficiency
             tList = tList[timeframe:]
             v_phList = v_phList[timeframe:]
             v_tempList = v_tempList[timeframe:]
+            if float(voltage_ph) > float(config_settings[3][0]) or float(voltage_ph) < float(config_settings[4][0]):
+                graph_color_ph = 'r'
+            else:
+                graph_color_ph = 'g'
+            if float(voltage_temp) > float(config_settings[3][8]) or float(voltage_temp) < float(config_settings[4][8]):
+                graph_color_temp = 'r'
+            else:
+                graph_color_temp = 'g' 
+
     #plot graphs
     plot1.clear()
     plot2.clear()
-    #plot1.plot(tList, vList, 'r')
-    #plot2.plot(tList, v1List, 'b')
-    #this is to get the reference to fill the graph, can change to more meaningful
-    #values later so we can change graph fill color based on water parameter
     listofzeros = [0] * len(tList)
     #add labels and config axis
-
     for ax in axes:
         ax.xaxis_date()
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))  
@@ -117,7 +119,6 @@ def animate(ii): #'with' block for efficiency
         [label.set_rotation(10) for label in ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
         ax.set_xlim(tList[int(timeframe/2)], tList[-1])
         ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))  #make sure the xticks aren't overlapping
-
     
     plot1.set_ylabel("pH (v)")
     plot1.set_ylim(2,4)
@@ -135,24 +136,6 @@ def animate(ii): #'with' block for efficiency
     #make sure the xticks aren't overlapping
     plot1.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
     plot2.xaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
-
-    #fill the graphs
-    
-    graph_color_ph = 'b'
-    graph_color_temp = 'b'
-    for eachLine in dataList:
-        if len(eachLine) >1:
-            timedate, voltage_ph, voltage_temp = eachLine.split(',')
-            if float(voltage_ph) > float(config_settings[3][0]) or float(voltage_ph) < float(config_settings[4][0]):
-                graph_color_ph = 'r'
-            else:
-                graph_color_ph = 'g'
-
-            if float(voltage_temp) > float(config_settings[3][8]) or float(voltage_temp) < float(config_settings[4][8]):
-                graph_color_temp = 'r'
-            else:
-                graph_color_temp = 'g' 
-
 
     plot1.fill_between(tList, v_phList,
                        where=(v_phList > listofzeros),
@@ -326,6 +309,8 @@ class HomePage(tk.Frame):
         flowrate_data.place(x=91, y=307)
 #function to update live text
         def GetValues():
+            with open(config_path, "r") as file:
+                config_settings = list(csv.reader(file))
             with open(file_path, "r") as file:
                 pullData = file.read()
                 dataList = pullData.split('\n')
