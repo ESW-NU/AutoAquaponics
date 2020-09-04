@@ -1,3 +1,5 @@
 media/
 venv/
 __pycache__/
+setup.json
+.vscode/
