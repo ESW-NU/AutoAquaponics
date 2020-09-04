@@ -234,8 +234,12 @@ def main():
 
     logger.close()
 
+def read():
+
     reader = Reader(tgt_dir,db_name)
-    reader.get_timeset('moop')
+    reader.get_timeset('gloop',num=1)
+    
     reader.close()
 
-main()
+#main()
+read()
