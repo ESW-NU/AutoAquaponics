@@ -11,17 +11,14 @@ db_name = 'testdb.db'
 
 #NEW TABLE DATA data column NAMES and data column TYPES tuple'd together inside a dictionary
 sp_data_names = ('time','pH','Water_Temp','Air_Temp','Nitrate','TDS','DO','Ammonia','Phosphate','Humidity','Flow_rt')
-sp_data_types = ("datetime","float","float","float","float","float","float","float","float","float","float")
+sp_data_types = ("datetime","float","float","float","float","float","float","float","float","float","float", "float")
 
 #TO DO: make work for 
 
 #input data function, analogous to getdata()
 choice = [0,1,2,3,4,5,6,7,8,9]
 def data_in():
-    return (random.choice(choice),random.choice(choice),random.choice(choice),
-            random.choice(choice),random.choice(choice),random.choice(choice),
-            random.choice(choice),random.choice(choice),random.choice(choice),
-            random.choice(choice))
+    return [random.choice(choice)] * 11
 
 class Logger:
     def __init__(self,tgt_path,database):

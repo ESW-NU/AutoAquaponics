@@ -13,6 +13,7 @@ LARGE_FONT = ("Verdana", 12)
 MEDIUM_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
 #import stuff for graph
+import csv
 import matplotlib
 from matplotlib import ticker as mticker
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk 
@@ -77,8 +78,8 @@ class Sensor_Plot:
         plot.fill_between(tList, incoming_data, facecolor=plot_color, edgecolor=plot_color, alpha=0.5) #blue @initilization
         
 for i, param in enumerate(param_list, 1): #tk.Label self refers to Homepage
-    most_recent = data.Reader.get_timeset(table="Sensor Plot", num=20)
-    data.Reader.close()
+    most_recent = Reader.get_timeset(table="Sensor Plot", num=20)
+    Reader.close()
     for j in enumerate(most_recent):
         tList = most_recent[j][0]
         most_recent_20 = most_recent[j][i]        
@@ -94,8 +95,8 @@ def animate(ii):
     for i, key in enumerate(param_dict, 1):
         current_plot = param_dict[key]
         data_stream = current_plot.incoming_data
-        most_recent = data.Reader.get_timeset(table="Sensor Plot", num=1)
-        data.Reader.close()
+        most_recent = Reader.get_timeset(table="Sensor Plot", num=1)
+        Reader.close()
         data_stream.pop()
         data_stream.insert(1, most_recent[0][i])
         current_plot.incoming_data = data_stream
@@ -200,6 +201,7 @@ class HomePage(tk.Frame):
         self.after(5000, GetValues)
 
 channel_count = []
+button_count = []
 on_times = []
 off_times = []
 on_buttons = []
