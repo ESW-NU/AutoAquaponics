@@ -1,22 +1,19 @@
 import random
 import sqlite3
-import random
-from sqlite3.dbapi2 import Error
 import numpy as np
 from datetime import datetime
 from time import sleep
 import os
 
 cwd0 = os.getcwd()
-tgt_dir = "C:/Users/markg/Repositories/AutoAquaponics" 
+tgt_dir = "C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\"
 db_name = 'testdb.db'
 
 #NEW TABLE DATA data column NAMES and data column TYPES tuple'd together inside a dictionary
-data_names = ('time','pH','Water_Temp','Air_Temp','Nitrate','TDS','DO','Ammonia','Phosphate','Humidity','Flow_rt')
-data_types = ("datetime","float","float","float","float","float","float","float","float","float","float")
+sp_data_names = ('time','pH','Water_Temp','Air_Temp','Nitrate','TDS','DO','Ammonia','Phosphate','Humidity','Flow_rt')
+sp_data_types = ("datetime","float","float","float","float","float","float","float","float","float","float")
 
-new_table = {'goopygoop':(data_names,data_types)} #TO DO: make work for 
-
+#TO DO: make work for 
 
 #input data function, analogous to getdata()
 choice = [0,1,2,3,4,5,6,7,8,9]
@@ -220,17 +217,17 @@ class Reader:
         self.conn.close()
 
 def main():
-
-    moop_table = {'moop':(data_names,data_types)}
+    
+    sensor_plot_table = {'Sensor Plot':(sp_data_names,sp_data_types)}
     logger = Logger(tgt_dir,db_name) 
-    logger.table(moop_table) 
+    logger.table(sensor_plot_table) 
 
     cnt = 0
     while cnt<5: #would be a while true statement if I wasn't testing
         
-        logger.collect_data('moop',data_in,tsamp=1,nsamp=5)
+        logger.collect_data('Sensor Plot',data_in,tsamp=1,nsamp=5)
         logger.log_data() #TO DO: TAKE OUT OF LOOP
-        cnt = cnt+1
+        cnt += 1
 
     logger.close()
 
