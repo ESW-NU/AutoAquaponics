@@ -59,7 +59,7 @@ class Sensor_Plot:
         self.incoming_data = incoming_data #<- graph is bound by incoming data and Data Summary Table displays most recent value 20 of them
         self.plot_color = plot_color #initially 'b' for all
         
-    def make_plot(self, plot, incoming_data, color, param=None):
+    def make_plot(self, plot, incoming_data, plot_color, param=None):
         self.param = param
         
         plot.clear()
