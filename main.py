@@ -41,7 +41,7 @@ def user_settings():
         if test_path_location != None:
             _testfile_dir = test_path_location
             _testfile_path = path.join(test_path_location, testfile_name)
-            break  
+            break
     if not path.exists(_config_file):
         with open(_config_file, "a+") as _:
             pass  
@@ -51,8 +51,8 @@ def start_GUI():
     import GUI
 
 def start_data_logging():
-    from fakeDataLogger import fakeDataLogger
-    fakeDataLogger(testfile_name)
+    from DataLogger import DataLogger
+    DataLogger()
 
 if(__name__ == '__main__'):
     p1 = Process(target=start_data_logging)
@@ -62,19 +62,12 @@ if(__name__ == '__main__'):
     #start data logging
     p1.start()
     
-    config_file, testfile_path = user_settings()
+    config_file, testfile_path = user_settings() #will not need this....
     from os import path
     if not path.exists(testfile_path):
         with open(testfile_path, "a+") as _:
             pass
     
-    #check length of CSV and wait for data logger to populate if it's too small
-    with open (testfile_path, "r") as input_file:
-        reader_file = csv.reader(input_file)
-        dataLen = len(list(reader_file))
-        if dataLen < 2:
-            print("Loading data....")
-            sleep(10.1)
     #start GUI
     p2.start()
     p1.join()

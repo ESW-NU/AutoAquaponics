@@ -12,6 +12,7 @@ from email.mime.multipart import MIMEMultipart
 # the "numbers" list can have any number of key-value pairs in there
 #   numbers = {'2029266579' : "T-Mobile", "2243459408" : "AT&T"}
 #   sendtext("your text message", **numbers) 
+numbers = {}
 
 def sendtext(message, **numbers):
     
