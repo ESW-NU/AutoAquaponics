@@ -92,11 +92,11 @@ for i, key in enumerate(param_dict, 1):
     
 ###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_2O LIST AND INSERT FRESHLY CALLED VALUE TO INDEX[1]
 def animate(ii):
+    most_recent = Reader.get_timeset(table="Sensor Plot", num=1)
+    Reader.close()
     for i, key in enumerate(param_dict, 1):
         current_plot = param_dict[key]
         data_stream = current_plot.incoming_data
-        most_recent = Reader.get_timeset(table="Sensor Plot", num=1)
-        Reader.close()
         data_stream.pop()
         data_stream.insert(1, most_recent[0][i])
         current_plot.incoming_data = data_stream
@@ -183,8 +183,8 @@ class HomePage(tk.Frame):
         def GetValues():
             with open(config_path, "r") as file:
                 config_settings = list(csv.reader(file))   
-            most_recent = data.Reader.get_timeset(table="Sensor Plot", num=1)
-            data.Reader.close()
+            most_recent = Reader.get_timeset(table="Sensor Plot", num=1)
+            Reader.close()
             
             for i, key in enumerate(param_dict):
                 current_param_val = most_recent[0][i]
