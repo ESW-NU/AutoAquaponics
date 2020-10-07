@@ -16,7 +16,7 @@ def getData():
 #create ADS object
     ads = ADS.ADS1115(i2c)
     ads.gain = 2/3
-#single ended mode read for pin 0 and 1
+#single ended mode read for pins 0 and 1
     chan = AnalogIn(ads, ADS.P0)
     chan1 = AnalogIn(ads, ADS.P1)
 #read air temp and air humidity
