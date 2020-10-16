@@ -7,24 +7,24 @@ from datetime import datetime
 from time import sleep
 import os
 
-cwd0 = os.getcwd()
-tgt_dir = "C:/Users/markg/Repositories/AutoAquaponics" 
-db_name = 'testdb.db'
+# cwd0 = os.getcwd()
+# tgt_dir = "C:/Users/markg/Repositories/AutoAquaponics" 
+# db_name = 'testdb.db'
 
-#NEW TABLE DATA data column NAMES and data column TYPES tuple'd together inside a dictionary
-data_names = ('time','pH','Water_Temp','Air_Temp','Nitrate','TDS','DO','Ammonia','Phosphate','Humidity','Flow_rt')
-data_types = ("datetime","float","float","float","float","float","float","float","float","float","float")
+# #NEW TABLE DATA data column NAMES and data column TYPES tuple'd together inside a dictionary
+# data_names = ('time','pH','Water_Temp','Air_Temp','Nitrate','TDS','DO','Ammonia','Phosphate','Humidity','Flow_rt')
+# data_types = ("datetime","float","float","float","float","float","float","float","float","float","float")
 
-new_table = {'goopygoop':(data_names,data_types)} #TO DO: make work for 
+# new_table = {'goopygoop':(data_names,data_types)} #TO DO: make work for 
 
 
 #input data function, analogous to getdata()
-choice = [0,1,2,3,4,5,6,7,8,9]
-def data_in():
-    return (random.choice(choice),random.choice(choice),random.choice(choice),
-            random.choice(choice),random.choice(choice),random.choice(choice),
-            random.choice(choice),random.choice(choice),random.choice(choice),
-            random.choice(choice))
+# choice = [0,1,2,3,4,5,6,7,8,9]
+# def data_in():
+#     return (random.choice(choice),random.choice(choice),random.choice(choice),
+#             random.choice(choice),random.choice(choice),random.choice(choice),
+#             random.choice(choice),random.choice(choice),random.choice(choice),
+#             random.choice(choice))
 
 class Logger:
     def __init__(self,tgt_path,database):
@@ -106,12 +106,8 @@ class Logger:
         if table == 'DAILY':
             table = self.datef
 
-        #check if table exists...
-        if table not in self.dbtables:
-            print(f'The table {table} is not defined. Use Logger.table to define one')
-
-        #time-controlled data collection (Running average. tsamp = time between measurements
-        #                                                  nsamp = number of measurements)
+        #time-controlled data collection 
+        # (Running average. tsamp = time between measurements, nsamp = number of measurements)
         
         #data is stored in a numpy array...
         leng = len(dataget())
@@ -129,10 +125,14 @@ class Logger:
 
         #adding the timestamp
         data_log = (datetime.now(),*data_avg)
+        print(data_log)
 
-        #collect data, datanames and assign to data dict
-        self.data_dict[table] = data_log
-        print(self.data_dict)
+        #assign data to tables in data_dict
+        if table not in self.data_dict:
+            self.data_dict[table] = []
+        self.data_dict[table].append(data_log)
+        
+        #print(self.data_dict)
 
     def log_data_old(self,table):
         #daily table
@@ -173,10 +173,14 @@ class Logger:
         
         ## LOGGING
         for tbl, data in self.data_dict.items(): #FOR ALL DATA IN DICT
-            cnt = len(data) - 1
-            params = '?' + ',?'*cnt
-            self.c.execute(f"INSERT INTO {tbl} VALUES({params})",data) #pushes values into database (dictionary format)
-            self.conn.commit()
+            for rdg in data:
+                cnt = len(rdg) - 1
+                params = '?' + ',?'*cnt
+                self.c.execute(f"INSERT INTO {tbl} VALUES({params})",rdg) #pushes values into database (dictionary format)
+                self.conn.commit()
+        
+        #empty the data dictionary
+        self.data_dict = {}
 
     def close(self):
         #close sqlite connection
@@ -221,15 +225,23 @@ class Reader:
 
 def main():
 
-    moop_table = {'moop':(data_names,data_types)}
+    table = 'booty3'
+    new_table = {table:(data_names,data_types)}
     logger = Logger(tgt_dir,db_name) 
-    logger.table(moop_table) 
+    logger.table(new_table) 
 
     cnt = 0
-    while cnt<5: #would be a while true statement if I wasn't testing
+    while cnt<12: #would be a while true statement if I wasn't testing
         
-        logger.collect_data('moop',data_in,tsamp=1,nsamp=5)
-        logger.log_data() #TO DO: TAKE OUT OF LOOP
+        print('new collect')
+        logger.collect_data(table,data_in,tsamp=.1,nsamp=5)
+        
+        #logging every 4 collects 
+        if (cnt+1) % 4 == 0:
+            print('new log')
+            logger.log_data()
+            print(cnt)
+
         cnt = cnt+1
 
     logger.close()
@@ -242,4 +254,4 @@ def read():
     reader.close()
 
 #main()
-read()
+#read()
