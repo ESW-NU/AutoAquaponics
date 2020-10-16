@@ -7,25 +7,6 @@ from datetime import datetime
 from time import sleep
 import os
 
-# cwd0 = os.getcwd()
-# tgt_dir = "C:/Users/markg/Repositories/AutoAquaponics" 
-# db_name = 'testdb.db'
-
-# #NEW TABLE DATA data column NAMES and data column TYPES tuple'd together inside a dictionary
-# data_names = ('time','pH','Water_Temp','Air_Temp','Nitrate','TDS','DO','Ammonia','Phosphate','Humidity','Flow_rt')
-# data_types = ("datetime","float","float","float","float","float","float","float","float","float","float")
-
-# new_table = {'goopygoop':(data_names,data_types)} #TO DO: make work for 
-
-
-#input data function, analogous to getdata()
-# choice = [0,1,2,3,4,5,6,7,8,9]
-# def data_in():
-#     return (random.choice(choice),random.choice(choice),random.choice(choice),
-#             random.choice(choice),random.choice(choice),random.choice(choice),
-#             random.choice(choice),random.choice(choice),random.choice(choice),
-#             random.choice(choice))
-
 class Logger:
     def __init__(self,tgt_path,database):
         self.data_dict = {}
@@ -223,35 +204,9 @@ class Reader:
         #close sqlite connection
         self.conn.close()
 
-def main():
-
-    table = 'booty3'
-    new_table = {table:(data_names,data_types)}
-    logger = Logger(tgt_dir,db_name) 
-    logger.table(new_table) 
-
-    cnt = 0
-    while cnt<12: #would be a while true statement if I wasn't testing
-        
-        print('new collect')
-        logger.collect_data(table,data_in,tsamp=.1,nsamp=5)
-        
-        #logging every 4 collects 
-        if (cnt+1) % 4 == 0:
-            print('new log')
-            logger.log_data()
-            print(cnt)
-
-        cnt = cnt+1
-
-    logger.close()
-
 def read():
 
     reader = Reader(tgt_dir,db_name)
     reader.get_timeset('gloop',num=1)
     
     reader.close()
-
-#main()
-#read()
