@@ -1,7 +1,5 @@
 import random
 import sqlite3
-import random
-from sqlite3.dbapi2 import Error
 import numpy as np
 from datetime import datetime
 from time import sleep
