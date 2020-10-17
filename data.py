@@ -5,21 +5,6 @@ from datetime import datetime
 from time import sleep
 import os
 
-cwd0 = os.getcwd()
-tgt_dir = "C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\"
-db_name = 'testdb.db'
-
-#NEW TABLE DATA data column NAMES and data column TYPES tuple'd together inside a dictionary
-sp_data_names = ('time','pH','Water_Temp','Air_Temp','Nitrate','TDS','DO','Ammonia','Phosphate','Humidity','Flow_rt')
-sp_data_types = ("datetime","float","float","float","float","float","float","float","float","float","float", "float")
-
-#TO DO: make work for 
-
-#input data function, analogous to getdata()
-choice = [0,1,2,3,4,5,6,7,8,9]
-def data_in():
-    return [random.choice(choice)] * 11
-
 class Logger:
     def __init__(self,tgt_path,database):
         self.data_dict = {}
@@ -100,12 +85,8 @@ class Logger:
         if table == 'DAILY':
             table = self.datef
 
-        #check if table exists...
-        if table not in self.dbtables:
-            print(f'The table {table} is not defined. Use Logger.table to define one')
-
-        #time-controlled data collection (Running average. tsamp = time between measurements
-        #                                                  nsamp = number of measurements)
+        #time-controlled data collection 
+        # (Running average. tsamp = time between measurements, nsamp = number of measurements)
         
         #data is stored in a numpy array...
         leng = len(dataget())
@@ -123,10 +104,14 @@ class Logger:
 
         #adding the timestamp
         data_log = (datetime.now(),*data_avg)
+        print(data_log)
 
-        #collect data, datanames and assign to data dict
-        self.data_dict[table] = data_log
-        print(self.data_dict)
+        #assign data to tables in data_dict
+        if table not in self.data_dict:
+            self.data_dict[table] = []
+        self.data_dict[table].append(data_log)
+        
+        #print(self.data_dict)
 
     def log_data_old(self,table):
         #daily table
@@ -167,10 +152,14 @@ class Logger:
         
         ## LOGGING
         for tbl, data in self.data_dict.items(): #FOR ALL DATA IN DICT
-            cnt = len(data) - 1
-            params = '?' + ',?'*cnt
-            self.c.execute(f"INSERT INTO {tbl} VALUES({params})",data) #pushes values into database (dictionary format)
-            self.conn.commit()
+            for rdg in data:
+                cnt = len(rdg) - 1
+                params = '?' + ',?'*cnt
+                self.c.execute(f"INSERT INTO {tbl} VALUES({params})",rdg) #pushes values into database (dictionary format)
+                self.conn.commit()
+        
+        #empty the data dictionary
+        self.data_dict = {}
 
     def close(self):
         #close sqlite connection
@@ -213,27 +202,9 @@ class Reader:
         #close sqlite connection
         self.conn.close()
 
-def main():
-    
-    sensor_plot_table = {'Sensor Plot':(sp_data_names,sp_data_types)}
-    logger = Logger(tgt_dir,db_name) 
-    logger.table(sensor_plot_table) 
-
-    cnt = 0
-    while cnt<5: #would be a while true statement if I wasn't testing
-        
-        logger.collect_data('Sensor Plot',data_in,tsamp=1,nsamp=5)
-        logger.log_data() #TO DO: TAKE OUT OF LOOP
-        cnt += 1
-
-    logger.close()
-
 def read():
 
     reader = Reader(tgt_dir,db_name)
     reader.get_timeset('gloop',num=1)
     
     reader.close()
-
-#main()
-read()
