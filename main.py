@@ -53,11 +53,7 @@ if(__name__ == '__main__'):
     #start data logging
     p1.start()
     
-    config_file, testfile_path = user_settings() #will not need this....
-    from os import path
-    if not path.exists(testfile_path):
-        with open(testfile_path, "a+") as _:
-            pass
+    config_file = user_settings() #will not need this....
     
     #start GUI
     p2.start()
