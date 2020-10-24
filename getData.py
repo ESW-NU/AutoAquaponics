@@ -23,7 +23,7 @@ def getData():
     hum, atemp = dht.read_retry(dht.DHT22, DHT)
 #read w1 water temp sensor
     wtemp = wt_sensor.get_temperature()
-    return chan.voltage, hum, atemp, wtemp
+    return chan.voltage, hum, atemp, wtemp #chan.voltage == ph
 
 #from time import sleep
 #while True:

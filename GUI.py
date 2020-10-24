@@ -1,4 +1,4 @@
-from data import Reader, Logger
+from data import Reader
 import datetime
 from typing import Container
 #import led info, replace with relay info
@@ -197,8 +197,8 @@ class HomePage(tk.Frame):
                     live_text.config(text=most_recent[i], fg="black", bg="white")
                     current_plot.plot_color = 'g'
             
-            self.after(5000, GetValues)
-        self.after(5000, GetValues)
+            self.after(18000000, GetValues) #every 18,000,000 milliseconds == 5 minutes
+        self.after(18000000, GetValues) #call said function
 
 channel_count = []
 button_count = []

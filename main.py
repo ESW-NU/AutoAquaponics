@@ -4,13 +4,10 @@ from multiprocessing import Process
 
 global IS_ALIVE
 IS_ALIVE = True
-    
-testfile_name = "test4.csv"
 
 # Set your own file path & config path in file setup.json
 # or as environment variables AQUA_testfile_dir, AQUA_config_file
 _config_file = None
-_testfile_dir = None
 
 def _load_setting_json(json_file_str, json_var):
     from os import path
@@ -30,22 +27,16 @@ def load_setting(envir_var: str, setup_file: str, json_var: str, default_return_
     yield default_return_value
 
 _config_file = None
-_testfile_dir = None
 def user_settings():
     from os import path
     for config_path_location in load_setting("AQUA_config_file", "setup.json", "config_file", "./config.csv"):
         if config_path_location != None:
             _config_file = config_path_location
             break
-    for test_path_location in load_setting("AQUA_testfile_dir", "setup.json", "testfile_dir", "./"):
-        if test_path_location != None:
-            _testfile_dir = test_path_location
-            _testfile_path = path.join(test_path_location, testfile_name)
-            break
     if not path.exists(_config_file):
         with open(_config_file, "a+") as _:
             pass  
-    return _config_file, _testfile_path
+    return _config_file
 
 def start_GUI():
     import GUI
