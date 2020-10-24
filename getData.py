@@ -16,16 +16,20 @@ def getData():
 #create ADS object
     ads = ADS.ADS1115(i2c)
     ads.gain = 2/3
-#single ended mode read for pins 0 and 1
+#single ended mode read for pin 0 and 1
     chan = AnalogIn(ads, ADS.P0)
     chan1 = AnalogIn(ads, ADS.P1)
+#define readings from ADC
+    pH = -5.82*chan.voltage + 22.1 #calibrated equation
+    TDS = chan1.voltage
 #read air temp and air humidity
     hum, atemp = dht.read_retry(dht.DHT22, DHT)
 #read w1 water temp sensor
     wtemp = wt_sensor.get_temperature()
-    return tuple(chan.voltage, hum, atemp, wtemp) #chan.voltage == ph
+    return pH, TDS, hum, atemp, wtemp
+    #return tuple(pH, TDS, hum, atemp, wtemp) #chan.voltage == ph
 
-#from time import sleep
-#while True:
-#    print(getData())
-#    sleep(2)
+from time import sleep
+while True:
+    print(getData())
+    sleep(0.2)
