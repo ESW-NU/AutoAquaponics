@@ -51,11 +51,11 @@ class Logger:
         if type(newtable).__name__=="dict":
             for a,b in newtable.items():
                 if len(b[0]) != len(b[1]):
-                    print(f'ALERT: table {a} has a different number of column names and column types')
+                    print('ALERT: table {a} has a different number of column names and column types')
         #elif list(newtable.keys())[0] == 'DAILY':
         #    # implement DAILY TABLE!
-        else: print('ALERT: You must input a table dictionary')
-
+        else:
+            print('ALERT: You must input a table dictionary')
         ## MAKING A TABLE IF IT DOESN'T EXIST
         #translating datatypes from python to sqlite3
         types = {   "int":"""INTEGER""","float":"""REAL""",
@@ -70,7 +70,7 @@ class Logger:
             i = 0 #index
             for name in info[0]: #looping over the table names for this table
                 key = info[1][i] #getting the datatype for translation via the types dictionary
-                names += f"""{name} {types[key]}, """
+                names += """{name} {types[key]}, """
                 i += 1
             names = names[:-2] + """)""" #deletes the last ', ' and adds ')'
             
@@ -103,7 +103,7 @@ class Logger:
         data_avg = tuple(data_arr.sum(axis=0)/nsamp)
 
         #adding the timestamp
-        data_log = (datetime.now(),*data_avg)
+        data_log = (datetime.now(),data_avg)
         print(data_log)
 
         #assign data to tables in data_dict
@@ -131,7 +131,7 @@ class Logger:
         i = 0 #index
         for name in self.table_dict[table][0]: #looping over the table names for this table
             key = type(self.data_dict[table][i]).__name__ #getting the datatype for translation via the types dictionary
-            names += f"""{name} {types[key]}, """
+            names += """{name} {types[key]}, """
             i += 1
         names = names[:-2] + """)""" #deletes the last ', ' and adds ')'
         
@@ -142,7 +142,7 @@ class Logger:
         for tbl, data in self.data_dict.items():
             cnt = len(data) - 1
             params = '?' + ',?'*cnt
-            c.execute(f"INSERT INTO {tbl} VALUES({params})",data) #pushes values into database (dictionary format)
+            c.execute("INSERT INTO {tbl} VALUES({params})", data) #pushes values into database (dictionary format)
             conn.commit()
 
         #close sqlite connection
@@ -155,7 +155,7 @@ class Logger:
             for rdg in data:
                 cnt = len(rdg) - 1
                 params = '?' + ',?'*cnt
-                self.c.execute(f"INSERT INTO {tbl} VALUES({params})",rdg) #pushes values into database (dictionary format)
+                self.c.execute("INSERT INTO {tbl} VALUES({params})",rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
         
         #empty the data dictionary
@@ -195,7 +195,7 @@ class Reader:
         print(self.c.fetchall())
     
     def get_timeset(self,table,num = 1,timeval = None):
-        self.c.execute(f"""SELECT * FROM {table} ORDER BY time DESC LIMIT {num}""")
+        self.c.execute("""SELECT * FROM {table} ORDER BY time DESC LIMIT {num}""")
         print(self.c.fetchall())
 
     def close(self):

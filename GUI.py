@@ -225,7 +225,7 @@ class ControlPanel(tk.Frame):
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.grid(row=3, columnspan=14, pady=(0,20))
         
-        def preconfig_label(count: str):
+        def preconfig_label(count):
             return tk.Label(self, text=count, bg='white', font=SMALL_FONT)
         for count in range(1, 17):
             channel_count.append(preconfig_label(str(count)))
