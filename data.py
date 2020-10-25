@@ -157,12 +157,16 @@ class Reader:
         print(self.c.fetchall())
     
     def get_timeset(self,table,num = 1,timeval = None):
-        self.c.execute("""SELECT * FROM {table} ORDER BY time DESC LIMIT {num}""")
+        self.c.execute("SELECT * FROM {} ORDER BY time DESC LIMIT {}".format(table, num))
         print(self.c.fetchall())
 
     def close(self):
         #close sqlite connection
         self.conn.close()
+        
+    def commit(self):
+        #commit sqlite transaction
+        self.conn.commit()
 
 def read():
 

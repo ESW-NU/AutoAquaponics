@@ -52,6 +52,8 @@ if(__name__ == '__main__'):
     p2.daemon = True
     #start data logging
     p1.start()
+    print("Loading Data...")
+    sleep(60)
     
     config_file = user_settings() #will not need this....
     

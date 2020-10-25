@@ -30,7 +30,11 @@ from vertical_scroll_frame import VerticalScrolledFrame
 from main import user_settings
 config_path = user_settings()
 
-#initialize channel_buttons_config & entry configs
+#initialize channel_buttons_config, entry configs, and SQLite reader
+tgt_dir = "/home/pi/AutoAquaponics/databases/"
+db_name = 'sensor_testdb.db'
+reader = Reader(tgt_dir, db_name)
+
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
     if len(config_settings) != 5:
@@ -76,31 +80,32 @@ class Sensor_Plot:
             ax.set_xlim(incoming_data[-1], incoming_data[0]) 
             ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 4))
         plot.fill_between(tList, incoming_data, facecolor=plot_color, edgecolor=plot_color, alpha=0.5) #blue @initilization
-        
-for i, param in enumerate(param_list, 1): #tk.Label self refers to Homepage
-    most_recent = Reader.get_timeset(table="SensorData", num=20)
-    Reader.close()
-    for j in enumerate(most_recent):
-        tList = most_recent[j][0]
-        most_recent_20 = most_recent[j][i]        
 
-    param_dict[param] = Sensor_Plot(f.add_subplot(6, 2, i), most_recent_20, 'b')
-    
-for i, key in enumerate(param_dict, 1):
-    current_plot = param_dict[key]
-    current_plot.make_plot(param=key)
+most_recent = reader.get_timeset(table="SensorData", num=20)
+print("most recent", most_recent)
+reader.commit()       
+# for i, param in enumerate(param_list, 1): #tk.Label self refers to Homepage
+#     for j in enumerate(most_recent):
+#         tList = most_recent[j][0]
+#         most_recent_20 = most_recent[j][i]        
+#         param_dict[param] = Sensor_Plot(f.add_subplot(6, 2, i), most_recent_20, 'b')
+#     
+# for i, key in enumerate(param_dict, 1):
+#     current_plot = param_dict[key]
+#     current_plot.make_plot(param=key)
     
 ###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_2O LIST AND INSERT FRESHLY CALLED VALUE TO INDEX[1]
 def animate(ii):
-    most_recent = Reader.get_timeset(table="SensorData", num=1)
-    Reader.close()
-    for i, key in enumerate(param_dict, 1):
-        current_plot = param_dict[key]
-        data_stream = current_plot.incoming_data
-        data_stream.pop()
-        data_stream.insert(1, most_recent[0][i])
-        current_plot.incoming_data = data_stream
-        current_plot.make_plot(param=key)
+    most_recent = reader.get_timeset(table="SensorData", num=1)
+    while most_recent != None:
+        reader.commit()
+        for i, key in enumerate(param_dict, 1):
+            current_plot = param_dict[key]
+            data_stream = current_plot.incoming_data
+            data_stream.pop()
+            data_stream.insert(1, most_recent[0][i])
+            current_plot.incoming_data = data_stream
+            current_plot.make_plot(param=key)
     
 #initialization
 class AllWindow(tk.Tk):
@@ -183,8 +188,8 @@ class HomePage(tk.Frame):
         def GetValues():
             with open(config_path, "r") as file:
                 config_settings = list(csv.reader(file))   
-            most_recent = Reader.get_timeset(table="SensorData", num=1)
-            Reader.close()
+            most_recent = reader.get_timeset(table="SensorData", num=1)
+            reader.commit()
             
             for i, key in enumerate(param_dict):
                 current_param_val = most_recent[0][i]
