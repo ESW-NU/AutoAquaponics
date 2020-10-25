@@ -1,7 +1,7 @@
 #importing/initializing for plotting/saving
 all_we_got_now = ('time', 'pH', 'humidity', 'air temp', 'water temp')
 now_data_types = ("datetime", "float", "float", "float", "float")
-tgt_dir = "/home/pi/Desktop/AutoAquaponics-master/databases/"
+tgt_dir = "/home/pi/AutoAquaponics/databases/"
 db_name = 'sensor_testdb.db'
 
 def data_fxn():
