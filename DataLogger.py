@@ -1,6 +1,6 @@
 #importing/initializing for plotting/saving
-all_we_got_now = ('time', 'pH', 'humidity', 'air temp', 'water temp')
-now_data_types = ("datetime", "float", "float", "float", "float")
+all_we_got_now = ('time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp')
+now_data_types = ("datetime", "float", "float", "float", "float", "float")
 
 tgt_dir = "/home/pi/AutoAquaponics/databases/"
 db_name = 'sensor_testdb.db'
@@ -12,13 +12,13 @@ def data_fxn():
 
 def DataLogger():
     from data import Reader, Logger
+    from getData import getData
     sensor_plot_table = {'SensorData':(all_we_got_now, now_data_types)}
     logger = Logger(tgt_dir, db_name)
     logger.table(sensor_plot_table)
-    for i in range(20):
-        from getData import getData
-        Logger.collect_data("SensorData", data_fxn, tsamp=1, nsamp=5)
-        Logger.log_data()
-        Logger.close()
+    while True:
+        logger.collect_data("SensorData", getData, tsamp=3, nsamp=1)
+        logger.log_data()
+        logger.commit()
         
 DataLogger()

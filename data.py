@@ -20,9 +20,9 @@ class Logger:
         os.chdir(tgt_path)
 
         ## INITIALIZING DATABASE
-        #first, keeping note of whether a database exists yet in the directory (to print an alert later) 
+        #first, keeping note of whether a database exists yet in the directory
+        #(to print an alert later) 
         newdb = not os.path.isfile(self.dbname)
-        
         #sqlite connection and cursor... (this will make a new database dbname.db if none exists)
         self.conn = sqlite3.connect(self.dbname)
         self.c = self.conn.cursor()
@@ -73,9 +73,7 @@ class Logger:
             names = names[:-2] + """)""" #deletes the last ', ' and adds ')'
             
             #Create table if not yet defined, with the following columns...
-            bruh = """CREATE TABLE IF NOT EXISTS """ + table + names
-            print(bruh)
-            self.c.execute(bruh)
+            self.c.execute("""CREATE TABLE IF NOT EXISTS """ + table + names)
 
             # add table(s) to the table dictionary...
             self.table_dict[table] = info
@@ -94,7 +92,6 @@ class Logger:
         ct = 0
         while ct < nsamp:
             tup_arr = np.asarray([dataget()]) #put the getdata() into array form
-            print(tup_arr)
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
             sleep(tsamp)
@@ -103,50 +100,14 @@ class Logger:
         data_avg = tuple(data_arr.sum(axis=0)/nsamp)
 
         #adding the timestamp
-        data_log = (datetime.now(),data_avg)
+        data_log = (datetime.now(),) + data_avg
         print(data_log)
 
         #assign data to tables in data_dict
         if table not in self.data_dict:
             self.data_dict[table] = []
         self.data_dict[table].append(data_log)
-        
-        #print(self.data_dict)
 
-    def log_data_old(self,table):
-        #daily table
-        if table == 'DAILY':
-            table = self.datef
-        
-        #sqlite connection and cursor
-        conn = sqlite3.connect(self.dbname)
-        c = conn.cursor()
-        
-        ## MAKING A TABLE IF IT DOESN'T EXIST
-        #translating datatypes from python to sqlite3
-        types = {"int":"""INTEGER""","float":"""REAL""","float64":"""REAL""","str":"""TEXT""","datetime":"""REAL"""}
-        
-        #generating a string for table generation
-        names = """("""
-        i = 0 #index
-        for name in self.table_dict[table][0]: #looping over the table names for this table
-            key = type(self.data_dict[table][i]).__name__ #getting the datatype for translation via the types dictionary
-            names += """{name} {types[key]}, """
-            i += 1
-        names = names[:-2] + """)""" #deletes the last ', ' and adds ')'
-        
-        #Create table if not yet defined, with the following columns...
-        c.execute("""CREATE TABLE IF NOT EXISTS """ + table + names)
-        
-        ## LOGGING
-        for tbl, data in self.data_dict.items():
-            cnt = len(data) - 1
-            params = '?' + ',?'*cnt
-            c.execute("INSERT INTO {tbl} VALUES({params})", data) #pushes values into database (dictionary format)
-            conn.commit()
-
-        #close sqlite connection
-        conn.close()
 
     def log_data(self):
         
@@ -155,7 +116,7 @@ class Logger:
             for rdg in data:
                 cnt = len(rdg) - 1
                 params = '?' + ',?'*cnt
-                self.c.execute("INSERT INTO {tbl} VALUES({params})",rdg) #pushes values into database (dictionary format)
+                self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
         
         #empty the data dictionary
@@ -164,6 +125,10 @@ class Logger:
     def close(self):
         #close sqlite connection
         self.conn.close()
+    
+    def commit(self):
+        #commit sqlite transaction
+        self.conn.commit()
     
 class Reader:
     def __init__(self,tgt_path,database):
@@ -174,10 +139,7 @@ class Reader:
 
         ## INITIALIZING DATABASE
         #first, keeping note of whether a database exists yet in the directory
-        if os.path.isfile(self.dbname):
-            newdb = False
-        else:
-            newdb = True 
+        newdb = not os.path.isfile(self.dbname)
         
         #Create an alert for when a new database is being made
         if newdb:
