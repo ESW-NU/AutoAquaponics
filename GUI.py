@@ -78,7 +78,7 @@ class Sensor_Plot:
         plot.fill_between(tList, incoming_data, facecolor=plot_color, edgecolor=plot_color, alpha=0.5) #blue @initilization
         
 for i, param in enumerate(param_list, 1): #tk.Label self refers to Homepage
-    most_recent = Reader.get_timeset(table="Sensor Plot", num=20)
+    most_recent = Reader.get_timeset(table="SensorData", num=20)
     Reader.close()
     for j in enumerate(most_recent):
         tList = most_recent[j][0]
@@ -92,7 +92,7 @@ for i, key in enumerate(param_dict, 1):
     
 ###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_2O LIST AND INSERT FRESHLY CALLED VALUE TO INDEX[1]
 def animate(ii):
-    most_recent = Reader.get_timeset(table="Sensor Plot", num=1)
+    most_recent = Reader.get_timeset(table="SensorData", num=1)
     Reader.close()
     for i, key in enumerate(param_dict, 1):
         current_plot = param_dict[key]
@@ -183,7 +183,7 @@ class HomePage(tk.Frame):
         def GetValues():
             with open(config_path, "r") as file:
                 config_settings = list(csv.reader(file))   
-            most_recent = Reader.get_timeset(table="Sensor Plot", num=1)
+            most_recent = Reader.get_timeset(table="SensorData", num=1)
             Reader.close()
             
             for i, key in enumerate(param_dict):
@@ -225,7 +225,7 @@ class ControlPanel(tk.Frame):
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.grid(row=3, columnspan=14, pady=(0,20))
         
-        def preconfig_label(count):
+        def preconfig_label(count: str):
             return tk.Label(self, text=count, bg='white', font=SMALL_FONT)
         for count in range(1, 17):
             channel_count.append(preconfig_label(str(count)))

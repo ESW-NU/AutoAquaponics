@@ -20,11 +20,8 @@ class Logger:
         os.chdir(tgt_path)
 
         ## INITIALIZING DATABASE
-        #first, keeping note of whether a database exists yet in the directory (to print an alert later)
-        if os.path.isfile(self.dbname):
-            newdb = False
-        else:
-            newdb = True 
+        #first, keeping note of whether a database exists yet in the directory (to print an alert later) 
+        newdb = not os.path.isfile(self.dbname)
         
         #sqlite connection and cursor... (this will make a new database dbname.db if none exists)
         self.conn = sqlite3.connect(self.dbname)
@@ -70,12 +67,15 @@ class Logger:
             i = 0 #index
             for name in info[0]: #looping over the table names for this table
                 key = info[1][i] #getting the datatype for translation via the types dictionary
-                names += """{name} {types[key]}, """
+                names += "{} {},".format(name, types[key])
+                #names += """{name} {types[key]}, """
                 i += 1
             names = names[:-2] + """)""" #deletes the last ', ' and adds ')'
             
             #Create table if not yet defined, with the following columns...
-            self.c.execute("""CREATE TABLE IF NOT EXISTS """ + table + names)
+            bruh = """CREATE TABLE IF NOT EXISTS """ + table + names
+            print(bruh)
+            self.c.execute(bruh)
 
             # add table(s) to the table dictionary...
             self.table_dict[table] = info
