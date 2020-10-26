@@ -134,8 +134,7 @@ def animate(ii):
             else:
                 current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
                 current_plot.plot_color = 'g'
-
-            
+           
 #initialization
 class AllWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -178,7 +177,6 @@ class AllWindow(tk.Tk):
     def die(self):
         exit()
 
-live_text_label = []  
 #add home page
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -216,30 +214,6 @@ class HomePage(tk.Frame):
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
         
-        #function to update live text
-        # def GetValues():
-        #     with open(config_path, "r") as file:
-        #         config_settings = list(csv.reader(file))   
-            
-        #     most_recent = reader.get_timeset(table="SensorData", num=1)
-        #     reader.commit()
-        #     if most_recent != None:
-        
-        #         for i, key in enumerate(param_dict, 1):
-        #             current_param_val = float(most_recent[0][i])
-        #             live_text = live_text_label[i-1]
-        #             current_plot = param_dict[key]
-        #             if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
-        #                 live_text.config(text=most_recent[0][i], fg="red", bg="white")
-        #                 current_plot.plot_color = 'r'
-        #             else:
-        #                 live_text.config(text=most_recent[0][i], fg="black", bg="white")
-        #                 current_plot.plot_color = 'g'
-            
-        #     self.after(5000, GetValues) #every 18,000,000 milliseconds == 5 minutes
-        
-        # self.after(5000, GetValues) #call said function
-
 channel_count = []
 button_count = []
 on_times = []
