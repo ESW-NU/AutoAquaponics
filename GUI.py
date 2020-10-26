@@ -1,5 +1,5 @@
 from data import Reader
-import datetime
+from datetime import datetime 
 from typing import Container
 #import led info, replace with relay info
 #from gpiozero import PWMLED
@@ -50,38 +50,43 @@ with open(config_path, "r") as file:
             file.flush()
 #create figure for plots and set figure size/layout
 f = figure.Figure(figsize=(8.6,17.5), dpi=100)
-
-f.subplots_adjust(top=0.993, bottom=0.015)
-axes = f.get_axes()
+f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
 param_list = ['pH', 'TDS', 'Humidity', 'Air Temp', 'Water Temp']
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
-
+live_dict = {}
+class Live_Text:
+    def __init__(self, label):
+        self.label = label
+    
 class Sensor_Plot:
-    def __init__(self, plot, tList, param, incoming_data, plot_color):
+    def __init__(self, plot, tList, x_ax, param, incoming_data, plot_color):
         self.plot = plot
         self.tList = tList
+        self.x_ax = x_ax
         self.param = param
         self.incoming_data = incoming_data #<- graph is bound by incoming data and Data Summary Table displays most recent value 20 of them
         self.plot_color = plot_color #initially 'b' for all
         
     def make_plot(self):
+
         self.plot.clear()
+        self.plot.set_xlabel('Time')
         self.plot.set_ylabel(self.param)
         # plot.set_ylim(ylim) #UNIQUE BUT HOW?
-        self.plot.set_xlim(self.tList[-1], self.tList[0])
-        for label in self.plot.xaxis.get_ticklabels():
-            label.set_rotation(10)
-        # for ax in axes:
-        #     ax.xaxis_date()
-        #     ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))  
-        #     [tk.set_visible(True) for tk in ax.get_xticklabels()]
-        #     [label.set_rotation(10) for label in ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
-        #     ax.set_xlim(self.tList[-1], self.tList[0]) 
-        #     ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 4))
+
+        self.x_ax.xaxis_date()
+        self.x_ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))
         
-        self.plot.fill_between(self.tList, self.incoming_data, where=(self.incoming_data > [0]*len(self.incoming_data)),
+        [tk.set_visible(True) for tk in self.x_ax.get_xticklabels()]
+        [label.set_rotation(10) for label in self.x_ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
+
+#        self.plot.set_xlim(self.tList[-2], self.tList[0])
+        self.x_ax.set_xlim(self.tList[-2], self.tList[0]) 
+        self.x_ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 4))
+        
+        self.plot.fill_between(self.tList, self.incoming_data, #where=(self.incoming_data > [0]*len(self.incoming_data))
                                facecolor=self.plot_color, edgecolor=self.plot_color, alpha=0.5) #blue @initilization
 
 
@@ -92,10 +97,13 @@ for i, param in enumerate(param_list, 1):
     tList = []
     most_recent_20 = []
     for j in range(len(most_recent)):
-        tList.append(most_recent[j][0])
+        time_f = datetime.strptime(most_recent[j][0], "%m/%d/%Y %H:%M:%S")
+        tList.append(time_f)
         most_recent_20.append(most_recent[j][i])
-        
-    current_plot = Sensor_Plot(f.add_subplot(6, 2, i), tList, param, most_recent_20, 'b')      
+    
+    subplot = f.add_subplot(6, 2, i) #sharex?
+    x_ax = f.get_axes()
+    current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param, most_recent_20, 'b')      
     param_dict[param] = current_plot
     current_plot.make_plot()
 
@@ -103,8 +111,10 @@ for i, param in enumerate(param_list, 1):
 ###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_2O LIST AND INSERT FRESHLY CALLED VALUE TO INDEX[1]
 def animate(ii):
     most_recent = reader.get_timeset(table="SensorData", num=1)
+    reader.commit()
     if most_recent != None:
-        reader.commit()
+        with open(config_path, "r") as file:
+            config_settings = list(csv.reader(file))
         for i, key in enumerate(param_dict, 1):
             current_plot = param_dict[key]
             data_stream = current_plot.incoming_data
@@ -112,17 +122,19 @@ def animate(ii):
             data_stream.pop()
             time_stream.pop()
             data_stream.insert(0, most_recent[0][i])
-            time_stream.insert(0, most_recent[0][0])
-            # for ax in axes:
-            #     ax.xaxis_date()
-            #     ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))  
-            #     [tk.set_visible(True) for tk in ax.get_xticklabels()]
-            #     [label.set_rotation(10) for label in ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
-            #     ax.set_xlim(time_stream[-1], time_stream[0])
-            #     ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 4))
+            time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+            time_stream.insert(0, time_f)
             current_plot.make_plot()
-    
-            # current_plot.incoming_data = data_stream
+            
+            current_param_val = float(most_recent[0][i])
+            current_text = live_dict[key]
+            if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
+                current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
+                current_plot.plot_color = 'r'
+            else:
+                current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
+                current_plot.plot_color = 'g'
+
             
 #initialization
 class AllWindow(tk.Tk):
@@ -176,6 +188,7 @@ class HomePage(tk.Frame):
         scframe.place(x=130, y=40)
         #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
+        background = canvas.copy_from_bbox(f.bbox)
         canvas.draw()
         #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
@@ -194,34 +207,38 @@ class HomePage(tk.Frame):
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
             param_label.place(x=5, y=65+22*i)
-        
-        for i in range(len(param_list)):   
+
+        for i, param in enumerate(param_list):
             loading_text = tk.Label(self, text="Loading", fg="black", bg="white",
-                            font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
-                            width=10, height=1)
-            live_text_label.append(loading_text)
+                    font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
+                    width=10, height=1)
             loading_text.place(x=91, y=65+22*i)
+            current_text = Live_Text(loading_text)
+            live_dict[param] = current_text
         
         #function to update live text
-        def GetValues():
-            with open(config_path, "r") as file:
-                config_settings = list(csv.reader(file))   
-            most_recent = reader.get_timeset(table="SensorData", num=1)
-            reader.commit()
+        # def GetValues():
+        #     with open(config_path, "r") as file:
+        #         config_settings = list(csv.reader(file))   
             
-            for i, key in enumerate(param_dict, 1):
-                current_param_val = float(most_recent[0][i])
-                live_text = live_text_label[i-1]
-                current_plot = param_dict[key]
-                if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
-                    live_text.config(text=most_recent[0][i], fg="red", bg="white")
-                    current_plot.plot_color = 'r'
-                else:
-                    live_text.config(text=most_recent[0][i], fg="black", bg="white")
-                    current_plot.plot_color = 'g'
+        #     most_recent = reader.get_timeset(table="SensorData", num=1)
+        #     reader.commit()
+        #     if most_recent != None:
+        
+        #         for i, key in enumerate(param_dict, 1):
+        #             current_param_val = float(most_recent[0][i])
+        #             live_text = live_text_label[i-1]
+        #             current_plot = param_dict[key]
+        #             if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
+        #                 live_text.config(text=most_recent[0][i], fg="red", bg="white")
+        #                 current_plot.plot_color = 'r'
+        #             else:
+        #                 live_text.config(text=most_recent[0][i], fg="black", bg="white")
+        #                 current_plot.plot_color = 'g'
             
-            self.after(5000, GetValues) #every 18,000,000 milliseconds == 5 minutes
-        self.after(5000, GetValues) #call said function
+        #     self.after(5000, GetValues) #every 18,000,000 milliseconds == 5 minutes
+        
+        # self.after(5000, GetValues) #call said function
 
 channel_count = []
 button_count = []

@@ -100,7 +100,7 @@ class Logger:
         data_avg = tuple(data_arr.sum(axis=0)/nsamp)
 
         #adding the timestamp
-        data_log = (datetime.now(),) + data_avg
+        data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_avg
         print(data_log)
 
         #assign data to tables in data_dict

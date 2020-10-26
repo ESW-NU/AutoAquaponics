@@ -17,7 +17,7 @@ def DataLogger():
     logger = Logger(tgt_dir, db_name)
     logger.table(sensor_plot_table)
     while True:
-        logger.collect_data("SensorData", data_fxn, tsamp=1, nsamp=1)
+        logger.collect_data("SensorData", data_fxn, tsamp=5, nsamp=1)
         logger.log_data()
         logger.commit()
         
