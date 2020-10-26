@@ -31,7 +31,7 @@ from main import user_settings
 config_path = user_settings()
 
 #initialize channel_buttons_config, entry configs, and SQLite reader
-tgt_dir = "/home/pi/AutoAquaponics/databases/"
+tgt_dir = "C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\" #"/home/pi/AutoAquaponics/databases/"
 db_name = 'sensor_testdb.db'
 reader = Reader(tgt_dir, db_name)
 
@@ -55,58 +55,75 @@ f.subplots_adjust(top=0.993, bottom=0.015)
 axes = f.get_axes()
 
 param_dict = {}
-param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
+param_list = ['pH', 'TDS', 'Humidity', 'Air Temp', 'Water Temp']
+#param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 
 class Sensor_Plot:
-    def __init__(self, plot, incoming_data, plot_color):
+    def __init__(self, plot, tList, param, incoming_data, plot_color):
         self.plot = plot
+        self.tList = tList
+        self.param = param
         self.incoming_data = incoming_data #<- graph is bound by incoming data and Data Summary Table displays most recent value 20 of them
         self.plot_color = plot_color #initially 'b' for all
         
-    def make_plot(self, plot, incoming_data, plot_color, param=None):
-        self.param = param
-        
-        plot.clear()
-        plot.set_ylabel(param)
+    def make_plot(self):
+        self.plot.clear()
+        self.plot.set_ylabel(self.param)
         # plot.set_ylim(ylim) #UNIQUE BUT HOW?
-        #plot.set_xlim(incoming_data[0], incoming_data[-1])
-        for label in plot.xaxis.get_ticklabels():
+        self.plot.set_xlim(self.tList[-1], self.tList[0])
+        for label in self.plot.xaxis.get_ticklabels():
             label.set_rotation(10)
-        for ax in axes:
-            ax.xaxis_date()
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))  
-            [tk.set_visible(True) for tk in ax.get_xticklabels()]
-            [label.set_rotation(10) for label in ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
-            ax.set_xlim(incoming_data[-1], incoming_data[0]) 
-            ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 4))
-        plot.fill_between(tList, incoming_data, facecolor=plot_color, edgecolor=plot_color, alpha=0.5) #blue @initilization
+        # for ax in axes:
+        #     ax.xaxis_date()
+        #     ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))  
+        #     [tk.set_visible(True) for tk in ax.get_xticklabels()]
+        #     [label.set_rotation(10) for label in ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
+        #     ax.set_xlim(self.tList[-1], self.tList[0]) 
+        #     ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 4))
+        
+        self.plot.fill_between(self.tList, self.incoming_data, where=(self.incoming_data > [0]*len(self.incoming_data)),
+                               facecolor=self.plot_color, edgecolor=self.plot_color, alpha=0.5) #blue @initilization
+
 
 most_recent = reader.get_timeset(table="SensorData", num=20)
-print("most recent", most_recent)
+#print("most recent", most_recent)
 reader.commit()       
-# for i, param in enumerate(param_list, 1): #tk.Label self refers to Homepage
-#     for j in enumerate(most_recent):
-#         tList = most_recent[j][0]
-#         most_recent_20 = most_recent[j][i]        
-#         param_dict[param] = Sensor_Plot(f.add_subplot(6, 2, i), most_recent_20, 'b')
-#     
-# for i, key in enumerate(param_dict, 1):
-#     current_plot = param_dict[key]
-#     current_plot.make_plot(param=key)
+for i, param in enumerate(param_list, 1): 
+    tList = []
+    most_recent_20 = []
+    for j in range(len(most_recent)):
+        tList.append(most_recent[j][0])
+        most_recent_20.append(most_recent[j][i])
+        
+    current_plot = Sensor_Plot(f.add_subplot(6, 2, i), tList, param, most_recent_20, 'b')      
+    param_dict[param] = current_plot
+    current_plot.make_plot()
+
     
 ###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_2O LIST AND INSERT FRESHLY CALLED VALUE TO INDEX[1]
 def animate(ii):
     most_recent = reader.get_timeset(table="SensorData", num=1)
-    while most_recent != None:
+    if most_recent != None:
         reader.commit()
         for i, key in enumerate(param_dict, 1):
             current_plot = param_dict[key]
             data_stream = current_plot.incoming_data
+            time_stream = current_plot.tList
             data_stream.pop()
-            data_stream.insert(1, most_recent[0][i])
-            current_plot.incoming_data = data_stream
-            current_plot.make_plot(param=key)
+            time_stream.pop()
+            data_stream.insert(0, most_recent[0][i])
+            time_stream.insert(0, most_recent[0][0])
+            # for ax in axes:
+            #     ax.xaxis_date()
+            #     ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))  
+            #     [tk.set_visible(True) for tk in ax.get_xticklabels()]
+            #     [label.set_rotation(10) for label in ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
+            #     ax.set_xlim(time_stream[-1], time_stream[0])
+            #     ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 4))
+            current_plot.make_plot()
     
+            # current_plot.incoming_data = data_stream
+            
 #initialization
 class AllWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -148,7 +165,8 @@ class AllWindow(tk.Tk):
     #end program fcn triggered by quit button
     def die(self):
         exit()
-  
+
+live_text_label = []  
 #add home page
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -176,13 +194,13 @@ class HomePage(tk.Frame):
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1, anchor=W, justify=LEFT)
             param_label.place(x=5, y=65+22*i)
-            
-        loading_text = tk.Label(self, text="Loading", fg="black", bg="white",
+        
+        for i in range(len(param_list)):   
+            loading_text = tk.Label(self, text="Loading", fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=10, height=1)
-        live_text_label = [loading_text] * len(param_list)
-        for i, data_label in enumerate(live_text_label):
-            data_label.place(x=91, y=65+22*i)
+            live_text_label.append(loading_text)
+            loading_text.place(x=91, y=65+22*i)
         
         #function to update live text
         def GetValues():
@@ -191,19 +209,19 @@ class HomePage(tk.Frame):
             most_recent = reader.get_timeset(table="SensorData", num=1)
             reader.commit()
             
-            for i, key in enumerate(param_dict):
-                current_param_val = most_recent[0][i]
-                live_text = live_text_label[i]
+            for i, key in enumerate(param_dict, 1):
+                current_param_val = float(most_recent[0][i])
+                live_text = live_text_label[i-1]
                 current_plot = param_dict[key]
                 if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
-                    live_text.config(text=most_recent[i], fg="red", bg="white")
+                    live_text.config(text=most_recent[0][i], fg="red", bg="white")
                     current_plot.plot_color = 'r'
                 else:
-                    live_text.config(text=most_recent[i], fg="black", bg="white")
+                    live_text.config(text=most_recent[0][i], fg="black", bg="white")
                     current_plot.plot_color = 'g'
             
-            self.after(18000000, GetValues) #every 18,000,000 milliseconds == 5 minutes
-        self.after(18000000, GetValues) #call said function
+            self.after(5000, GetValues) #every 18,000,000 milliseconds == 5 minutes
+        self.after(5000, GetValues) #call said function
 
 channel_count = []
 button_count = []
@@ -238,6 +256,7 @@ class ControlPanel(tk.Frame):
         preconfig_button = tk.Button(self, text="Channel OFF", bg= "red", fg= "white", width=10, 
                            height=1, command=self.get_channel_state)
         button_count = [preconfig_button] * 16
+        #self.discard()
         
         #Labels, buttons, and entries, oh my!
         for i in range(16):

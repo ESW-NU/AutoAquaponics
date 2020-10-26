@@ -2,12 +2,12 @@
 all_we_got_now = ('time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp')
 now_data_types = ("datetime", "float", "float", "float", "float", "float")
 
-tgt_dir = "/home/pi/AutoAquaponics/databases/"
+tgt_dir = "C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\" #"/home/pi/AutoAquaponics/databases/" 
 db_name = 'sensor_testdb.db'
 
 def data_fxn():
     import numpy as np
-    N = 5
+    N = len(all_we_got_now)
     return tuple(np.random.randint(0,10,size=(N-1))) #N-tuple of random ints from 0 to 10.
 
 def DataLogger():
@@ -17,8 +17,8 @@ def DataLogger():
     logger = Logger(tgt_dir, db_name)
     logger.table(sensor_plot_table)
     while True:
-        logger.collect_data("SensorData", getData, tsamp=1, nsamp=1)
+        logger.collect_data("SensorData", data_fxn, tsamp=1, nsamp=1)
         logger.log_data()
         logger.commit()
         
-DataLogger()
+#DataLogger()

@@ -53,10 +53,11 @@ if(__name__ == '__main__'):
     #start data logging
     p1.start()
     print("Loading Data...")
-    sleep(60)
+    sleep(30)
+    #sleep(60)
     
-    config_file = user_settings() #will not need this....
-    
+    #config_file = user_settings() #will not need this....
+
     #start GUI
     p2.start()
     p1.join()

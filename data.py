@@ -154,11 +154,13 @@ class Reader:
         self.c.execute("""SELECT * FROM """ + table)
         
         #return a list...
-        print(self.c.fetchall())
+        return self.c.fetchall()
+        #print(self.c.fetchall())
     
     def get_timeset(self,table,num = 1,timeval = None):
         self.c.execute("SELECT * FROM {} ORDER BY time DESC LIMIT {}".format(table, num))
-        print(self.c.fetchall())
+        return self.c.fetchall()
+        #print(self.c.fetchall())
 
     def close(self):
         #close sqlite connection
@@ -167,10 +169,3 @@ class Reader:
     def commit(self):
         #commit sqlite transaction
         self.conn.commit()
-
-def read():
-
-    reader = Reader(tgt_dir,db_name)
-    reader.get_timeset('gloop',num=1)
-    
-    reader.close()
