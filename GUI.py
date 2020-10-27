@@ -37,6 +37,11 @@ reader = Reader(tgt_dir, db_name)
 
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
+    channel_buttons_config = config_settings[0]
+    on_config = config_settings[1]
+    off_config = config_settings[2]
+    upper_config = config_settings[3]
+    lower_config = config_settings[4]
     if len(config_settings) != 5:
         with open(config_path, 'w', newline='') as file:
             channel_buttons_config = [-1]*16
@@ -245,9 +250,10 @@ class ControlPanel(tk.Frame):
             channel_count.append(preconfig_label(str(count)))
     
         preconfig_button = tk.Button(self, text="Channel OFF", bg= "red", fg= "white", width=10, 
-                           height=1, command=self.get_channel_state)
-        button_count = [preconfig_button] * 16
-        #self.discard()
+                           height=1, command=self.get_channel_state) #command will change state
+        for count in range(16):
+            button_count.append(preconfig_button)
+        
         
         #Labels, buttons, and entries, oh my!
         for i in range(16):
@@ -304,6 +310,10 @@ class ControlPanel(tk.Frame):
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(13, weight=1)
+        
+        self.discard()
+        
+        
 
     #fcn triggered by save button
     def popup(self):
