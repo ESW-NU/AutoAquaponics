@@ -31,7 +31,7 @@ from main import user_settings
 config_path = user_settings()
 
 #initialize channel_buttons_config, entry configs, and SQLite reader
-tgt_dir = "C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\" #"/home/pi/AutoAquaponics/databases/"
+tgt_dir = "C:\\Users\\Bill Yen\\Desktop\\NU Urban Ag\\AutoAquaponics\\" #"/home/pi/AutoAquaponics/databases/"
 db_name = 'sensor_testdb.db'
 reader = Reader(tgt_dir, db_name)
 
@@ -53,7 +53,7 @@ f = figure.Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
-param_list = ['pH', 'TDS', 'Humidity', 'Air Temp', 'Water Temp']
+param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (C)', 'Water Temp (C)']
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 class Live_Text:
