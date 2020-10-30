@@ -2,7 +2,7 @@
 all_we_got_now = ('time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp')
 now_data_types = ("datetime", "float", "float", "float", "float", "float")
 
-tgt_dir = "C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\" #"/home/pi/AutoAquaponics/databases/" 
+tgt_dir = "/home/pi/AutoAquaponics/databases/" #"C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\"
 db_name = 'sensor_testdb.db'
 
 def data_fxn():

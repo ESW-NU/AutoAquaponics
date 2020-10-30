@@ -31,7 +31,7 @@ from main import user_settings
 config_path = user_settings()
 
 #initialize channel_buttons_config, entry configs, and SQLite reader
-tgt_dir = "C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\" #"/home/pi/AutoAquaponics/databases/"
+tgt_dir = "/home/pi/AutoAquaponics/databases/" #"C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\"
 db_name = 'sensor_testdb.db'
 reader = Reader(tgt_dir, db_name)
 
@@ -244,6 +244,9 @@ class ControlPanel(tk.Frame):
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.grid(row=3, columnspan=14, pady=(0,20))
         
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(13, weight=1)
+        
         def preconfig_label(count: str):
             return tk.Label(self, text=count, bg='white', font=SMALL_FONT)
         for count in range(1, 17):
@@ -307,9 +310,6 @@ class ControlPanel(tk.Frame):
                 off_element.grid(row=row, column=6) #off entry
         #Tells user what to input
         tk.Label(self, text="*Input Time in Hours", bg="white").grid(row=12, columnspan=14)
-
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(13, weight=1)
         
         self.discard()
         
