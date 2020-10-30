@@ -31,17 +31,12 @@ from main import user_settings
 config_path = user_settings()
 
 #initialize channel_buttons_config, entry configs, and SQLite reader
-tgt_dir = "C:\\Users\\Bill Yen\\Desktop\\NU Urban Ag\\AutoAquaponics\\" #"/home/pi/AutoAquaponics/databases/"
+tgt_dir = "C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\" #"/home/pi/AutoAquaponics/databases/"
 db_name = 'sensor_testdb.db'
 reader = Reader(tgt_dir, db_name)
 
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
-    channel_buttons_config = config_settings[0]
-    on_config = config_settings[1]
-    off_config = config_settings[2]
-    upper_config = config_settings[3]
-    lower_config = config_settings[4]
     if len(config_settings) != 5:
         with open(config_path, 'w', newline='') as file:
             channel_buttons_config = [-1]*16
@@ -53,12 +48,17 @@ with open(config_path, "r") as file:
             writer.writerows([channel_buttons_config,on_config,off_config, upper_config, lower_config])
             config_settings = [channel_buttons_config,on_config,off_config, upper_config, lower_config]
             file.flush()
+    channel_buttons_config = config_settings[0]
+    on_config = config_settings[1]
+    off_config = config_settings[2]
+    upper_config = config_settings[3]
+    lower_config = config_settings[4]
 #create figure for plots and set figure size/layout
 f = figure.Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
-param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (C)', 'Water Temp (C)']
+param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (C)', 'Water Temp (C)', 'Distance']
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 class Live_Text:
@@ -130,7 +130,7 @@ def animate(ii):
             time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
             time_stream.insert(0, time_f)
             current_plot.make_plot()
-            
+            #edit to put this check closer to the top?
             current_param_val = float(most_recent[0][i])
             current_text = live_dict[key]
             if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
@@ -244,6 +244,9 @@ class ControlPanel(tk.Frame):
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.grid(row=3, columnspan=14, pady=(0,20))
         
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(13, weight=1)
+        
         def preconfig_label(count: str):
             return tk.Label(self, text=count, bg='white', font=SMALL_FONT)
         for count in range(1, 17):
@@ -307,9 +310,6 @@ class ControlPanel(tk.Frame):
                 off_element.grid(row=row, column=6) #off entry
         #Tells user what to input
         tk.Label(self, text="*Input Time in Hours", bg="white").grid(row=12, columnspan=14)
-
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(13, weight=1)
         
         self.discard()
         

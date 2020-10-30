@@ -26,7 +26,7 @@ def load_setting(envir_var: str, setup_file: str, json_var: str, default_return_
     yield _load_setting_json(setup_file, json_var)
     yield default_return_value
 
-_config_file = None
+# _config_file = None
 def user_settings():
     from os import path
     for config_path_location in load_setting("AQUA_config_file", "setup.json", "config_file", "./config.csv"):
