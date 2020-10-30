@@ -31,17 +31,12 @@ from main import user_settings
 config_path = user_settings()
 
 #initialize channel_buttons_config, entry configs, and SQLite reader
-tgt_dir = "/home/pi/AutoAquaponics/databases/" #"C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\"
+tgt_dir = "C:\\Users\\Chris\\Desktop\\NU_Urban_Ag\\" #"/home/pi/AutoAquaponics/databases/"
 db_name = 'sensor_testdb.db'
 reader = Reader(tgt_dir, db_name)
 
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
-    channel_buttons_config = config_settings[0]
-    on_config = config_settings[1]
-    off_config = config_settings[2]
-    upper_config = config_settings[3]
-    lower_config = config_settings[4]
     if len(config_settings) != 5:
         with open(config_path, 'w', newline='') as file:
             channel_buttons_config = [-1]*16
@@ -53,12 +48,17 @@ with open(config_path, "r") as file:
             writer.writerows([channel_buttons_config,on_config,off_config, upper_config, lower_config])
             config_settings = [channel_buttons_config,on_config,off_config, upper_config, lower_config]
             file.flush()
+    channel_buttons_config = config_settings[0]
+    on_config = config_settings[1]
+    off_config = config_settings[2]
+    upper_config = config_settings[3]
+    lower_config = config_settings[4]
 #create figure for plots and set figure size/layout
 f = figure.Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
-param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (C)', 'Water Temp (C)']
+param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (C)', 'Water Temp (C)', 'Distance']
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 class Live_Text:
