@@ -130,7 +130,7 @@ def animate(ii):
             time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
             time_stream.insert(0, time_f)
             current_plot.make_plot()
-            
+            #edit to put this check closer to the top?
             current_param_val = float(most_recent[0][i])
             current_text = live_dict[key]
             if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):

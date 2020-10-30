@@ -61,7 +61,6 @@ def getData():
     distance = (TimeElapsed * 34300) / 2
     
     return pH, TDS, hum, atemp, wtemp, distance
-    #return tuple(pH, TDS, hum, atemp, wtemp) #chan.voltage == ph
 
 #from time import sleep
 #while True:
