@@ -63,7 +63,7 @@ def getData():
     return pH, TDS, hum, atemp, wtemp, distance
     #return tuple(pH, TDS, hum, atemp, wtemp) #chan.voltage == ph
 
-from time import sleep
-while True:
-    print(getData())
-    sleep(0.2)
+#from time import sleep
+#while True:
+#    print(getData())
+#    sleep(0.2)
