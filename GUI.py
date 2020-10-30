@@ -58,7 +58,7 @@ f = figure.Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
-param_list = ['pH', 'TDS', 'Humidity', 'Air Temp', 'Water Temp']
+param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (C)', 'Water Temp (C)']
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 class Live_Text:
@@ -208,14 +208,14 @@ class HomePage(tk.Frame):
         for i, param in enumerate(param_list): #tk.Label self refers to Homepage
             param_label = tk.Label(self, text=param, fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
-                            width=10, height=1, anchor=W, justify=LEFT)
+                            width=18, height=1, anchor=W, justify=LEFT)
             param_label.place(x=5, y=65+22*i)
 
         for i, param in enumerate(param_list):
             loading_text = tk.Label(self, text="Loading", fg="black", bg="white",
                     font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
-                    width=10, height=1)
-            loading_text.place(x=91, y=65+22*i)
+                    width=5, height=1)
+            loading_text.place(x=156, y=65+22*i)
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
         
