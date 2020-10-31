@@ -28,12 +28,11 @@ style.use("seaborn-darkgrid")
 from vertical_scroll_frame import VerticalScrolledFrame
 
 from main import user_settings
-config_path = user_settings()
+config_path, db_path = user_settings()
 
 #initialize channel_buttons_config, entry configs, and SQLite reader
-tgt_dir = "C:\\Users\\Bill Yen\\Desktop\\NU Urban Ag\\AutoAquaponics\\" #"/home/pi/AutoAquaponics/databases/"
 db_name = 'sensor_testdb.db'
-reader = Reader(tgt_dir, db_name)
+reader = Reader(db_path, db_name)
 
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
@@ -122,15 +121,6 @@ def animate(ii):
             config_settings = list(csv.reader(file))
         for i, key in enumerate(param_dict, 1):
             current_plot = param_dict[key]
-            data_stream = current_plot.incoming_data
-            time_stream = current_plot.tList
-            data_stream.pop()
-            time_stream.pop()
-            data_stream.insert(0, most_recent[0][i])
-            time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
-            time_stream.insert(0, time_f)
-            current_plot.make_plot()
-            #edit to put this check closer to the top?
             current_param_val = float(most_recent[0][i])
             current_text = live_dict[key]
             if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
@@ -139,6 +129,16 @@ def animate(ii):
             else:
                 current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
                 current_plot.plot_color = 'g'
+            
+            data_stream = current_plot.incoming_data
+            time_stream = current_plot.tList
+            data_stream.pop()
+            time_stream.pop()
+            data_stream.insert(0, most_recent[0][i])
+            time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+            time_stream.insert(0, time_f)
+            current_plot.make_plot()
+            
            
 #initialization
 class AllWindow(tk.Tk):
