@@ -413,132 +413,52 @@ class Settings(tk.Frame):
         self.discardButton.grid(row = 3, columnspan = 14, pady = (0,20))
 
 
-        # ENTRY WIDGETS      
-        # pH widget
-        pH_lower = tk.DoubleVar()
-        pH_upper = tk.DoubleVar()
-        # pH_lower = DoubleVar()
-        # #pH_lower.set(??) <- need to set every value that is being put as some float?
-        # pH_upper = DoubleVar()
-        self.pH_lower_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Min pH:")
-        self.pH_lower_entry = tk.Entry(self, width = 20, textvariable = pH_lower)
-        self.pH_upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max pH:")
-        self.pH_upper_entry = tk.Entry(self, width = 20, textvariable = pH_upper)
-        self.pH_lower_label.grid(row=4, column = 1, padx = (0,10))
-        self.pH_lower_entry.grid(row=4, column = 2, padx = (0,50))
-        self.pH_upper_label.grid(row=4, column = 3, padx = (0,10))
-        self.pH_upper_entry.grid(row=4, column = 4)
-        # TDS widget
-        TDS_lower = tk.DoubleVar()
-        TDS_upper = tk.DoubleVar()
-        self.TDS_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Min TDS (ppm):")
-        self.TDS_lower_entry = tk.Entry(self, width = 20, textvariable = TDS_lower)
-        self.TDS_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Max TDS (ppm):")
-        self.TDS_upper_entry = tk.Entry(self, width = 20, textvariable = TDS_upper)
-        self.TDS_lower_label.grid(row=5, column = 1, padx = (0,10))
-        self.TDS_lower_entry.grid(row=5, column = 2, padx = (0,50))
-        self.TDS_upper_label.grid(row=5, column = 3, padx = (0,10))
-        self.TDS_upper_entry.grid(row=5, column = 4)
-        # DO widget
-        DO_lower = tk.DoubleVar()
-        DO_upper = tk.DoubleVar()
-        self.DO_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Min DO (ppm):")
-        self.DO_lower_entry = tk.Entry(self, width = 20, textvariable = DO_lower)
-        self.DO_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Max DO (ppm):")
-        self.DO_upper_entry = tk.Entry(self, width = 20, textvariable = DO_upper)
-        self.DO_lower_label.grid(row=6, column = 1, padx = (0,10))
-        self.DO_lower_entry.grid(row=6, column = 2, padx = (0,50))
-        self.DO_upper_label.grid(row=6, column = 3, padx = (0,10))
-        self.DO_upper_entry.grid(row=6, column = 4)
-        # Phosphate widget
-        Phosphate_lower = tk.DoubleVar()
-        Phosphate_upper = tk.DoubleVar()
-        self.Phosphate_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Min Phosphate (ppm):")
-        self.Phosphate_lower_entry = tk.Entry(self, width = 20, textvariable = Phosphate_lower)
-        self.Phosphate_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Max Phosphate (ppm):")
-        self.Phosphate_upper_entry = tk.Entry(self, width = 20, textvariable = Phosphate_upper)
-        self.Phosphate_lower_label.grid(row=7, column = 1, padx = (0,10))
-        self.Phosphate_lower_entry.grid(row=7, column = 2, padx = (0,50))
-        self.Phosphate_upper_label.grid(row=7, column = 3, padx = (0,10))
-        self.Phosphate_upper_entry.grid(row=7, column = 4)
+        # ENTRY WIDGETS
         
-        # Nitrate widget
-        Nitrate_lower = tk.DoubleVar()
-        Nitrate_upper = tk.DoubleVar()
-        self.Nitrate_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Min Nitrate (ppm):")
-        self.Nitrate_lower_entry = tk.Entry(self, width = 20, textvariable = Nitrate_lower)
-        self.Nitrate_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Max Nitrate (ppm):")
-        self.Nitrate_upper_entry = tk.Entry(self, width = 20, textvariable = Nitrate_upper)
-        self.Nitrate_lower_label.grid(row=8, column = 1, padx = (0,10))
-        self.Nitrate_lower_entry.grid(row=8, column = 2, padx = (0,50))
-        self.Nitrate_upper_label.grid(row=8, column = 3, padx = (0,10))
-        self.Nitrate_upper_entry.grid(row=8, column = 4)
-        # Ammonia widget
-        Ammonia_lower = tk.DoubleVar()
-        Ammonia_upper = tk.DoubleVar()
-        self.Ammonia_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Min Ammonia (ppm):")
-        self.Ammonia_lower_entry = tk.Entry(self, width = 20, textvariable = Ammonia_lower)
-        self.Ammonia_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e',text="Max Ammonia (ppm):")
-        self.Ammonia_upper_entry = tk.Entry(self, width = 20, textvariable = Ammonia_upper)
-        self.Ammonia_lower_label.grid(row=9, column = 1, padx = (0,10))
-        self.Ammonia_lower_entry.grid(row=9, column = 2, padx = (0,50))
-        self.Ammonia_upper_label.grid(row=9, column = 3, padx = (0,10))
-        self.Ammonia_upper_entry.grid(row=9, column = 4)
-        # Air Temperature widget
-        Air_Temperature_lower = tk.DoubleVar()
-        Air_Temperature_upper = tk.DoubleVar()
-        self.Air_Temperature_lower_label = tk.Label(self, bg = 'white', width = 25,anchor = 'e', text="Min Air Temperature (\N{DEGREE SIGN}C):")
-        self.Air_Temperature_lower_entry = tk.Entry(self, width = 20, textvariable = Air_Temperature_lower)
-        self.Air_Temperature_upper_label = tk.Label(self, bg = 'white', width = 25,anchor = 'e', text="Max Air Temperature (\N{DEGREE SIGN}C):")
-        self.Air_Temperature_upper_entry = tk.Entry(self, width = 20, textvariable = Air_Temperature_upper)
-        self.Air_Temperature_lower_label.grid(row=10, column = 1, padx = (0,10))
-        self.Air_Temperature_lower_entry.grid(row=10, column = 2, padx = (0,50))
-        self.Air_Temperature_upper_label.grid(row=10, column = 3, padx = (0,10))
-        self.Air_Temperature_upper_entry.grid(row=10, column = 4)
-        # Air Humidity widget
-        Air_Humidity_lower = tk.DoubleVar()
-        Air_Humidity_upper = tk.DoubleVar()
-        self.Air_Humidity_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Min Air Humidity (%):")
-        self.Air_Humidity_lower_entry = tk.Entry(self, width = 20, textvariable = Air_Humidity_lower)
-        self.Air_Humidity_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Max Air Humidity (%):")
-        self.Air_Humidity_upper_entry = tk.Entry(self, width = 20, textvariable = Air_Humidity_upper)
-        self.Air_Humidity_lower_label.grid(row=11, column = 1, padx = (0,10))
-        self.Air_Humidity_lower_entry.grid(row=11, column = 2, padx = (0,50))
-        self.Air_Humidity_upper_label.grid(row=11, column = 3, padx = (0,10))
-        self.Air_Humidity_upper_entry.grid(row=11, column = 4)
-        # Water Temperature widget
-        Water_Temperature_lower = tk.DoubleVar()
-        Water_Temperature_upper = tk.DoubleVar()
-        self.Water_Temperature_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Min Water Temperature (\N{DEGREE SIGN}C):")
-        self.Water_Temperature_lower_entry = tk.Entry(self, width = 20, textvariable = Water_Temperature_lower)
-        self.Water_Temperature_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Max Water Temperature (\N{DEGREE SIGN}C):")
-        self.Water_Temperature_upper_entry = tk.Entry(self, width = 20, textvariable = Water_Temperature_upper)
-        self.Water_Temperature_lower_label.grid(row=12, column = 1, padx = (0,10))
-        self.Water_Temperature_lower_entry.grid(row=12, column = 2, padx = (0,50))
-        self.Water_Temperature_upper_label.grid(row=12, column = 3, padx = (0,10))
-        self.Water_Temperature_upper_entry.grid(row=12, column = 4)
-        # Water Level widget
-        Water_Level_lower = tk.DoubleVar()
-        Water_Level_upper = tk.DoubleVar()
-        self.Water_Level_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Min Water Level (cm):")
-        self.Water_Level_lower_entry = tk.Entry(self, width = 20, textvariable = Water_Level_lower)
-        self.Water_Level_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Max Water Level (cm):")
-        self.Water_Level_upper_entry = tk.Entry(self, width = 20, textvariable = Water_Level_upper) 
-        self.Water_Level_lower_label.grid(row=13, column = 1, padx = (0,10))
-        self.Water_Level_lower_entry.grid(row=13, column = 2, padx = (0,50))
-        self.Water_Level_upper_label.grid(row=13, column = 3, padx = (0,10))
-        self.Water_Level_upper_entry.grid(row=13, column = 4)
-        # Flow Rate widget
-        Flow_Rate_lower = tk.DoubleVar()
-        Flow_Rate_upper = tk.DoubleVar()
-        self.Flow_Rate_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Min Flow Rate (GPH):")
-        self.Flow_Rate_lower_entry = tk.Entry(self, width = 20, textvariable = Flow_Rate_lower)
-        self.Flow_Rate_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Max Flow Rate (GPH):")
-        self.Flow_Rate_upper_entry = tk.Entry(self, width = 20, textvariable = Flow_Rate_upper) 
-        self.Flow_Rate_lower_label.grid(row=14, column = 1, padx = (0,10))
-        self.Flow_Rate_lower_entry.grid(row=14, column = 2, padx = (0,50))
-        self.Flow_Rate_upper_label.grid(row=14, column = 3, padx = (0,10))
-        self.Flow_Rate_upper_entry.grid(row=14, column = 4)
+        # widget text
+        widgets = ["pH", "TDS (ppm)", "DO (ppm)", "Phosphate (ppm)", "Nitrate (ppm)", "Ammonia (ppm)", "Air Temperature (\N{DEGREE SIGN}C)",
+                   "Air Humidity (%)", "Water Temperature (\N{DEGREE SIGN}C)", "Water Level (cm)", "Flow Rate (GPH)"]
+        # initialize holder vars
+        lower_labels = lower_entries = upper_labels = upper_entries = [0 for i in range(len(widgets))]
+        # initialize param vars
+        pH_lower, TDS_lower, DO_lower, Phosphate_lower, Nitrate_lower, Ammonia_lower, Air_Temperature_lower, Air_Humidity_lower, \
+            Water_Temperature_lower, Water_Level_lower, Flow_Rate_lower = [tk.DoubleVar() for x in range(len(widgets))]
+        pH_upper, TDS_upper, DO_upper, Phosphate_upper, Nitrate_upper, Ammonia_upper, Air_Temperature_upper, Air_Humidity_upper, \
+            Water_Temperature_upper, Water_Level_upper, Flow_Rate_upper = [tk.DoubleVar() for x in range(len(widgets))]
+        # param var tables for looping
+        widget_var_lower = [pH_lower, TDS_lower, DO_lower, Phosphate_lower, Nitrate_lower, Ammonia_lower, Air_Temperature_lower,
+                            Air_Humidity_lower, Water_Temperature_lower, Water_Level_lower, Flow_Rate_lower]
+        widget_var_upper = [pH_upper, TDS_upper, DO_upper, Phosphate_upper, Nitrate_upper, Ammonia_upper, Air_Temperature_upper,
+                            Air_Humidity_upper, Water_Temperature_upper, Water_Level_upper, Flow_Rate_upper]
+        
+        # for each widget, create its upper and lower label and entry, store in temp var, then place in holder list
+        for i in range(len(widgets)):
+            lower_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Min " + widgets[i] + ":")
+            lower_label.grid(row=i+4, column = 1, padx = (0,10))
+            lower_labels[i] = lower_label
+            lower_entry = tk.Entry(self, width = 20, textvariable = widget_var_lower[i])
+            lower_entry.grid(row=i+4, column = 2, padx = (0,50))
+            lower_entries[i] = lower_entry
+            upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max " + widgets[i] + ":")
+            upper_label.grid(row=i+4, column = 3, padx = (0,10))
+            upper_labels[i] = upper_label
+            upper_entry = tk.Entry(self, width = 20, textvariable = widget_var_upper[i])
+            upper_entry.grid(row=i+4, column = 4)
+            upper_entries[i] = upper_entry
+        
+        # initialize Settings members using holder lists from for loop
+        self.pH_lower_label, self.TDS_lower_label, self.DO_lower_label, self.Phosphate_lower_label, self.Nitrate_lower_label, \
+            self.Ammonia_lower_label, self.Air_Temperature_lower_label, self.Air_Humidity_lower_label, \
+            self.Water_Temperature_lower_label,self.Water_Level_lower_label, self.Flow_Rate_lower_label = lower_labels
+        self.pH_lower_entry, self.TDS_lower_entry, self.DO_lower_entry, self.Phosphate_lower_entry, self.Nitrate_lower_entry, \
+            self.Ammonia_lower_entry, self.Air_Temperature_lower_entry, self.Air_Humidity_lower_entry, \
+            self.Water_Temperature_lower_entry, self.Water_Level_lower_entry, self.Flow_Rate_lower_entry = lower_entries
+        self.pH_upper_label, self.TDS_upper_label, self.DO_upper_label, self.Phosphate_upper_label, self.Nitrate_upper_label, \
+            self.Ammonia_upper_label, self.Air_Temperature_upper_label, self.Air_Humidity_upper_label, \
+            self.Water_Temperature_upper_label, self.Water_Level_upper_label, self.Flow_Rate_upper_label = upper_labels
+        self.pH_upper_entry, self.TDS_upper_entry, self.DO_upper_entry, self.Phosphate_upper_entry, self.Nitrate_upper_entry, \
+            self.Ammonia_upper_entry, self.Air_Temperature_upper_entry, self.Air_Humidity_upper_entry, \
+            self.Water_Temperature_upper_entry, self.Water_Level_upper_entry, self.Flow_Rate_upper_entry = upper_entries
 
         self.grid_columnconfigure(0, weight=2)
         self.grid_columnconfigure(5, weight=3)
