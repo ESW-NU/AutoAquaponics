@@ -57,7 +57,7 @@ f = figure.Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
-param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (C)', 'Water Temp (C)', 'Distance (cm)']
+param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Distance (cm)']
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 class Live_Text:
@@ -487,9 +487,9 @@ class Settings(tk.Frame):
         # Air Temperature widget
         Air_Temperature_lower = tk.DoubleVar()
         Air_Temperature_upper = tk.DoubleVar()
-        self.Air_Temperature_lower_label = tk.Label(self, bg = 'white', width = 25,anchor = 'e', text="Min Air Temperature (Celsius):")
+        self.Air_Temperature_lower_label = tk.Label(self, bg = 'white', width = 25,anchor = 'e', text="Min Air Temperature (\N{DEGREE SIGN}C):")
         self.Air_Temperature_lower_entry = tk.Entry(self, width = 20, textvariable = Air_Temperature_lower)
-        self.Air_Temperature_upper_label = tk.Label(self, bg = 'white', width = 25,anchor = 'e', text="Max Air Temperature (Celsius):")
+        self.Air_Temperature_upper_label = tk.Label(self, bg = 'white', width = 25,anchor = 'e', text="Max Air Temperature (\N{DEGREE SIGN}C):")
         self.Air_Temperature_upper_entry = tk.Entry(self, width = 20, textvariable = Air_Temperature_upper)
         self.Air_Temperature_lower_label.grid(row=10, column = 1, padx = (0,10))
         self.Air_Temperature_lower_entry.grid(row=10, column = 2, padx = (0,50))
@@ -509,9 +509,9 @@ class Settings(tk.Frame):
         # Water Temperature widget
         Water_Temperature_lower = tk.DoubleVar()
         Water_Temperature_upper = tk.DoubleVar()
-        self.Water_Temperature_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Min Water Temperature (Celsius):")
+        self.Water_Temperature_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Min Water Temperature (\N{DEGREE SIGN}C):")
         self.Water_Temperature_lower_entry = tk.Entry(self, width = 20, textvariable = Water_Temperature_lower)
-        self.Water_Temperature_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Max Water Temperature (Celsius):")
+        self.Water_Temperature_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Max Water Temperature (\N{DEGREE SIGN}C):")
         self.Water_Temperature_upper_entry = tk.Entry(self, width = 20, textvariable = Water_Temperature_upper)
         self.Water_Temperature_lower_label.grid(row=12, column = 1, padx = (0,10))
         self.Water_Temperature_lower_entry.grid(row=12, column = 2, padx = (0,50))
@@ -520,9 +520,9 @@ class Settings(tk.Frame):
         # Water Level widget
         Water_Level_lower = tk.DoubleVar()
         Water_Level_upper = tk.DoubleVar()
-        self.Water_Level_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Min Water Level (inches):")
+        self.Water_Level_lower_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Min Water Level (cm):")
         self.Water_Level_lower_entry = tk.Entry(self, width = 20, textvariable = Water_Level_lower)
-        self.Water_Level_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Max Water Level (inches):")
+        self.Water_Level_upper_label = tk.Label(self,bg = 'white', width = 25,anchor = 'e', text="Max Water Level (cm):")
         self.Water_Level_upper_entry = tk.Entry(self, width = 20, textvariable = Water_Level_upper) 
         self.Water_Level_lower_label.grid(row=13, column = 1, padx = (0,10))
         self.Water_Level_lower_entry.grid(row=13, column = 2, padx = (0,50))
