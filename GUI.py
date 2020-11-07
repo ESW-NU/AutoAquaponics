@@ -418,8 +418,9 @@ class Settings(tk.Frame):
         # widget text
         widgets = ["pH", "TDS (ppm)", "DO (ppm)", "Phosphate (ppm)", "Nitrate (ppm)", "Ammonia (ppm)", "Air Temperature (\N{DEGREE SIGN}C)",
                    "Air Humidity (%)", "Water Temperature (\N{DEGREE SIGN}C)", "Water Level (cm)", "Flow Rate (GPH)"]
-        # initialize holder vars
-        lower_labels = lower_entries = upper_labels = upper_entries = [0 for i in range(len(widgets))]
+        # initialize entries list vars
+        self.lower_entries = [0 for i in range(len(widgets))]
+        self.upper_entries = [0 for i in range(len(widgets))]
         # initialize param vars
         pH_lower, TDS_lower, DO_lower, Phosphate_lower, Nitrate_lower, Ammonia_lower, Air_Temperature_lower, Air_Humidity_lower, \
             Water_Temperature_lower, Water_Level_lower, Flow_Rate_lower = [tk.DoubleVar() for x in range(len(widgets))]
@@ -431,34 +432,18 @@ class Settings(tk.Frame):
         widget_var_upper = [pH_upper, TDS_upper, DO_upper, Phosphate_upper, Nitrate_upper, Ammonia_upper, Air_Temperature_upper,
                             Air_Humidity_upper, Water_Temperature_upper, Water_Level_upper, Flow_Rate_upper]
         
-        # for each widget, create its upper and lower label and entry, store in temp var, then place in holder list
+        # for each widget, create its upper and lower label and entry, store in temp var, then place in entries list
         for i in range(len(widgets)):
             lower_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Min " + widgets[i] + ":")
             lower_label.grid(row=i+4, column = 1, padx = (0,10))
-            lower_labels[i] = lower_label
             lower_entry = tk.Entry(self, width = 20, textvariable = widget_var_lower[i])
             lower_entry.grid(row=i+4, column = 2, padx = (0,50))
-            lower_entries[i] = lower_entry
+            self.lower_entries[i] = lower_entry
             upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max " + widgets[i] + ":")
             upper_label.grid(row=i+4, column = 3, padx = (0,10))
-            upper_labels[i] = upper_label
             upper_entry = tk.Entry(self, width = 20, textvariable = widget_var_upper[i])
             upper_entry.grid(row=i+4, column = 4)
-            upper_entries[i] = upper_entry
-        
-        # initialize Settings members using holder lists from for loop
-        self.pH_lower_label, self.TDS_lower_label, self.DO_lower_label, self.Phosphate_lower_label, self.Nitrate_lower_label, \
-            self.Ammonia_lower_label, self.Air_Temperature_lower_label, self.Air_Humidity_lower_label, \
-            self.Water_Temperature_lower_label,self.Water_Level_lower_label, self.Flow_Rate_lower_label = lower_labels
-        self.pH_lower_entry, self.TDS_lower_entry, self.DO_lower_entry, self.Phosphate_lower_entry, self.Nitrate_lower_entry, \
-            self.Ammonia_lower_entry, self.Air_Temperature_lower_entry, self.Air_Humidity_lower_entry, \
-            self.Water_Temperature_lower_entry, self.Water_Level_lower_entry, self.Flow_Rate_lower_entry = lower_entries
-        self.pH_upper_label, self.TDS_upper_label, self.DO_upper_label, self.Phosphate_upper_label, self.Nitrate_upper_label, \
-            self.Ammonia_upper_label, self.Air_Temperature_upper_label, self.Air_Humidity_upper_label, \
-            self.Water_Temperature_upper_label, self.Water_Level_upper_label, self.Flow_Rate_upper_label = upper_labels
-        self.pH_upper_entry, self.TDS_upper_entry, self.DO_upper_entry, self.Phosphate_upper_entry, self.Nitrate_upper_entry, \
-            self.Ammonia_upper_entry, self.Air_Temperature_upper_entry, self.Air_Humidity_upper_entry, \
-            self.Water_Temperature_upper_entry, self.Water_Level_upper_entry, self.Flow_Rate_upper_entry = upper_entries
+            self.upper_entries[i] = upper_entry
 
         self.grid_columnconfigure(0, weight=2)
         self.grid_columnconfigure(5, weight=3)
@@ -484,32 +469,8 @@ class Settings(tk.Frame):
             channel_buttons_config = config_settings[0]
             on_config = config_settings[1]
             off_config = config_settings[2]
-            upper_config = [
-                round(float(self.pH_upper_entry.get()),2), 
-                round(float(self.TDS_upper_entry.get()),2),
-                round(float(self.DO_upper_entry.get()),2), 
-                round(float(self.Phosphate_upper_entry.get()),2), 
-                round(float(self.Nitrate_upper_entry.get()),2), 
-                round(float(self.Ammonia_upper_entry.get()),2), 
-                round(float(self.Air_Temperature_upper_entry.get()),2), 
-                round(float(self.Air_Humidity_upper_entry.get()),2),
-                round(float(self.Water_Temperature_upper_entry.get()),2),
-                round(float(self.Water_Level_upper_entry.get()),2),
-                round(float(self.Flow_Rate_upper_entry.get()),2),
-                ]
-            lower_config = [
-                round(float(self.pH_lower_entry.get()),2), 
-                round(float(self.TDS_lower_entry.get()),2), 
-                round(float(self.DO_lower_entry.get()),2),
-                round(float(self.Phosphate_lower_entry.get()),2), 
-                round(float(self.Nitrate_lower_entry.get()),2), 
-                round(float(self.Ammonia_lower_entry.get()),2), 
-                round(float(self.Air_Temperature_lower_entry.get()),2), 
-                round(float(self.Air_Humidity_lower_entry.get()),2),
-                round(float(self.Water_Temperature_lower_entry.get()),2),
-                round(float(self.Water_Level_lower_entry.get()),2),
-                round(float(self.Flow_Rate_lower_entry.get()),2),
-                ]
+            upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]  
+            lower_config = [round(float(entry.get()),2) for entry in self.lower_entries]
             with open(config_path, 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerows([channel_buttons_config, on_config, off_config, upper_config, lower_config])
@@ -520,54 +481,17 @@ class Settings(tk.Frame):
     #fcn triggered by discard button
     def discard(self):
         #Delete current values
-        self.pH_lower_entry.delete(0, END)
-        self.TDS_lower_entry.delete(0, END)
-        self.DO_lower_entry.delete(0, END)
-        self.Phosphate_lower_entry.delete(0, END)
-        self.Nitrate_lower_entry.delete(0, END)
-        self.Ammonia_lower_entry.delete(0, END)
-        self.Air_Temperature_lower_entry.delete(0, END)
-        self.Air_Humidity_lower_entry.delete(0, END)
-        self.Water_Level_lower_entry.delete(0, END)
-        self.Water_Temperature_lower_entry.delete(0, END)
-        self.Flow_Rate_lower_entry.delete(0, END)
-        self.pH_upper_entry.delete(0, END)
-        self.TDS_upper_entry.delete(0, END)
-        self.DO_upper_entry.delete(0, END)
-        self.Phosphate_upper_entry.delete(0, END)
-        self.Nitrate_upper_entry.delete(0, END)
-        self.Ammonia_upper_entry.delete(0, END)
-        self.Air_Temperature_upper_entry.delete(0, END)
-        self.Air_Humidity_upper_entry.delete(0, END)
-        self.Water_Level_upper_entry.delete(0, END)
-        self.Water_Temperature_upper_entry.delete(0, END)
-        self.Flow_Rate_upper_entry.delete(0, END)
+        for entry in self.lower_entries:  
+            entry.delete(0, END)
+        for entry in self.upper_entries:  
+            entry.delete(0, END)
         #Get last saved values
         with open(config_path, "r") as file:
             config_settings = list(csv.reader(file))
-            self.pH_upper_entry.insert(0, config_settings[3][0])
-            self.TDS_upper_entry.insert(0, config_settings[3][1])
-            self.DO_upper_entry.insert(0, config_settings[3][2])
-            self.Phosphate_upper_entry.insert(0, config_settings[3][3])
-            self.Nitrate_upper_entry.insert(0, config_settings[3][4])
-            self.Ammonia_upper_entry.insert(0, config_settings[3][5])
-            self.Air_Temperature_upper_entry.insert(0, config_settings[3][6])
-            self.Air_Humidity_upper_entry.insert(0, config_settings[3][7])
-            self.Water_Temperature_upper_entry.insert(0, config_settings[3][8])
-            self.Water_Level_upper_entry.insert(0, config_settings[3][9])
-            self.Flow_Rate_upper_entry.insert(0, config_settings[3][10])
-            
-            self.pH_lower_entry.insert(0, config_settings[4][0])
-            self.TDS_lower_entry.insert(0, config_settings[4][1])
-            self.DO_lower_entry.insert(0, config_settings[4][2])
-            self.Phosphate_lower_entry.insert(0, config_settings[4][3])
-            self.Nitrate_lower_entry.insert(0, config_settings[4][4])
-            self.Ammonia_lower_entry.insert(0, config_settings[4][5])
-            self.Air_Temperature_lower_entry.insert(0, config_settings[4][6])
-            self.Air_Humidity_lower_entry.insert(0, config_settings[4][7])
-            self.Water_Temperature_lower_entry.insert(0, config_settings[4][8])
-            self.Water_Level_lower_entry.insert(0, config_settings[4][9])
-            self.Flow_Rate_lower_entry.insert(0, config_settings[4][10])
+            for entry in self.lower_entries:
+                entry.insert(0, config_settings[3][i])
+            for entry in self.upper_entries:
+                entry.insert(0, config_settings[4][i])
 
 #add Video Stream page
 class VideoStream(tk.Frame):
