@@ -78,3 +78,4 @@ def sendtext(message, **numbers):
         
         server.sendmail(email,sms_gateway,sms)
 
+sendtext('hello', **numbers)
