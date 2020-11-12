@@ -1,5 +1,3 @@
-
-
 ## this code sends a message to a keyworded dictionary of phone numbers, where the phone number is the key 
     ## and the carrier is the value. Carriers are case sensitive. Numbers must be in XXXYYYZZZZ format, 
     ## with no 1 at the beginning and no - in between sections
