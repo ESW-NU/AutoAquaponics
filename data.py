@@ -102,7 +102,7 @@ class Logger:
         #adding the timestamp
         data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_avg
         print(data_log)
-
+        
         #assign data to tables in data_dict
         if table not in self.data_dict:
             self.data_dict[table] = []

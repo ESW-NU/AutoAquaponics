@@ -13,7 +13,7 @@ from email.mime.multipart import MIMEMultipart
 #   numbers = {'2029266579' : "T-Mobile", "2243459408" : "AT&T"}
 #   sendtext("your text message", **numbers) 
 numbers = {}
-
+numbers['9496905371'] = 'T-Mobile'
 def sendtext(message, **numbers):
     
     numberlist =[]
@@ -60,7 +60,7 @@ def sendtext(message, **numbers):
     smtp = "smtp.gmail.com" 
     port = 587
     # This will start our email server
-    server = smtplib.SMTP(smtp,port)
+    server = smtplib.SMTP(host = smtp,port = port)
     # Starting the server
     server.starttls()
     # Now we need to login
@@ -77,4 +77,18 @@ def sendtext(message, **numbers):
         sms = msg.as_string()
         
         server.sendmail(email,sms_gateway,sms)
+
+def pCheck(lower, upper, datatype, inp):
+    string = None
+    if inp < lower:
+        string = 'The ' + datatype + ' is lower than it should be. The value was ' + str(inp) + \
+            '. The value should be between ' + str(lower) + ' and ' + str(upper) + '.'
+    elif inp > upper:
+        string = 'The ' + datatype + ' is higher than it should be. The value was ' + str(inp) + \
+            '. The value should be between ' + str(lower) + ' and ' + str(upper) + '.'
+    
+    numbers = {}
+    numbers['9496905371'] = 'T-Mobile'
+    if string:
+        sendtext(string,**numbers)
 

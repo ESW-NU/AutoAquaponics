@@ -26,7 +26,7 @@ from matplotlib import style
 style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
-
+from sendtext import pCheck
 from main import user_settings
 config_path, db_path = user_settings()
 
@@ -124,6 +124,7 @@ def animate(ii):
             current_param_val = float(most_recent[0][i])
             current_text = live_dict[key]
             if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
+                pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val)
                 current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                 current_plot.plot_color = 'r'
             else:
