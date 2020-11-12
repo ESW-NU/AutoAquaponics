@@ -1,6 +1,7 @@
 from time import sleep
 import csv
 from multiprocessing import Process
+import sendtext
 
 global IS_ALIVE
 IS_ALIVE = True
@@ -27,7 +28,7 @@ def load_setting(envir_var: str, setup_file: str, json_var: str, default_return_
     yield _load_setting_json(setup_file, json_var)
     yield default_return_value
 
-def user_settings():
+def user_settings(): 
     from os import path
     for config_path_location in load_setting("AQUA_config_file", "setup.json", "config_file", "./config.csv"):
         if config_path_location != None:

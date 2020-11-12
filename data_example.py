@@ -29,7 +29,7 @@ DATA FUNCTION
 
 """
 #DATABASE SETUP
-tgt_dir = "C:/Users/markg/Repositories/AutoAquaponics" #replace for your own system
+tgt_dir = "C:/Users/water/AutoAquaponics" #replace for your own system
 db_name = 'testdb.db' #name of the database. Include .db
 
 #NEW TABLE SETUP 
