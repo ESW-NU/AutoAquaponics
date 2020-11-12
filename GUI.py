@@ -74,7 +74,6 @@ class Sensor_Plot:
         self.plot_color = plot_color #initially 'b' for all
         
     def make_plot(self):
-
         self.plot.clear()
         self.plot.set_xlabel('Time')
         self.plot.set_ylabel(self.param)
@@ -86,30 +85,40 @@ class Sensor_Plot:
         [tk.set_visible(True) for tk in self.x_ax.get_xticklabels()]
         [label.set_rotation(10) for label in self.x_ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
 
-#        self.plot.set_xlim(self.tList[-2], self.tList[0])
-        self.x_ax.set_xlim(self.tList[-2], self.tList[0]) 
+        if len(self.tList) > 3:
+            self.x_ax.set_xlim(self.tList[-2], self.tList[0]) 
         self.x_ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 4))
         
         self.plot.fill_between(self.tList, self.incoming_data, #where=(self.incoming_data > [0]*len(self.incoming_data))
                                facecolor=self.plot_color, edgecolor=self.plot_color, alpha=0.5) #blue @initilization
 
 
-most_recent = reader.get_timeset(table="SensorData", num=20)
-#print("most recent", most_recent)
-reader.commit()       
-for i, param in enumerate(param_list, 1): 
-    tList = []
-    most_recent_20 = []
-    for j in range(len(most_recent)):
-        time_f = datetime.strptime(most_recent[j][0], "%m/%d/%Y %H:%M:%S")
-        tList.append(time_f)
-        most_recent_20.append(most_recent[j][i])
-    
-    subplot = f.add_subplot(6, 2, i) #sharex?
-    x_ax = f.get_axes()
-    current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param, most_recent_20, 'b')      
-    param_dict[param] = current_plot
-    current_plot.make_plot()
+while True:
+    try:
+        most_recent = reader.get_timeset(table="SensorData", num=20)
+        reader.commit()
+        for i, param in enumerate(param_list, 1):
+            tList = []
+            most_recent_20 = []
+            for j in range(len(most_recent)):
+                time_f = datetime.strptime(most_recent[j][0], "%m/%d/%Y %H:%M:%S")
+                tList.append(time_f)
+                most_recent_20.append(most_recent[j][i])
+
+            subplot = f.add_subplot(6, 2, i)  # sharex?
+            x_ax = f.get_axes()
+            current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param, most_recent_20, 'b')
+            param_dict[param] = current_plot
+            current_plot.make_plot()
+        break
+    except:
+        for i, param in enumerate(param_list, 1):
+            subplot = f.add_subplot(6, 2, i)
+            x_ax = f.get_axes()
+            current_plot = Sensor_Plot(subplot, [], x_ax[i-1], param, [], 'b')
+            param_dict[param] = current_plot
+            current_plot.make_plot()  
+        break
 
     
 ###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_2O LIST AND INSERT FRESHLY CALLED VALUE TO INDEX[1]
@@ -122,9 +131,9 @@ def animate(ii):
         for i, key in enumerate(param_dict, 1):
             current_plot = param_dict[key]
             current_param_val = float(most_recent[0][i])
-            current_text = live_dict[key]
+            current_text = live_dict[key] #update to live text data summary
             if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
-                pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val)
+                #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) uncomment to test emergency texts
                 current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                 current_plot.plot_color = 'r'
             else:
@@ -133,12 +142,22 @@ def animate(ii):
             
             data_stream = current_plot.incoming_data
             time_stream = current_plot.tList
-            data_stream.pop()
-            time_stream.pop()
-            data_stream.insert(0, most_recent[0][i])
-            time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
-            time_stream.insert(0, time_f)
-            current_plot.make_plot()
+            if len(data_stream) == 20:
+                data_stream.pop()
+                time_stream.pop()
+                data_stream.insert(0, most_recent[0][i])
+                time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+                time_stream.insert(0, time_f)
+                current_plot.make_plot()
+            else:
+                data_stream.insert(0, most_recent[0][i])
+                time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+                time_stream.insert(0, time_f)
+                current_plot.make_plot()
+    
+    else:
+        pass
+                
             
            
 #initialization
@@ -192,7 +211,7 @@ class HomePage(tk.Frame):
         scframe.place(x=130, y=40)
         #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
-        background = canvas.copy_from_bbox(f.bbox)
+        #background = canvas.copy_from_bbox(f.bbox)
         canvas.draw()
         #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
