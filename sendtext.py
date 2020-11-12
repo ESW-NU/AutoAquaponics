@@ -1,5 +1,3 @@
-
-
 ## this code sends a message to a keyworded dictionary of phone numbers, where the phone number is the key 
     ## and the carrier is the value. Carriers are case sensitive. Numbers must be in XXXYYYZZZZ format, 
     ## with no 1 at the beginning and no - in between sections
@@ -78,19 +76,22 @@ def sendtext(message, **numbers):
         
         server.sendmail(email,sms_gateway,sms)
 
-def pCheck(lower, upper, datatype, inp):
+def pCheck(lower, upper, parameter, inp):
     string = None
+    if '°' in parameter:
+        parameter = parameter.replace('°','')
     if inp < lower:
-        string = 'Warning! The ' + datatype + ' is too low. It is ' + str(inp) + \
+        string = 'Warning! The ' + parameter + ' is too low. It is ' + str(inp) + \
             '. It should be between ' + str(lower) + ' and ' + str(upper) + '.'
     elif inp > upper:
-        string = 'Warning! The ' + datatype + ' is too high. It is ' + str(inp) + \
+        string = 'Warning! The ' + parameter + ' is too high. It is ' + str(inp) + \
             '. It should be between ' + str(lower) + ' and ' + str(upper) + '.'
     
     numbers = {}
     numbers['9496905371'] = 'T-Mobile'
     numbers['2243459408'] = 'AT&T'
-    numbers['2029266579'] = 'T-Mobile'
+    #numbers['2029266579'] = 'T-Mobile'
     if string:
         sendtext(string,**numbers)
+    return
 

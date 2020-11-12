@@ -3,9 +3,6 @@ import csv
 from multiprocessing import Process
 import sendtext
 
-global IS_ALIVE
-IS_ALIVE = True
-
 # Set your own file path & config path in file setup.json
 # or as environment variables AQUA_testfile_dir, AQUA_config_file
 _config_file = None
@@ -58,10 +55,9 @@ if(__name__ == '__main__'):
     #start data logging
     p1.start()
     print("Loading Data...")
-    sleep(65)
-    #sleep(60)
+    sleep(5)
+    p2.start()
  
     #start GUI
-    p2.start()
     p1.join()
     p2.join()
