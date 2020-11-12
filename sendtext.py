@@ -81,14 +81,16 @@ def sendtext(message, **numbers):
 def pCheck(lower, upper, datatype, inp):
     string = None
     if inp < lower:
-        string = 'The ' + datatype + ' is lower than it should be. The value was ' + str(inp) + \
-            '. The value should be between ' + str(lower) + ' and ' + str(upper) + '.'
+        string = 'Warning! The ' + datatype + ' is too low. It is ' + str(inp) + \
+            '. It should be between ' + str(lower) + ' and ' + str(upper) + '.'
     elif inp > upper:
-        string = 'The ' + datatype + ' is higher than it should be. The value was ' + str(inp) + \
-            '. The value should be between ' + str(lower) + ' and ' + str(upper) + '.'
+        string = 'Warning! The ' + datatype + ' is too high. It is ' + str(inp) + \
+            '. It should be between ' + str(lower) + ' and ' + str(upper) + '.'
     
     numbers = {}
     numbers['9496905371'] = 'T-Mobile'
+    numbers['2243459408'] = 'AT&T'
+    numbers['2029266579'] = 'T-Mobile'
     if string:
         sendtext(string,**numbers)
 
