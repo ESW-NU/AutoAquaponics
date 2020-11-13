@@ -57,6 +57,7 @@ f = figure.Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
+param_to_i = {'pH':0, 'TDS (ppm)':1, 'Relative Humidity (%)':7, 'Air Temp (\N{DEGREE SIGN}C)':6, 'Water Temp (\N{DEGREE SIGN}C)':8, 'Distance (cm)':9}
 param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Distance (cm)']
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
@@ -132,8 +133,9 @@ def animate(ii):
             current_plot = param_dict[key]
             current_param_val = float(most_recent[0][i])
             current_text = live_dict[key] #update to live text data summary
-            if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
-                #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) uncomment to test emergency texts
+            #if param_to_index_dict.get(key) is not None:
+            if current_param_val > float(config_settings[3][param_to_i[key]]) or current_param_val < float(config_settings[4][param_to_i[key]]):
+                #pCheck(float(config_settings[4][param_to_i[key]]),float(config_settings[3][param_to_i[key]]),key,current_param_val) uncomment to test emergency texts
                 current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                 current_plot.plot_color = 'r'
             else:
