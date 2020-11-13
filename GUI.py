@@ -133,7 +133,7 @@ def animate(ii):
             current_param_val = float(most_recent[0][i])
             current_text = live_dict[key] #update to live text data summary
             if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
-                #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) uncomment to test emergency texts
+                pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
                 current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                 current_plot.plot_color = 'r'
             else:
