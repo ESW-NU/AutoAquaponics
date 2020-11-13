@@ -17,6 +17,8 @@ def getData():
     import time
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM) #GPIO Mode (BOARD / BCM)
+#read w1 water temp sensor
+    wtemp = wt_sensor.get_temperature()
 #create ADS object
     ads = ADS.ADS1115(i2c)
     ads.gain = 2/3
@@ -26,11 +28,18 @@ def getData():
 #define readings from ADC
     pH = -5.82*chan.voltage + 22.1 #calibrated equation
     #pH = chan.voltage
-    TDS = chan1.voltage
+    '''calibrate TDS here'''
+    Vtds_raw = chan1.voltage #raw reading from sensor right now
+    TheoEC = 684 #theoretical EC of calibration fluid
+    Vc = 1.085751885 #v reading of sensor when calibrating
+    temp_calibrate = 23.25 #measured water temp when calibrating
+    rawECsol = TheoEC*(1+0.02*(temp_calibrate-25)) #temp compensate the calibrated values
+    K = (rawECsol)/(133.42*(Vc**3)-255.86*(Vc**2)+857.39*Vc)#defined calibration factor K
+    EC_raw = K*(133.42*(Vtds_raw**3)-255.86*(Vtds_raw**2)+857.39*Vtds_raw)
+    EC = EC_raw/(1+0.02*(wtemp-25)) #use current temp for temp compensation
+    TDS = EC/2 #TDS is just half of electrical conductivity in ppm
 #read air temp and air humidity
     hum, atemp = dht.read_retry(dht.DHT22, DHT)
-#read w1 water temp sensor
-    wtemp = wt_sensor.get_temperature()
 #setup distance sensing stuff
     GPIO_TRIGGER = 6 #set GPIO Pins
     GPIO_ECHO = 18
@@ -62,7 +71,7 @@ def getData():
     
     return pH, TDS, hum, atemp, wtemp, distance
 
-#from time import sleep
-#while True:
-#    print(getData())
-#    sleep(0.2)
+from time import sleep
+while True:
+    print(getData())
+    sleep(0.2)
