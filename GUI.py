@@ -508,10 +508,10 @@ class Settings(tk.Frame):
         #Get last saved values
         with open(config_path, "r") as file:
             config_settings = list(csv.reader(file))
-            for entry in self.lower_entries:
-                entry.insert(0, config_settings[3][i])
-            for entry in self.upper_entries:
-                entry.insert(0, config_settings[4][i])
+            for i in range(len(self.lower_entries)):
+                self.lower_entries[i].insert(0, config_settings[4][i])
+            for i in range(len(self.upper_entries)):
+                self.upper_entries[i].insert(0, config_settings[3][i])
 
 #add Video Stream page
 class VideoStream(tk.Frame):
