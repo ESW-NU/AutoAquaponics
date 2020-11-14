@@ -58,7 +58,8 @@ f = figure.Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
-param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Distance (cm)']
+param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level/Distance (cm)']
+param_ylim = [(6, 8.5), (0, 250), (20, 80), (15, 35), (15, 35), (0, 61)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 class Live_Text:
@@ -66,10 +67,11 @@ class Live_Text:
         self.label = label
     
 class Sensor_Plot:
-    def __init__(self, plot, tList, x_ax, param, incoming_data, plot_color):
+    def __init__(self, plot, tList, x_ax, ylim, param, incoming_data, plot_color):
         self.plot = plot
         self.tList = tList
         self.x_ax = x_ax
+        self.ylim = ylim
         self.param = param
         self.incoming_data = incoming_data #<- graph is bound by incoming data and Data Summary Table displays most recent value 20 of them
         self.plot_color = plot_color #initially 'b' for all
@@ -78,7 +80,7 @@ class Sensor_Plot:
         self.plot.clear()
         self.plot.set_xlabel('Time')
         self.plot.set_ylabel(self.param)
-        # plot.set_ylim(ylim) #UNIQUE BUT HOW?
+        self.plot.set_ylim(self.ylim)
 
         self.x_ax.xaxis_date()
         self.x_ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))
@@ -107,7 +109,8 @@ def initialize_plots(): #intiailizes plots...
 
             subplot = f.add_subplot(6, 2, i)  # sharex?
             x_ax = f.get_axes()
-            current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param, most_recent_any_size, 'b')
+            
+            current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param_ylim[i-1], param, most_recent_any_size, 'b')
             param_dict[param] = current_plot
             current_plot.make_plot()
                     
@@ -115,7 +118,7 @@ def initialize_plots(): #intiailizes plots...
         for i, param in enumerate(param_list, 1):
             subplot = f.add_subplot(6, 2, i)
             x_ax = f.get_axes()
-            current_plot = Sensor_Plot(subplot, [], x_ax[i-1], param, [], 'b')
+            current_plot = Sensor_Plot(subplot, [], x_ax[i-1], param_ylim[i-1], param, [], 'b')
             param_dict[param] = current_plot
             #current_plot.make_plot()    
     reader.commit()
