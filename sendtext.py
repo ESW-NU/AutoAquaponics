@@ -10,8 +10,7 @@ from email.mime.multipart import MIMEMultipart
 # the "numbers" list can have any number of key-value pairs in there
 #   numbers = {'2029266579' : "T-Mobile", "2243459408" : "AT&T"}
 #   sendtext("your text message", **numbers) 
-numbers = {}
-numbers['9496905371'] = 'T-Mobile'
+
 def sendtext(message, **numbers):
     
     numberlist =[]
@@ -88,9 +87,10 @@ def pCheck(lower, upper, parameter, inp):
             '. It should be between ' + str(lower) + ' and ' + str(upper) + '.'
     
     numbers = {}
-    numbers['9496905371'] = 'T-Mobile'
-    numbers['2243459408'] = 'AT&T'
+    #numbers['9496905371'] = 'T-Mobile'
+    #numbers['2243459408'] = 'AT&T'
     #numbers['2029266579'] = 'T-Mobile'
+    numbers['7274853498'] = 'T-Mobile'
     if string:
         sendtext(string,**numbers)
     return

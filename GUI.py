@@ -52,12 +52,12 @@ with open(config_path, "r") as file:
     off_config = config_settings[2]
     upper_config = config_settings[3]
     lower_config = config_settings[4]
+
 #create figure for plots and set figure size/layout
 f = figure.Figure(figsize=(8.6,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
-param_to_i = {'pH':0, 'TDS (ppm)':1, 'Relative Humidity (%)':7, 'Air Temp (\N{DEGREE SIGN}C)':6, 'Water Temp (\N{DEGREE SIGN}C)':8, 'Distance (cm)':9}
 param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Distance (cm)']
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
@@ -86,82 +86,89 @@ class Sensor_Plot:
         [tk.set_visible(True) for tk in self.x_ax.get_xticklabels()]
         [label.set_rotation(10) for label in self.x_ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
 
-        if len(self.tList) > 3:
-            self.x_ax.set_xlim(self.tList[-2], self.tList[0]) 
+        if len(self.tList) > 4:
+            self.x_ax.set_xlim(self.tList[-2], self.tList[0])
         self.x_ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 4))
         
         self.plot.fill_between(self.tList, self.incoming_data, #where=(self.incoming_data > [0]*len(self.incoming_data))
                                facecolor=self.plot_color, edgecolor=self.plot_color, alpha=0.5) #blue @initilization
 
-
-while True:
+def initialize_plots(): #intiailizes plots...
+    global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=20)
-        reader.commit()
+        most_recent = reader.get_timeset(table="SensorData", num=20) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
-            most_recent_20 = []
+            most_recent_any_size = []
             for j in range(len(most_recent)):
                 time_f = datetime.strptime(most_recent[j][0], "%m/%d/%Y %H:%M:%S")
                 tList.append(time_f)
-                most_recent_20.append(most_recent[j][i])
+                most_recent_any_size.append(most_recent[j][i])
 
             subplot = f.add_subplot(6, 2, i)  # sharex?
             x_ax = f.get_axes()
-            current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param, most_recent_20, 'b')
+            current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param, most_recent_any_size, 'b')
             param_dict[param] = current_plot
             current_plot.make_plot()
-        break
-    except:
+                    
+    except: #if there is no data points available to plot, initialize the subplots
         for i, param in enumerate(param_list, 1):
             subplot = f.add_subplot(6, 2, i)
             x_ax = f.get_axes()
             current_plot = Sensor_Plot(subplot, [], x_ax[i-1], param, [], 'b')
             param_dict[param] = current_plot
-            current_plot.make_plot()  
-        break
-
-    
-###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_2O LIST AND INSERT FRESHLY CALLED VALUE TO INDEX[1]
-def animate(ii):
-    most_recent = reader.get_timeset(table="SensorData", num=1)
+            #current_plot.make_plot()    
     reader.commit()
-    if most_recent != None:
-        with open(config_path, "r") as file:
-            config_settings = list(csv.reader(file))
-        for i, key in enumerate(param_dict, 1):
-            current_plot = param_dict[key]
-            current_param_val = float(most_recent[0][i])
-            current_text = live_dict[key] #update to live text data summary
-            #if param_to_index_dict.get(key) is not None:
-            if current_param_val > float(config_settings[3][param_to_i[key]]) or current_param_val < float(config_settings[4][param_to_i[key]]):
-                #pCheck(float(config_settings[4][param_to_i[key]]),float(config_settings[3][param_to_i[key]]),key,current_param_val) uncomment to test emergency texts
-                current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
-                current_plot.plot_color = 'r'
-            else:
+    initialize_plots = _plots_initialized
+
+def _plots_initialized(): #ensures plots only intialized once though!
+    pass
+initialize_plots()
+
+###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_ANY LIST AND INSERT FRESHLY CALLED VALUE TO BE FIRST IN LIST
+def animate(ii):
+    while True:
+        most_recent_time_graphed = param_dict[param_list[0]] #first, pulls up first plot
+        most_recent = reader.get_timeset(table="SensorData", num=1)
+        reader.commit()         #if identical, do not animate
+        time_reader = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+        #then checks that plot's time list
+        if len(most_recent_time_graphed.tList) > 0 and len(most_recent) > 0 and (time_reader == most_recent_time_graphed.tList[0]):
+            for i, param in enumerate(param_list, 1):
+                current_text = live_dict[param]
                 current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
-                current_plot.plot_color = 'g'
-            
-            data_stream = current_plot.incoming_data
-            time_stream = current_plot.tList
-            if len(data_stream) == 20:
-                data_stream.pop()
-                time_stream.pop()
-                data_stream.insert(0, most_recent[0][i])
-                time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
-                time_stream.insert(0, time_f)
-                current_plot.make_plot()
-            else:
-                data_stream.insert(0, most_recent[0][i])
-                time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
-                time_stream.insert(0, time_f)
-                current_plot.make_plot()
+            break #checks if the timestamp is exactly the same as prior, i.e. no new data points have been logged in this frame
     
-    else:
-        pass
-                
+        else:
+            with open(config_path, "r") as file: #ELSE: this is a new data point, so go ahead and plot it
+                config_settings = list(csv.reader(file))
+            for i, key in enumerate(param_dict, 1):
+                current_plot = param_dict[key]
+                current_param_val = float(most_recent[0][i])
+                current_text = live_dict[key] #update to live text data summary
+                if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
+                    #if Settings.get_state(Settings):
+                    #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                    current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
+                    current_plot.plot_color = 'r'
+                else:
+                    current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
+                    current_plot.plot_color = 'g'
             
-           
+                data_stream = current_plot.incoming_data
+                time_stream = current_plot.tList
+                data_stream.insert(0, most_recent[0][i])
+                time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+                time_stream.insert(0, time_f)
+                if len(data_stream) < 20: #graph updates, growing to show 20 points
+                    current_plot.make_plot()
+                else:                      #there are 20 points and more available, so animation occurs
+                    data_stream.pop()
+                    time_stream.pop()
+                    current_plot.make_plot()
+            break
+
+                           
 #initialization
 class AllWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -433,37 +440,29 @@ class Settings(tk.Frame):
         #Discard button
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.grid(row = 3, columnspan = 14, pady = (0,20))
-
-
-        # ENTRY WIDGETS
+        self.v = tk.IntVar()
+        self.emergencyButton = ttk.Checkbutton(self, text="Enable Emergency Texts", #state=tk.NORMAL
+                                variable=self.v, onvalue = 1, offvalue = 0) #command=self.get_state)
+        self.emergencyButton.var = self.v
+        self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,0))
         
-        # widget text
-        widgets = ["pH", "TDS (ppm)", "DO (ppm)", "Phosphate (ppm)", "Nitrate (ppm)", "Ammonia (ppm)", "Air Temperature (\N{DEGREE SIGN}C)",
-                   "Air Humidity (%)", "Water Temperature (\N{DEGREE SIGN}C)", "Water Level (cm)", "Flow Rate (GPH)"]
-        # initialize entries list vars
-        self.lower_entries = [0 for i in range(len(widgets))]
-        self.upper_entries = [0 for i in range(len(widgets))]
-        # initialize param vars
-        pH_lower, TDS_lower, DO_lower, Phosphate_lower, Nitrate_lower, Ammonia_lower, Air_Temperature_lower, Air_Humidity_lower, \
-            Water_Temperature_lower, Water_Level_lower, Flow_Rate_lower = [tk.DoubleVar() for x in range(len(widgets))]
-        pH_upper, TDS_upper, DO_upper, Phosphate_upper, Nitrate_upper, Ammonia_upper, Air_Temperature_upper, Air_Humidity_upper, \
-            Water_Temperature_upper, Water_Level_upper, Flow_Rate_upper = [tk.DoubleVar() for x in range(len(widgets))]
-        # param var tables for looping
-        widget_var_lower = [pH_lower, TDS_lower, DO_lower, Phosphate_lower, Nitrate_lower, Ammonia_lower, Air_Temperature_lower,
-                            Air_Humidity_lower, Water_Temperature_lower, Water_Level_lower, Flow_Rate_lower]
-        widget_var_upper = [pH_upper, TDS_upper, DO_upper, Phosphate_upper, Nitrate_upper, Ammonia_upper, Air_Temperature_upper,
-                            Air_Humidity_upper, Water_Temperature_upper, Water_Level_upper, Flow_Rate_upper]
+        # ENTRY WIDGETS
+        self.lower_entries = [0 for i in range(len(param_list))]
+        self.lower_entries = [tk.DoubleVar() for x in range(len(param_list))]
+        
+        self.upper_entries = [0 for i in range(len(param_list))]
+        self.upper_entries = [tk.DoubleVar() for x in range(len(param_list))]
         
         # for each widget, create its upper and lower label and entry, store in temp var, then place in entries list
-        for i in range(len(widgets)):
-            lower_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Min " + widgets[i] + ":")
+        for i in range(len(param_list)):
+            lower_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Min " + param_list[i] + ":")
             lower_label.grid(row=i+4, column = 1, padx = (0,10))
-            lower_entry = tk.Entry(self, width = 20, textvariable = widget_var_lower[i])
+            lower_entry = tk.Entry(self, width = 20, textvariable = self.lower_entries[i])
             lower_entry.grid(row=i+4, column = 2, padx = (0,50))
             self.lower_entries[i] = lower_entry
-            upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max " + widgets[i] + ":")
+            upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max " + param_list[i] + ":")
             upper_label.grid(row=i+4, column = 3, padx = (0,10))
-            upper_entry = tk.Entry(self, width = 20, textvariable = widget_var_upper[i])
+            upper_entry = tk.Entry(self, width = 20, textvariable = self.upper_entries[i])
             upper_entry.grid(row=i+4, column = 4)
             self.upper_entries[i] = upper_entry
 
@@ -510,10 +509,38 @@ class Settings(tk.Frame):
         #Get last saved values
         with open(config_path, "r") as file:
             config_settings = list(csv.reader(file))
-            for i in range(len(self.lower_entries)):
-                self.lower_entries[i].insert(0, config_settings[4][i])
-            for i in range(len(self.upper_entries)):
-                self.upper_entries[i].insert(0, config_settings[3][i])
+            for i, entry in enumerate(self.lower_entries):
+                entry.insert(0, config_settings[4][i])
+            for i, entry in enumerate(self.upper_entries):
+                entry.insert(0, config_settings[3][i])
+    
+    def get_state(self):
+        if self.emergencyButton.var.get():
+            return 1
+        else:
+            return 0
+        
+        #
+        #if (self.emergencyButton['variable'].get() == 1):
+         #  return 1 
+        #else:
+         #   return 0
+    # def change_state(self):
+    #     #initially set to disabled
+    #     if (self.emergencyButton['state'] == tk.NORMAL):
+    #         #self.emergencyButton['state'] = "DISABLED"
+    #         print("switching to disabled mode->sending texts")
+    #         #self.emergencyButton['text'] = "Disable Emergency Texts"
+    #         self.emergencyButton.configure(bg="green")
+    #         self.emergencyButton.configure(text="Disable Emergency Texts")
+    #         self.emergencyButton.configure(state=tk.DISABLED)
+    #     else: 
+    #         #self.emergencyButton['state'] = "NORMAL" #normal means texts are disabled
+    #         print("switching to normal mode, not sending texts!")
+    #         self.emergencyButton.configure(bg="red")
+    #         self.emergencyButton.configure(text="Enable Emergency Texts")
+    #         self.emergencyButton.configure(state=tk.NORMAL)    
+        
 
 #add Video Stream page
 class VideoStream(tk.Frame):
