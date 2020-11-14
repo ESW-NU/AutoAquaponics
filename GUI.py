@@ -450,8 +450,10 @@ class Settings(tk.Frame):
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.grid(row = 3, columnspan = 14, pady = (0,20))
         self.sendtext_state = tk.IntVar()
+        self.s = ttk.Style() #make a new style for checkbutton so bg can be white
+        self.s.configure('New.TCheckbutton', background='white')
         self.emergencyButton = ttk.Checkbutton(self, text="Enable Emergency Texts", #state=tk.NORMAL
-                                variable=self.sendtext_state, onvalue = 1, offvalue = 0) #command=self.get_state)
+                                variable=self.sendtext_state, onvalue = 1, offvalue = 0, style='New.TCheckbutton') #command=self.get_state)
         self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,0))
         
         # ENTRY WIDGETS
