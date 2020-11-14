@@ -54,7 +54,7 @@ with open(config_path, "r") as file:
     lower_config = config_settings[4]
 
 #create figure for plots and set figure size/layout
-f = figure.Figure(figsize=(8.6,17.5), dpi=100)
+f = figure.Figure(figsize=(8.5,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
@@ -225,7 +225,7 @@ class HomePage(tk.Frame):
         tk.Frame.__init__(self,parent)
         #bring up vertical scroll frame and place it
         scframe = VerticalScrolledFrame(self)
-        scframe.place(x=130, y=40)
+        scframe.place(x=140, y=40)
         #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
         #background = canvas.copy_from_bbox(f.bbox)
