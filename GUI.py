@@ -425,6 +425,7 @@ class ControlPanel(tk.Frame):
                 channel_buttons_config[i] = -1
                 continue
 
+
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
