@@ -131,13 +131,17 @@ def animate(ii):
         most_recent_time_graphed = param_dict[param_list[0]] #first, pulls up first plot
         most_recent = reader.get_timeset(table="SensorData", num=1)
         reader.commit()         #if identical, do not animate
-        time_reader = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
         #then checks that plot's time list
-        if len(most_recent_time_graphed.tList) > 0 and len(most_recent) > 0 and (time_reader == most_recent_time_graphed.tList[0]):
+        if  (len(most_recent) == 0):
+            break
+        
+        time_reader = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+        if (len(most_recent_time_graphed.tList) != 0) and (time_reader == most_recent_time_graphed.tList[0]):
             for i, param in enumerate(param_list, 1):
                 current_text = live_dict[param]
                 current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
             break #checks if the timestamp is exactly the same as prior, i.e. no new data points have been logged in this frame
+        #do I have to add an else?
     
         else:
             with open(config_path, "r") as file: #ELSE: this is a new data point, so go ahead and plot it
@@ -146,8 +150,8 @@ def animate(ii):
                 current_plot = param_dict[key]
                 current_param_val = float(most_recent[0][i])
                 current_text = live_dict[key] #update to live text data summary
-                if current_param_val > float(config_settings[3][i]) or current_param_val < float(config_settings[4][i]):
-                    #if Settings.get_state(Settings):
+                if current_param_val > float(config_settings[3][i-1]) or current_param_val < float(config_settings[4][i-1]):
+                    #if sendtext_state global variable?
                     #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
                     current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                     current_plot.plot_color = 'r'
@@ -442,10 +446,9 @@ class Settings(tk.Frame):
         #Discard button
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.grid(row = 3, columnspan = 14, pady = (0,20))
-        self.v = tk.IntVar()
+        self.sendtext_state = tk.IntVar()
         self.emergencyButton = ttk.Checkbutton(self, text="Enable Emergency Texts", #state=tk.NORMAL
-                                variable=self.v, onvalue = 1, offvalue = 0) #command=self.get_state)
-        self.emergencyButton.var = self.v
+                                variable=self.sendtext_state, onvalue = 1, offvalue = 0) #command=self.get_state)
         self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,0))
         
         # ENTRY WIDGETS
@@ -515,18 +518,7 @@ class Settings(tk.Frame):
                 entry.insert(0, config_settings[4][i])
             for i, entry in enumerate(self.upper_entries):
                 entry.insert(0, config_settings[3][i])
-    
-    def get_state(self):
-        if self.emergencyButton.var.get():
-            return 1
-        else:
-            return 0
-        
-        #
-        #if (self.emergencyButton['variable'].get() == 1):
-         #  return 1 
-        #else:
-         #   return 0
+
     # def change_state(self):
     #     #initially set to disabled
     #     if (self.emergencyButton['state'] == tk.NORMAL):
