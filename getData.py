@@ -71,7 +71,7 @@ def getData():
     
     return pH, TDS, hum, atemp, wtemp, distance
 
-from time import sleep
-while True:
-    print(getData())
-    sleep(0.2)
+# from time import sleep
+# while True:
+#     print(getData())
+#     sleep(0.2)

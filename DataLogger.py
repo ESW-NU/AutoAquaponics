@@ -5,6 +5,8 @@ db_name = 'sensor_testdb.db'
 
 all_we_got_now = ('time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
 now_data_types = ("datetime", "float", "float", "float", "float", "float", "float")
+end_GOAL = ["pH", "TDS (ppm)", "DO (ppm)", "Phosphate (ppm)", "Nitrate (ppm)", "Ammonia (ppm)", "Air Temperature (\N{DEGREE SIGN}C)",
+                   "Air Humidity (%)", "Water Temperature (\N{DEGREE SIGN}C)", "Water Level (cm)", "Flow Rate (GPH)"]
 
 def data_fxn():
     import numpy as np
@@ -18,7 +20,7 @@ def DataLogger():
     logger = Logger(db_path, db_name)
     logger.table(sensor_plot_table)
     while True:
-        logger.collect_data("SensorData", data_fxn, tsamp=3, nsamp=1)
+        logger.collect_data("SensorData", data_fxn, tsamp=5, nsamp=1)
         logger.log_data()
         logger.commit()
         

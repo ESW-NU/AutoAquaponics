@@ -5,7 +5,7 @@ import sendtext
 
 # Set your own file path & config path in file setup.json
 # or as environment variables AQUA_testfile_dir, AQUA_config_file
-_config_file = None
+_config_file = "setup.json"
 _tgt_db_dir = None
 
 def _load_setting_json(json_file_str, json_var):
@@ -55,7 +55,7 @@ if(__name__ == '__main__'):
     #start data logging
     p1.start()
     print("Loading Data...")
-    sleep(5)
+    sleep(1)
     p2.start()
  
     #start GUI
