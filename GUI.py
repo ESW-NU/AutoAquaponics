@@ -187,6 +187,7 @@ class AllWindow(tk.Tk):
         navimenu.add_command(label="Control Panel", command=lambda: self.show_frame(ControlPanel))
         navimenu.add_command(label="Video Stream", command=lambda: self.show_frame(VideoStream))
         navimenu.add_command(label="Settings", command=lambda: self.show_frame(Settings))
+        navimenu.add_command(label="Alternate Control Panel", command=lambda: self.show_frame(AltControlPanelMain))
         #add separator line
         navimenu.add_separator()
         #add quit button in menu that triggers a command
@@ -197,7 +198,7 @@ class AllWindow(tk.Tk):
         #show the frames
         self.frames = {}
         #remember to add page to this list when making new ones
-        for F in (HomePage, ControlPanel, Settings, VideoStream):
+        for F in (HomePage, ControlPanel, Settings, VideoStream, AltControlPanelMain):
             frame = F(container, self)
             #set background color for the pages
             frame.config(bg='white')
@@ -553,6 +554,35 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
+
+class AltControlPanelMain(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"]
+        self.ctrl_panel_image_path = ["Images/light.png", "Images/water.png", "Images/food.png",  "Images/sensor.png", "Images/oxygen.png", "Images/backwash.png", "Images/camera.png", "Images/back.png"]
+        self.ctrl_panel_image = []
+        for i in range(8):
+                self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i]))
+        i = 0
+        j = 0
+        for counter in range(8):
+            self.columnconfigure(i, weight=1, minsize=75)
+            self.rowconfigure(i, weight=1, minsize=50)
+    
+            frame = tk.Frame(self)
+
+            frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
+            button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
+            if(counter == 7):
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
+            button.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            j += 1
+            if(j == 3):
+                i += 1
+                j = 0
+            
+
+
 app = AllWindow()
 app.geometry('1025x672')
 #this makes app full screen, not sure if it's good for us or not
