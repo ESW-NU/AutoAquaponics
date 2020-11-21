@@ -555,29 +555,38 @@ class VideoStream(tk.Frame):
 class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"]
-        self.ctrl_panel_image_path = ["Images/light.png", "Images/water.png", "Images/food.png",  "Images/sensor.png", "Images/oxygen.png", "Images/backwash.png", "Images/camera.png", "Images/back.png"]
+
+        #title
+        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 20)
+
+        #Setup for lables and button images
+        self.path_setup = "home/pi/AutoAquaponics" #Change this string to empty if not running on Rpi
+        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"] 
+        self.ctrl_panel_image_path = [path_setup + "Images/light.png", path_setup + "Images/water.png", path_setup + "Images/food.png",  path_setup + "Images/sensor.png", path_setup + "Images/oxygen.png", path_setup + "Images/backwash.png", path_setup + "Images/camera.png", path_setup +"Images/back.png"]
         self.ctrl_panel_image = []
+
         for i in range(8):
-                self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i]))
+                self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i])) #create array of images using image path
+        
+        buttonFrame = tk.Frame(master=self)
+        buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
         i = 0
         j = 0
         for counter in range(8):
-            self.columnconfigure(i, weight=1, minsize=75)
-            self.rowconfigure(i, weight=1, minsize=50)
+            buttonFrame.columnconfigure(i, weight=1, minsize=300)
+            buttonFrame.rowconfigure(i, weight=1, minsize=200)
     
-            frame = tk.Frame(self)
+            frame = tk.Frame(master=buttonFrame)
 
             frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 7):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
-            button.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
             j += 1
             if(j == 3):
                 i += 1
                 j = 0
-            
 
 
 app = AllWindow()
