@@ -1,7 +1,7 @@
 from main import user_settings
 
 config_path, db_path = user_settings()
-db_name = 'sensor_testdb.db'
+db_name = 'sensor_db.db'
 
 all_we_got_now = ('time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
 now_data_types = ("datetime", "float", "float", "float", "float", "float", "float")
@@ -20,7 +20,7 @@ def DataLogger():
     logger = Logger(db_path, db_name)
     logger.table(sensor_plot_table)
     while True:
-        logger.collect_data("SensorData", data_fxn, tsamp=5, nsamp=1)
+        logger.collect_data("SensorData", getData, tsamp=30, nsamp=5)
         logger.log_data()
         logger.commit()
         

@@ -55,7 +55,7 @@ if(__name__ == '__main__'):
     #start data logging
     p1.start()
     print("Loading Data...")
-    sleep(1)
+
     p2.start()
  
     #start GUI

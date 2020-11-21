@@ -26,7 +26,7 @@ def getData():
     chan = AnalogIn(ads, ADS.P0)
     chan1 = AnalogIn(ads, ADS.P1)
 #define readings from ADC
-    pH = -5.82*chan.voltage + 22.1 #calibrated equation
+    pH = round(-5.82*chan.voltage + 22.1,2) #calibrated equation
     #pH = chan.voltage
     '''calibrate TDS here'''
     Vtds_raw = chan1.voltage #raw reading from sensor right now
@@ -37,9 +37,11 @@ def getData():
     K = (rawECsol)/(133.42*(Vc**3)-255.86*(Vc**2)+857.39*Vc)#defined calibration factor K
     EC_raw = K*(133.42*(Vtds_raw**3)-255.86*(Vtds_raw**2)+857.39*Vtds_raw)
     EC = EC_raw/(1+0.02*(wtemp-25)) #use current temp for temp compensation
-    TDS = EC/2 #TDS is just half of electrical conductivity in ppm
+    TDS = round(EC/2,2) #TDS is just half of electrical conductivity in ppm
 #read air temp and air humidity
     hum, atemp = dht.read_retry(dht.DHT22, DHT)
+    hum = round(hum,2)
+    atemp = round(atemp,2)
 #setup distance sensing stuff
     GPIO_TRIGGER = 6 #set GPIO Pins
     GPIO_ECHO = 18
@@ -67,8 +69,8 @@ def getData():
     TimeElapsed = StopTime - StartTime
     # multiply with the sonic speed (34300 cm/s)
     # and divide by 2, because there and back
-    distance = (TimeElapsed * 34300) / 2
-    
+    distance = round((TimeElapsed * 34300) / 2,2)
+    wtemp = round(wtemp,2)
     return pH, TDS, hum, atemp, wtemp, distance
 
 # from time import sleep

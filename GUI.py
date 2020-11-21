@@ -31,7 +31,7 @@ from main import user_settings
 config_path, db_path = user_settings()
 
 #initialize channel_buttons_config, entry configs, and SQLite reader
-db_name = 'sensor_testdb.db'
+db_name = 'sensor_db.db'
 reader = Reader(db_path, db_name)
 
 with open(config_path, "r") as file:
@@ -54,11 +54,12 @@ with open(config_path, "r") as file:
     lower_config = config_settings[4]
 
 #create figure for plots and set figure size/layout
-f = figure.Figure(figsize=(8.6,17.5), dpi=100)
+f = figure.Figure(figsize=(8.5,17.5), dpi=100)
 f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
-param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Distance (cm)']
+param_list = ['pH', 'TDS (ppm)', 'Relative Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level/Distance (cm)']
+param_ylim = [(6, 8.5), (0, 250), (20, 80), (15, 35), (15, 35), (0, 61)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 class Live_Text:
@@ -66,10 +67,11 @@ class Live_Text:
         self.label = label
     
 class Sensor_Plot:
-    def __init__(self, plot, tList, x_ax, param, incoming_data, plot_color):
+    def __init__(self, plot, tList, x_ax, ylim, param, incoming_data, plot_color):
         self.plot = plot
         self.tList = tList
         self.x_ax = x_ax
+        self.ylim = ylim
         self.param = param
         self.incoming_data = incoming_data #<- graph is bound by incoming data and Data Summary Table displays most recent value 20 of them
         self.plot_color = plot_color #initially 'b' for all
@@ -78,7 +80,7 @@ class Sensor_Plot:
         self.plot.clear()
         self.plot.set_xlabel('Time')
         self.plot.set_ylabel(self.param)
-        # plot.set_ylim(ylim) #UNIQUE BUT HOW?
+        self.plot.set_ylim(self.ylim)
 
         self.x_ax.xaxis_date()
         self.x_ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))
@@ -107,7 +109,8 @@ def initialize_plots(): #intiailizes plots...
 
             subplot = f.add_subplot(6, 2, i)  # sharex?
             x_ax = f.get_axes()
-            current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param, most_recent_any_size, 'b')
+            
+            current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param_ylim[i-1], param, most_recent_any_size, 'b')
             param_dict[param] = current_plot
             current_plot.make_plot()
                     
@@ -115,7 +118,7 @@ def initialize_plots(): #intiailizes plots...
         for i, param in enumerate(param_list, 1):
             subplot = f.add_subplot(6, 2, i)
             x_ax = f.get_axes()
-            current_plot = Sensor_Plot(subplot, [], x_ax[i-1], param, [], 'b')
+            current_plot = Sensor_Plot(subplot, [], x_ax[i-1], param_ylim[i-1], param, [], 'b')
             param_dict[param] = current_plot
             #current_plot.make_plot()    
     reader.commit()
@@ -152,7 +155,7 @@ def animate(ii):
                 current_text = live_dict[key] #update to live text data summary
                 if current_param_val > float(config_settings[3][i-1]) or current_param_val < float(config_settings[4][i-1]):
                     #if sendtext_state global variable?
-                    pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                    #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
                     current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                     current_plot.plot_color = 'r'
                 else:
@@ -222,7 +225,7 @@ class HomePage(tk.Frame):
         tk.Frame.__init__(self,parent)
         #bring up vertical scroll frame and place it
         scframe = VerticalScrolledFrame(self)
-        scframe.place(x=130, y=40)
+        scframe.place(x=140, y=40)
         #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
         #background = canvas.copy_from_bbox(f.bbox)
@@ -447,10 +450,32 @@ class Settings(tk.Frame):
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.grid(row = 3, columnspan = 14, pady = (0,20))
         self.sendtext_state = tk.IntVar()
+        self.s = ttk.Style() #make a new style for checkbutton so bg can be white
+        self.s.configure('New.TCheckbutton', background='white')
         self.emergencyButton = ttk.Checkbutton(self, text="Enable Emergency Texts", #state=tk.NORMAL
-                                variable=self.sendtext_state, onvalue = 1, offvalue = 0) #command=self.get_state)
+                                variable=self.sendtext_state, onvalue = 1, offvalue = 0, style='New.TCheckbutton') #command=self.get_state)
         self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,0))
         
+        self.phone_number = tk.StringVar()
+        self.phone_carrier = tk.StringVar()
+        self.phone_carrier.set('Select')
+        # emergency phone number entry buttons:
+        self.phone_label = tk.Label(self, bg = 'white', width = 25, anchor = 'e', text='Phone Number for Emergency Texts:')
+        self.phone_label.grid(row = 20, column = 1, columnspan = 2, padx = (0,25), pady = (20,0))
+        self.phone_entry = tk.Entry(self, width = 12, textvariable = self.phone_number)
+        self.phone_entry.grid(row = 20, column = 2, sticky = 'e', padx = (0,10), pady = (20,0))
+        # emergency phone carrier entry buttons:
+        self.carrier_label = tk.Label(self, bg = 'white', width = 10, anchor = 'e', text='Phone Carrier:')
+        self.carrier_label.grid(row = 20, column = 3, sticky = 'w', padx = (10,0), pady = (20,0))
+        self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
+                         'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
+        self.carrier_entry = tk.OptionMenu(self, self.phone_carrier, *self.carriers)
+        self.carrier_entry.config(width = 12)
+        self.carrier_entry.grid(row = 20, column = 3, columnspan = 2, padx = (0,110), pady = (20,0))
+        # emergency phone number submit button:
+        self.submitButton = ttk.Button(self, text="Submit", command=self.submit)
+        self.submitButton.grid(row = 20, column = 4, sticky = 'e', padx = (0,50), pady = (20,0))
+
         # ENTRY WIDGETS
         self.lower_entries = [0 for i in range(len(param_list))]
         self.lower_entries = [tk.DoubleVar() for x in range(len(param_list))]
@@ -468,7 +493,7 @@ class Settings(tk.Frame):
             upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max " + param_list[i] + ":")
             upper_label.grid(row=i+4, column = 3, padx = (0,10))
             upper_entry = tk.Entry(self, width = 20, textvariable = self.upper_entries[i])
-            upper_entry.grid(row=i+4, column = 4)
+            upper_entry.grid(row=i+4, column = 4, padx = (0,50))
             self.upper_entries[i] = upper_entry
 
         self.grid_columnconfigure(0, weight=2)
@@ -519,6 +544,37 @@ class Settings(tk.Frame):
             for i, entry in enumerate(self.upper_entries):
                 entry.insert(0, config_settings[3][i])
 
+    def submit(self):
+        # submit the entered phone number & carrier to the emergency texts list
+        # need to add senttext.py to GUI before this can function
+        if len(self.phone_number.get()) != 10:
+            self.num_popup = tk.Tk()
+            self.num_popup.wm_title("Alert")
+            label = ttk.Label(self.num_popup, text="Invalid phone number.", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+            okb = ttk.Button(self.num_popup, text="OK", command = self.num_popup.destroy)
+            okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
+            self.num_popup.mainloop()
+        elif self.phone_carrier.get() == 'Select':
+            self.car_popup = tk.Tk()
+            self.car_popup.wm_title("Alert")
+            label = ttk.Label(self.car_popup, text="  Choose a carrier.  ", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+            okb = ttk.Button(self.car_popup, text="OK", command = self.car_popup.destroy)
+            okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
+            self.car_popup.mainloop()
+        else:
+            # numbers[self.phone_number.get()] = self.phone_carrier.get()     <- once sendtext.py is in GUI
+            self.phone_entry.delete(0, 'end')
+            self.phone_carrier.set('Select')
+            self.ent_popup = tk.Tk()
+            self.ent_popup.wm_title("Alert")
+            label = ttk.Label(self.ent_popup, text="Phone number entered.", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+            okb = ttk.Button(self.ent_popup, text="OK", command = self.ent_popup.destroy)
+            okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
+            self.ent_popup.mainloop()
+
     # def change_state(self):
     #     #initially set to disabled
     #     if (self.emergencyButton['state'] == tk.NORMAL):
@@ -551,29 +607,37 @@ class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
         homepath = "/home/pi/AutoAquaponics/"
         tk.Frame.__init__(self, parent)
-        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"]
-        self.ctrl_panel_image_path = [homepath + "Images/light.png", homepath + "Images/water.png", homepath + "Images/food.png",  homepath + "Images/sensor.png", homepath + "Images/oxygen.png", homepath + "Images/backwash.png", homepath + "Images/camera.png", homepath + "Images/back.png"]
+        #title
+        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 20)
+
+        #Setup for lables and button images
+        path_setup = "/home/pi/AutoAquaponics/" #Change this string to empty if not running on Rpi
+        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"] 
+        self.ctrl_panel_image_path = [path_setup + "Images/light.png", path_setup + "Images/water.png", path_setup + "Images/food.png",  path_setup + "Images/sensor.png", path_setup + "Images/oxygen.png", path_setup + "Images/backwash.png", path_setup + "Images/camera.png", path_setup +"Images/back.png"]
         self.ctrl_panel_image = []
+
         for i in range(8):
-                self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i]))
+                self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i])) #create array of images using image path
+        
+        buttonFrame = tk.Frame(master=self)
+        buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
         i = 0
         j = 0
         for counter in range(8):
-            self.columnconfigure(i, weight=1, minsize=75)
-            self.rowconfigure(i, weight=1, minsize=50)
+            buttonFrame.columnconfigure(i, weight=1, minsize=300)
+            buttonFrame.rowconfigure(i, weight=1, minsize=200)
     
-            frame = tk.Frame(self)
+            frame = tk.Frame(master=buttonFrame)
 
             frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 7):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
-            button.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
             j += 1
             if(j == 3):
                 i += 1
                 j = 0
-            
 
 
 app = AllWindow()
