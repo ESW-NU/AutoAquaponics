@@ -619,7 +619,7 @@ class AltControlPanelMain(tk.Frame):
         for i in range(8):
                 self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i])) #create array of images using image path
         
-        buttonFrame = tk.Frame(master=self)
+        buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
         i = 0
         j = 0
