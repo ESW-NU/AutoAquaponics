@@ -456,6 +456,26 @@ class Settings(tk.Frame):
                                 variable=self.sendtext_state, onvalue = 1, offvalue = 0, style='New.TCheckbutton') #command=self.get_state)
         self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,0))
         
+        self.phone_number = tk.StringVar()
+        self.phone_carrier = tk.StringVar()
+        self.phone_carrier.set('Select')
+        # emergency phone number entry buttons:
+        self.phone_label = tk.Label(self, bg = 'white', width = 25, anchor = 'e', text='Phone Number for Emergency Texts:')
+        self.phone_label.grid(row = 20, column = 1, columnspan = 2, padx = (0,25), pady = (20,0))
+        self.phone_entry = tk.Entry(self, width = 12, textvariable = self.phone_number)
+        self.phone_entry.grid(row = 20, column = 2, sticky = 'e', padx = (0,10), pady = (20,0))
+        # emergency phone carrier entry buttons:
+        self.carrier_label = tk.Label(self, bg = 'white', width = 10, anchor = 'e', text='Phone Carrier:')
+        self.carrier_label.grid(row = 20, column = 3, sticky = 'w', padx = (10,0), pady = (20,0))
+        self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
+                         'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
+        self.carrier_entry = tk.OptionMenu(self, self.phone_carrier, *self.carriers)
+        self.carrier_entry.config(width = 12)
+        self.carrier_entry.grid(row = 20, column = 3, columnspan = 2, padx = (0,110), pady = (20,0))
+        # emergency phone number submit button:
+        self.submitButton = ttk.Button(self, text="Submit", command=self.submit)
+        self.submitButton.grid(row = 20, column = 4, sticky = 'e', padx = (0,50), pady = (20,0))
+
         # ENTRY WIDGETS
         self.lower_entries = [0 for i in range(len(param_list))]
         self.lower_entries = [tk.DoubleVar() for x in range(len(param_list))]
@@ -473,7 +493,7 @@ class Settings(tk.Frame):
             upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max " + param_list[i] + ":")
             upper_label.grid(row=i+4, column = 3, padx = (0,10))
             upper_entry = tk.Entry(self, width = 20, textvariable = self.upper_entries[i])
-            upper_entry.grid(row=i+4, column = 4)
+            upper_entry.grid(row=i+4, column = 4, padx = (0,50))
             self.upper_entries[i] = upper_entry
 
         self.grid_columnconfigure(0, weight=2)
@@ -523,6 +543,37 @@ class Settings(tk.Frame):
                 entry.insert(0, config_settings[4][i])
             for i, entry in enumerate(self.upper_entries):
                 entry.insert(0, config_settings[3][i])
+
+    def submit(self):
+        # submit the entered phone number & carrier to the emergency texts list
+        # need to add senttext.py to GUI before this can function
+        if len(self.phone_number.get()) != 10:
+            self.num_popup = tk.Tk()
+            self.num_popup.wm_title("Alert")
+            label = ttk.Label(self.num_popup, text="Invalid phone number.", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+            okb = ttk.Button(self.num_popup, text="OK", command = self.num_popup.destroy)
+            okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
+            self.num_popup.mainloop()
+        elif self.phone_carrier.get() == 'Select':
+            self.car_popup = tk.Tk()
+            self.car_popup.wm_title("Alert")
+            label = ttk.Label(self.car_popup, text="  Choose a carrier.  ", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+            okb = ttk.Button(self.car_popup, text="OK", command = self.car_popup.destroy)
+            okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
+            self.car_popup.mainloop()
+        else:
+            # numbers[self.phone_number.get()] = self.phone_carrier.get()     <- once sendtext.py is in GUI
+            self.phone_entry.delete(0, 'end')
+            self.phone_carrier.set('Select')
+            self.ent_popup = tk.Tk()
+            self.ent_popup.wm_title("Alert")
+            label = ttk.Label(self.ent_popup, text="Phone number entered.", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+            okb = ttk.Button(self.ent_popup, text="OK", command = self.ent_popup.destroy)
+            okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
+            self.ent_popup.mainloop()
 
     # def change_state(self):
     #     #initially set to disabled
