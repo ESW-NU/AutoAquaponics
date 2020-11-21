@@ -152,7 +152,7 @@ def animate(ii):
                 current_text = live_dict[key] #update to live text data summary
                 if current_param_val > float(config_settings[3][i-1]) or current_param_val < float(config_settings[4][i-1]):
                     #if sendtext_state global variable?
-                    #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                    pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
                     current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                     current_plot.plot_color = 'r'
                 else:
@@ -549,9 +549,10 @@ class VideoStream(tk.Frame):
 
 class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
+        homepath = "/home/pi/AutoAquaponics/"
         tk.Frame.__init__(self, parent)
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"]
-        self.ctrl_panel_image_path = ["Images/light.png", "Images/water.png", "Images/food.png",  "Images/sensor.png", "Images/oxygen.png", "Images/backwash.png", "Images/camera.png", "Images/back.png"]
+        self.ctrl_panel_image_path = [homepath + "Images/light.png", homepath + "Images/water.png", homepath + "Images/food.png",  homepath + "Images/sensor.png", homepath + "Images/oxygen.png", homepath + "Images/backwash.png", homepath + "Images/camera.png", homepath + "Images/back.png"]
         self.ctrl_panel_image = []
         for i in range(8):
                 self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i]))

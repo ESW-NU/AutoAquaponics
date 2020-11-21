@@ -88,9 +88,9 @@ def pCheck(lower, upper, parameter, inp):
     
     numbers = {}
     #numbers['9496905371'] = 'T-Mobile'
-    #numbers['2243459408'] = 'AT&T'
+    numbers['2243459408'] = 'AT&T'
     #numbers['2029266579'] = 'T-Mobile'
-    numbers['7274853498'] = 'T-Mobile'
+    #numbers['7274853498'] = 'T-Mobile'
     if string:
         sendtext(string,**numbers)
     return
