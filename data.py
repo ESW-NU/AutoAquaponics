@@ -97,7 +97,8 @@ class Logger:
             sleep(tsamp)
 
         #averaging the columns of the array
-        data_avg = tuple(data_arr.sum(axis=0)/nsamp)
+        avg = data_arr.sum(axis=0)/nsamp
+        data_avg = tuple(np.round(avg, 2))
 
         #adding the timestamp
         data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_avg

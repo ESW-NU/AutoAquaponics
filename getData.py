@@ -26,7 +26,7 @@ def getData():
     chan = AnalogIn(ads, ADS.P0)
     chan1 = AnalogIn(ads, ADS.P1)
 #define readings from ADC
-    pH = round(-5.82*chan.voltage + 22.1,2) #calibrated equation
+    pH = -5.82*chan.voltage + 22.1 #calibrated equation
     #pH = chan.voltage
     '''calibrate TDS here'''
     Vtds_raw = chan1.voltage #raw reading from sensor right now
@@ -37,43 +37,39 @@ def getData():
     K = (rawECsol)/(133.42*(Vc**3)-255.86*(Vc**2)+857.39*Vc)#defined calibration factor K
     EC_raw = K*(133.42*(Vtds_raw**3)-255.86*(Vtds_raw**2)+857.39*Vtds_raw)
     EC = EC_raw/(1+0.02*(wtemp-25)) #use current temp for temp compensation
-    TDS = round(EC/2,2) #TDS is just half of electrical conductivity in ppm
+    TDS = EC/2 #TDS is just half of electrical conductivity in ppm
 #read air temp and air humidity
     hum, atemp = dht.read_retry(dht.DHT22, DHT)
-    hum = round(hum,2)
-    atemp = round(atemp,2)
 #setup distance sensing stuff
-    GPIO_TRIGGER = 6 #set GPIO Pins
+    '''GPIO_TRIGGER = 6 #set GPIO Pins
     GPIO_ECHO = 18
     GPIO.setup(GPIO_TRIGGER, GPIO.OUT) #set GPIO direction (IN / OUT)
     GPIO.setup(GPIO_ECHO, GPIO.IN)
     # set Trigger to HIGH
+    StopTime = time.time()
     GPIO.output(GPIO_TRIGGER, True)
- 
     # set Trigger after 0.01ms to LOW
     time.sleep(0.00001)
     GPIO.output(GPIO_TRIGGER, False)
- 
     StartTime = time.time()
-    StopTime = time.time()
- 
     # save StartTime
     while GPIO.input(GPIO_ECHO) == 0:
+        pass
         StartTime = time.time()
- 
     # save time of arrival
     while GPIO.input(GPIO_ECHO) == 1:
+        pass
         StopTime = time.time()
- 
     # time difference between start and arrival
     TimeElapsed = StopTime - StartTime
     # multiply with the sonic speed (34300 cm/s)
     # and divide by 2, because there and back
-    distance = round((TimeElapsed * 34300) / 2,2)
-    wtemp = round(wtemp,2)
-    return pH, TDS, hum, atemp, wtemp, distance
+    distance = round((TimeElapsed * 34300)/2, 2)'''
 
-# from time import sleep
-# while True:
+    return pH, TDS, hum, atemp, wtemp, 30# distance
+
+#from time import sleep
+#while True:
+#     print('updating...')
 #     print(getData())
-#     sleep(0.2)
+#     sleep(1)
