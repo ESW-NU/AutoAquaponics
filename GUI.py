@@ -359,11 +359,21 @@ class ControlPanel(tk.Frame):
         self.popup.wm_title("Alert")
         label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
         label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        
+
         YesB = ttk.Button(self.popup, text="YES", command = self.save)
         YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
         NoB.grid(row=1, column=2, pady = (0,10))
         self.popup.mainloop()
+
 
     #triggered if user press YES in popup window    
     def save(self):
@@ -488,6 +498,14 @@ class Settings(tk.Frame):
         self.popup.wm_title("Alert")
         label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
         label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        
         YesB = ttk.Button(self.popup, text="YES", command = self.save)
         YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
@@ -557,9 +575,16 @@ class AltControlPanelMain(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"]
         self.ctrl_panel_image_path = ["Images/light.png", "Images/water.png", "Images/food.png",  "Images/sensor.png", "Images/oxygen.png", "Images/backwash.png", "Images/camera.png", "Images/back.png"]
+        
+        '''
+        for i, path in enumerate(self.ctrl_panel_image_path):
+            self.ctrl_panel_image_path[i] = "/Users/larinachen/Desktop/AutoAquaponics/" + path
+        ''' 
+        
         self.ctrl_panel_image = []
         for i in range(8):
                 self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i]))
+        
         i = 0
         j = 0
         for counter in range(8):
