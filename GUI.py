@@ -466,6 +466,26 @@ class Settings(tk.Frame):
                                 variable=self.sendtext_state, onvalue = 1, offvalue = 0, style='New.TCheckbutton') #command=self.get_state)
         self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,0))
         
+        self.phone_number = tk.StringVar()
+        self.phone_carrier = tk.StringVar()
+        self.phone_carrier.set('Select')
+        # emergency phone number entry buttons:
+        self.phone_label = tk.Label(self, bg = 'white', width = 25, anchor = 'e', text='Phone Number for Emergency Texts:')
+        self.phone_label.grid(row = 20, column = 1, columnspan = 2, padx = (0,25), pady = (20,0))
+        self.phone_entry = tk.Entry(self, width = 12, textvariable = self.phone_number)
+        self.phone_entry.grid(row = 20, column = 2, sticky = 'e', padx = (0,10), pady = (20,0))
+        # emergency phone carrier entry buttons:
+        self.carrier_label = tk.Label(self, bg = 'white', width = 10, anchor = 'e', text='Phone Carrier:')
+        self.carrier_label.grid(row = 20, column = 3, sticky = 'w', padx = (10,0), pady = (20,0))
+        self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
+                         'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
+        self.carrier_entry = tk.OptionMenu(self, self.phone_carrier, *self.carriers)
+        self.carrier_entry.config(width = 12)
+        self.carrier_entry.grid(row = 20, column = 3, columnspan = 2, padx = (0,110), pady = (20,0))
+        # emergency phone number submit button:
+        self.submitButton = ttk.Button(self, text="Submit", command=self.submit)
+        self.submitButton.grid(row = 20, column = 4, sticky = 'e', padx = (0,50), pady = (20,0))
+
         # ENTRY WIDGETS
         self.lower_entries = [0 for i in range(len(param_list))]
         self.lower_entries = [tk.DoubleVar() for x in range(len(param_list))]
@@ -483,7 +503,7 @@ class Settings(tk.Frame):
             upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max " + param_list[i] + ":")
             upper_label.grid(row=i+4, column = 3, padx = (0,10))
             upper_entry = tk.Entry(self, width = 20, textvariable = self.upper_entries[i])
-            upper_entry.grid(row=i+4, column = 4)
+            upper_entry.grid(row=i+4, column = 4, padx = (0,50))
             self.upper_entries[i] = upper_entry
 
         self.grid_columnconfigure(0, weight=2)
@@ -542,6 +562,37 @@ class Settings(tk.Frame):
             for i, entry in enumerate(self.upper_entries):
                 entry.insert(0, config_settings[3][i])
 
+    def submit(self):
+        # submit the entered phone number & carrier to the emergency texts list
+        # need to add senttext.py to GUI before this can function
+        if len(self.phone_number.get()) != 10:
+            self.num_popup = tk.Tk()
+            self.num_popup.wm_title("Alert")
+            label = ttk.Label(self.num_popup, text="Invalid phone number.", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+            okb = ttk.Button(self.num_popup, text="OK", command = self.num_popup.destroy)
+            okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
+            self.num_popup.mainloop()
+        elif self.phone_carrier.get() == 'Select':
+            self.car_popup = tk.Tk()
+            self.car_popup.wm_title("Alert")
+            label = ttk.Label(self.car_popup, text="  Choose a carrier.  ", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+            okb = ttk.Button(self.car_popup, text="OK", command = self.car_popup.destroy)
+            okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
+            self.car_popup.mainloop()
+        else:
+            # numbers[self.phone_number.get()] = self.phone_carrier.get()     <- once sendtext.py is in GUI
+            self.phone_entry.delete(0, 'end')
+            self.phone_carrier.set('Select')
+            self.ent_popup = tk.Tk()
+            self.ent_popup.wm_title("Alert")
+            label = ttk.Label(self.ent_popup, text="Phone number entered.", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+            okb = ttk.Button(self.ent_popup, text="OK", command = self.ent_popup.destroy)
+            okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
+            self.ent_popup.mainloop()
+
     # def change_state(self):
     #     #initially set to disabled
     #     if (self.emergencyButton['state'] == tk.NORMAL):
@@ -573,36 +624,38 @@ class VideoStream(tk.Frame):
 class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"]
-        self.ctrl_panel_image_path = ["Images/light.png", "Images/water.png", "Images/food.png",  "Images/sensor.png", "Images/oxygen.png", "Images/backwash.png", "Images/camera.png", "Images/back.png"]
-        
-        '''
-        for i, path in enumerate(self.ctrl_panel_image_path):
-            self.ctrl_panel_image_path[i] = "/Users/larinachen/Desktop/AutoAquaponics/" + path
-        ''' 
-        
+
+        #title
+        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 20)
+
+        #Setup for lables and button images
+        path_setup = "C:\\Users\\Bill Yen\\Desktop\\NU Urban Ag\\AutoAquaponics\\" #Change this string to empty if not running on Rpi
+        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"] 
+        self.ctrl_panel_image_path = [path_setup + "Images\\light.png", path_setup + "Images\\water.png", path_setup + "Images\\food.png",  path_setup + "Images\\sensor.png", path_setup + "Images\\oxygen.png", path_setup + "Images\\backwash.png", path_setup + "Images\\camera.png", path_setup +"Images\\back.png"]
         self.ctrl_panel_image = []
+
         for i in range(8):
-                self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i]))
+                self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i])) #create array of images using image path
         
+        buttonFrame = tk.Frame(master=self, bg='white')
+        buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
         i = 0
         j = 0
         for counter in range(8):
-            self.columnconfigure(i, weight=1, minsize=75)
-            self.rowconfigure(i, weight=1, minsize=50)
+            buttonFrame.columnconfigure(i, weight=1, minsize=300)
+            buttonFrame.rowconfigure(i, weight=1, minsize=200)
     
-            frame = tk.Frame(self)
+            frame = tk.Frame(master=buttonFrame)
 
             frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 7):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
-            button.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
             j += 1
             if(j == 3):
                 i += 1
                 j = 0
-            
 
 
 app = AllWindow()
