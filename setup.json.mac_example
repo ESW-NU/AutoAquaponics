@@ -1,4 +1,5 @@
 {
-    "db_dir":"/Users/Bill Yen/Desktop/NU Urban Ag/",
-    "config_file":"/Users/Bill Yen/Desktop/NU Urban Ag/config.csv"
+    "config_file":"/Users/larinachen/Desktop/AutoAquaponics/config.csv",
+    "db_dir":"/Users/larinachen/Desktop/AutoAquaponics/"
+    
 }

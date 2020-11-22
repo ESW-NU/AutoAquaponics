@@ -359,11 +359,21 @@ class ControlPanel(tk.Frame):
         self.popup.wm_title("Alert")
         label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
         label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        
+
         YesB = ttk.Button(self.popup, text="YES", command = self.save)
         YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
         NoB.grid(row=1, column=2, pady = (0,10))
         self.popup.mainloop()
+
 
     #triggered if user press YES in popup window    
     def save(self):
@@ -508,6 +518,14 @@ class Settings(tk.Frame):
         self.popup.wm_title("Alert")
         label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
         label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        
         YesB = ttk.Button(self.popup, text="YES", command = self.save)
         YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
