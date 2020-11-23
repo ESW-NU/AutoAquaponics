@@ -41,7 +41,9 @@ def getData():
 #read air temp and air humidity
     hum, atemp = dht.read_retry(dht.DHT22, DHT)
 #setup distance sensing stuff
-    '''GPIO_TRIGGER = 6 #set GPIO Pins
+    new_reading = False
+    counter = 0
+    GPIO_TRIGGER = 6 #set GPIO Pins
     GPIO_ECHO = 18
     GPIO.setup(GPIO_TRIGGER, GPIO.OUT) #set GPIO direction (IN / OUT)
     GPIO.setup(GPIO_ECHO, GPIO.IN)
@@ -49,27 +51,34 @@ def getData():
     StopTime = time.time()
     GPIO.output(GPIO_TRIGGER, True)
     # set Trigger after 0.01ms to LOW
-    time.sleep(0.00001)
+    time.sleep(0.00006)
     GPIO.output(GPIO_TRIGGER, False)
     StartTime = time.time()
     # save StartTime
     while GPIO.input(GPIO_ECHO) == 0:
         pass
-        StartTime = time.time()
+        counter += 1 #stop loop if it gets stuck
+        if counter == 5000:
+            new_reading = True
+            break
+    StartTime = time.time()
+    if new_reading:
+        return False
     # save time of arrival
     while GPIO.input(GPIO_ECHO) == 1:
         pass
-        StopTime = time.time()
+    StopTime = time.time()
     # time difference between start and arrival
     TimeElapsed = StopTime - StartTime
     # multiply with the sonic speed (34300 cm/s)
     # and divide by 2, because there and back
-    distance = round((TimeElapsed * 34300)/2, 2)'''
+    distance = round((TimeElapsed * 34300)/2, 2)
 
-    return pH, TDS, hum, atemp, wtemp, 30# distance
+    return pH, TDS, hum, atemp, wtemp, distance
 
 #from time import sleep
+#from datetime import datetime
 #while True:
 #     print('updating...')
-#     print(getData())
-#     sleep(1)
+#     print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData())
+#     sleep(5)
