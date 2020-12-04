@@ -1,12 +1,15 @@
 from data import Reader
 from datetime import datetime 
 from typing import Container
-#import led info, replace with relay info
-#from gpiozero import PWMLED
-#LED1 = PWMLED(17)
 #import tkinter for GUI
 import tkinter as tk
-from tkinter import ttk, W, LEFT, END
+from tkinter import ttk, W, LEFT, END, Label
+#initializations for video
+import cv2   #open source computer vision library
+from PIL import Image, ImageTk
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+button_state = 0
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
@@ -621,7 +624,41 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-
+        #main label for showing the feed
+        self.imagel = tk.Label(self)
+        self.imagel.pack(pady=10, padx=10)
+        #initialize button with a picture
+        frame = self.get_frame()
+        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(cv2image)
+        imgtk = ImageTk.PhotoImage(image=img)
+        self.imagel.imgtk = imgtk
+        self.imagel.configure(image=imgtk)
+        #button to turn video on and off
+        self.toggle_button = tk.Button(self, text="Video OFF", bg= "red", fg= "white", width=10, 
+                           height=1, command=self.toggle)
+        self.toggle_button.pack(pady=10)
+        self.update()
+    def toggle(self):
+        if self.toggle_button['bg']=='red':
+            self.toggle_button.config(bg='green',text='Video ON')
+            self.update()
+        elif self.toggle_button['bg']=='green':
+            self.toggle_button.configure(bg='red',text='Video OFF')
+    def get_frame(self):
+        """get a frame from the cam and return it."""
+        ret, frame = cap.read()
+        return frame
+    def update(self):
+        """update frames."""
+        if self.toggle_button['bg']=='green':
+            frame = self.get_frame()
+            cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(cv2image)
+            imgtk = ImageTk.PhotoImage(image=img)
+            self.imagel.imgtk = imgtk
+            self.imagel.configure(image=imgtk)
+            self.imagel.after(15, self.update)
 class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
         homepath = "/home/pi/AutoAquaponics/"
