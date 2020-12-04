@@ -91,7 +91,10 @@ class Logger:
         data_arr = np.zeros((1,leng))   #initialize the array w/out timestamp (is this line problematic?)
         ct = 0
         while ct < nsamp:
-            tup_arr = np.asarray([dataget()]) #put the getdata() into array form
+            getdata = dataget()
+            tup_arr = np.asarray([getdata]) #put the getdata() into array form
+            #print(tup_arr)
+            print(getdata)
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
             sleep(tsamp)

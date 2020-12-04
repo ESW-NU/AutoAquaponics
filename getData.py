@@ -62,8 +62,7 @@ def getData():
             new_reading = True
             break
     StartTime = time.time()
-    if new_reading:
-        return False
+    
     # save time of arrival
     while GPIO.input(GPIO_ECHO) == 1:
         pass
@@ -72,7 +71,10 @@ def getData():
     TimeElapsed = StopTime - StartTime
     # multiply with the sonic speed (34300 cm/s)
     # and divide by 2, because there and back
-    distance = round((TimeElapsed * 34300)/2, 2)
+    if new_reading:
+        distance = 60
+    else:
+        distance = (TimeElapsed * 34300)/2
 
     return pH, TDS, hum, atemp, wtemp, distance
 

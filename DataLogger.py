@@ -20,7 +20,7 @@ def DataLogger():
     logger = Logger(db_path, db_name)
     logger.table(sensor_plot_table)
     while True:
-        logger.collect_data("SensorData", getData, tsamp=2, nsamp=5) #make sure tsamp > 2 seconds or distance sensor will freak
+        logger.collect_data("SensorData", getData, tsamp=5, nsamp=5) #make sure tsamp > 5 seconds or distance sensor will freak
         logger.log_data()
         logger.commit()
         
