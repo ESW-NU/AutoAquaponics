@@ -1,9 +1,8 @@
 from data import Reader
 from datetime import datetime 
-from typing import Container
 #import tkinter for GUI
 import tkinter as tk
-from tkinter import ttk, W, LEFT, END, Label
+from tkinter import ttk, W, LEFT, END
 #initializations for video
 import cv2   #open source computer vision library
 from PIL import Image, ImageTk
