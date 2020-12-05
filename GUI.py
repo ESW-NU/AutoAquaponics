@@ -9,7 +9,6 @@ import cv2   #open source computer vision library
 from PIL import Image, ImageTk
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
-button_state = 0
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
