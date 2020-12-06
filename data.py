@@ -78,7 +78,7 @@ class Logger:
             # add table(s) to the table dictionary...
             self.table_dict[table] = info
 
-    def collect_data(self,table,dataget,tsamp=0,nsamp=1):
+    def collect_data(self,table,dataget,temp_distance,tsamp=0,nsamp=1):
         #daily table mode 
         if table == 'DAILY':
             table = self.datef
@@ -87,14 +87,12 @@ class Logger:
         # (Running average. tsamp = time between measurements, nsamp = number of measurements)
         
         #data is stored in a numpy array...
-        leng = len(dataget())
+        leng = len(dataget(temp_distance))
         data_arr = np.zeros((1,leng))   #initialize the array w/out timestamp (is this line problematic?)
         ct = 0
         while ct < nsamp:
-            getdata = dataget()
+            getdata = dataget(temp_distance)
             tup_arr = np.asarray([getdata]) #put the getdata() into array form
-            #print(tup_arr)
-            print(getdata)
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
             sleep(tsamp)
@@ -111,6 +109,9 @@ class Logger:
         if table not in self.data_dict:
             self.data_dict[table] = []
         self.data_dict[table].append(data_log)
+        
+        #return the distance value for temp_distance
+        return data_avg[-1] #make sure this is the distance value
 
 
     def log_data(self):

@@ -1,4 +1,4 @@
-def getData():
+def getData(temp_distance):
 #import necessary modules and initialize I2C bus
     import board
     import busio
@@ -72,10 +72,10 @@ def getData():
     # multiply with the sonic speed (34300 cm/s)
     # and divide by 2, because there and back
     if new_reading:
-        distance = 60
+        distance = temp_distance
     else:
         distance = (TimeElapsed * 34300)/2
-
+    #make sure distance is the last value on this list
     return pH, TDS, hum, atemp, wtemp, distance
 
 #from time import sleep
