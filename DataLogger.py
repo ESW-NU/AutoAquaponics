@@ -16,11 +16,13 @@ def data_fxn():
 def DataLogger():
     from data import Reader, Logger
     from getData import getData
+    import numpy as np
     sensor_plot_table = {'SensorData':(all_we_got_now, now_data_types)}
     logger = Logger(db_path, db_name)
     logger.table(sensor_plot_table)
+    temp_distance = 60 #to give an arbitrary initial value to getData for the first time the distance sensor fails
     while True:
-        logger.collect_data("SensorData", getData, tsamp=5, nsamp=5) #make sure tsamp > 5 seconds or distance sensor will freak
+        temp_distance = np.round(logger.collect_data("SensorData", getData, temp_distance, tsamp=5, nsamp=5),2) #make sure tsamp > 5 seconds or distance sensor will freak
         logger.log_data()
         logger.commit()
         
