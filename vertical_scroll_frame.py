@@ -1,6 +1,6 @@
 '''
-Code below found from GitHub in {vertical_scroll_frame.py}
-{https://github.com/CS196Illinois/Finance/tree/master/MVP}
+Code below found from GitHub in {ScrolledFrame.py}
+{https://gist.github.com/JackTheEngineer/81df334f3dcff09fd19e4169dd560c59}
 Used to create vertical scroll bar on Dashboard, modified for sizing and binding to mouse scroll
 '''
 import tkinter as tk
@@ -42,7 +42,7 @@ class VerticalScrolledFrame(tk.Frame):
             self.canvas.unbind_all("<Button-4>")
             self.canvas.unbind_all("<Button-5>")
             self.canvas.unbind_all("<MouseWheel>")
-            
+
         tk.Frame.__init__(self, parent, *args, **kw)
 
         # create a canvas object and a vertical scrollbar for scrolling it
