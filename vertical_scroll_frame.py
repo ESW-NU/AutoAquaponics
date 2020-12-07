@@ -29,14 +29,19 @@ class VerticalScrolledFrame(tk.Frame):
                 # update the inner frame's width to fill the canvas
                 self.canvas.itemconfigure(interior_id, width=self.canvas.winfo_width())
         #this part binds scroll bar to mouse scroll
-        def _on_mousewheel(event, scroll):
-            self.canvas.yview_scroll(int(scroll), "units")
+        def _on_mousewheel(event, scroll=0):
+            if scroll == -1 or scroll == 1:
+                self.canvas.yview_scroll(int(scroll), "units")
+            else:
+                self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
         def _bind_to_mousewheel(event):
             self.canvas.bind_all("<Button-4>", fp(_on_mousewheel, scroll=-1))
             self.canvas.bind_all("<Button-5>", fp(_on_mousewheel, scroll=1))
+            self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
         def _unbind_from_mousewheel(event):
             self.canvas.unbind_all("<Button-4>")
             self.canvas.unbind_all("<Button-5>")
+            self.canvas.unbind_all("<MouseWheel>")
             
         """
         #This is the Windows code for scrolling the Frame
