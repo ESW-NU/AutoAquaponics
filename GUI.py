@@ -659,13 +659,13 @@ class VideoStream(tk.Frame):
             self.imagel.after(15, self.update)
 class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
-        homepath = "C://Users//Bill Yen//Desktop//NU Urban Ag//AutoAquaponics//"
+        homepath = "/home/pi/AutoAquaponics/"
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 20)
 
         #Setup for lables and button images
-        path_setup = "C://Users//Bill Yen//Desktop//NU Urban Ag//AutoAquaponics//" #Change this string to empty if not running on Rpi
+        path_setup = "/home/pi/AutoAquaponics/" #Change this string to empty if not running on Rpi
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"] 
         self.ctrl_panel_image_path = [path_setup + "Images//light.png", path_setup + "Images//water.png", path_setup + "Images//food.png",  path_setup + "Images//sensor.png", path_setup + "Images//oxygen.png", path_setup + "Images//backwash.png", path_setup + "Images//camera.png", path_setup +"Images//back.png"]
         self.ctrl_panel_image = []
