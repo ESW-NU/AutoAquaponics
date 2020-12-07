@@ -10,6 +10,7 @@ The bottom of the Settings page contains entry boxes that the user can fill in w
 - Which parameter is out of bound
 - What the lower and upper bound of that parameter should be
 - What the actual value of that parameter was when it exceeded the bound
+
 The warning message will only be sent once, and a separate message stating that the parameter is back within the safe level will be sent once the detected sensor value is within the bounds again. If the users don't get a second message stating that the parameter is now back into the safe level, they should assume that it remained at a dangerous level and check Dashboard to stay updated on what the latest values are.
 ### Video Stream
 The Video Stream page contains a canvas in the middle that shows a live stream view from the Raspberry Pi camera module. The video is OFF when the program first starts (the static image displayed is a picture of the camera view when GUI.py first opens), and can be toggled on by pressing the red "Video OFF" button on the bottom of the page. After pressing that button, it should turn green and say "Video ON", and a live stream video should be displayed in the middle. If the user presses the button again, it will turn back to red and freeze the camera view to a static image of whatever the last frame from the camera module was. It is recommended for the user to keep the video off if they are not watching it to preserve CPU on the Raspberry Pi. The amount of CPU the overall program uses at different states of the GUI is roughly the following:
