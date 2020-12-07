@@ -42,19 +42,6 @@ class VerticalScrolledFrame(tk.Frame):
             self.canvas.unbind_all("<Button-4>")
             self.canvas.unbind_all("<Button-5>")
             self.canvas.unbind_all("<MouseWheel>")
-            
-        """
-        #This is the Windows code for scrolling the Frame
-        
-        def _on_mousewheel(event):
-            self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-
-        def _bind_to_mousewheel(event):
-            self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
-
-        def _unbind_from_mousewheel(event):
-            self.canvas.unbind_all("<MouseWheel>")
-        """
         
         tk.Frame.__init__(self, parent, *args, **kw)
 
