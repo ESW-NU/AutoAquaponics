@@ -94,6 +94,7 @@ class Logger:
             getdata = dataget(temp_distance)
             tup_arr = np.asarray([getdata]) #put the getdata() into array form
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
+            print(getdata)
             ct += 1
             sleep(tsamp)
 

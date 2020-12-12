@@ -100,7 +100,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=20) #initializes plot up to 20 if possible if possible
+        most_recent = reader.get_timeset(table="SensorData", num=3500) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
