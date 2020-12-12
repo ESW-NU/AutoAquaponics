@@ -4,9 +4,10 @@ from multiprocessing import Process
 import sendtext
 
 # Set your own file path & config path in file setup.json
-# or as environment variables AQUA_testfile_dir, AQUA_config_file
+# or as environment variables AQUA_testfile_dir, AQUA_config_file, AQUA_img_path
 _config_file = "setup.json"
 _tgt_db_dir = None
+_tgt_img_path = None
 
 def _load_setting_json(json_file_str, json_var):
     from os import path
@@ -18,7 +19,7 @@ def _load_setting_json(json_file_str, json_var):
     return result
 
 # Set your own config path & database path in file setup.json
-# or as environment variables AQUA_tgt_db_dir, AQUA_config_file
+# or as environment variables AQUA_tgt_db_dir, AQUA_config_file, AQUA_img_path
 def load_setting(envir_var: str, setup_file: str, json_var: str, default_return_value: str):
     from os import environ
     yield environ.get(envir_var)
@@ -35,10 +36,14 @@ def user_settings():
         if db_path_location != None:
             _tgt_db_dir = db_path_location
             break
+    for img_path_location in load_setting("AQUA_img_path", "setup.json", "img_path", "./"):
+        if img_path_location != None:
+            _tgt_img_path = img_path_location
+            break
     if not path.exists(_config_file):
         with open(_config_file, "a+") as _:
             pass  
-    return _config_file, _tgt_db_dir
+    return _config_file, _tgt_db_dir, _tgt_img_path
 
 def start_GUI():
     import GUI

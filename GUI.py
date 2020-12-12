@@ -4,10 +4,10 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
-import cv2   #open source computer vision library
 from PIL import Image, ImageTk
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+##RPI ONLY import cv2   #open source computer vision library
+##RPI ONLY cap = cv2.VideoCapture(0)
+##RPI ONLY cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
@@ -29,7 +29,7 @@ style.use("seaborn-darkgrid")
 from vertical_scroll_frame import VerticalScrolledFrame
 from sendtext import pCheck
 from main import user_settings
-config_path, db_path = user_settings()
+config_path, db_path, img_path = user_settings()
 
 #initialize channel_buttons_config, entry configs, and SQLite reader
 db_name = 'sensor_db.db'
@@ -60,8 +60,7 @@ f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 
 param_dict = {}
 param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
-param_ylim = [(6, 8.5), (0, 250), (20, 80), (15, 35
-), (15, 35), (0, 61)]
+param_ylim = [(6, 8.5), (0, 250), (20, 80), (15, 35), (15, 35), (0, 61)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 class Live_Text:
@@ -100,7 +99,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=20) #initializes plot up to 20 if possible if possible
+        most_recent = reader.get_timeset(table="SensorData", num=20) 
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -593,23 +592,7 @@ class Settings(tk.Frame):
             label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
             okb = ttk.Button(self.ent_popup, text="OK", command = self.ent_popup.destroy)
             okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
-            self.ent_popup.mainloop()
-
-    # def change_state(self):
-    #     #initially set to disabled
-    #     if (self.emergencyButton['state'] == tk.NORMAL):
-    #         #self.emergencyButton['state'] = "DISABLED"
-    #         print("switching to disabled mode->sending texts")
-    #         #self.emergencyButton['text'] = "Disable Emergency Texts"
-    #         self.emergencyButton.configure(bg="green")
-    #         self.emergencyButton.configure(text="Disable Emergency Texts")
-    #         self.emergencyButton.configure(state=tk.DISABLED)
-    #     else: 
-    #         #self.emergencyButton['state'] = "NORMAL" #normal means texts are disabled
-    #         print("switching to normal mode, not sending texts!")
-    #         self.emergencyButton.configure(bg="red")
-    #         self.emergencyButton.configure(text="Enable Emergency Texts")
-    #         self.emergencyButton.configure(state=tk.NORMAL)    
+            self.ent_popup.mainloop()   
         
 
 #add Video Stream page
@@ -622,56 +605,58 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-        #main label for showing the feed
-        self.imagel = tk.Label(self)
-        self.imagel.pack(pady=10, padx=10)
-        #initialize button with a picture
-        frame = self.get_frame()
-        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(cv2image)
-        imgtk = ImageTk.PhotoImage(image=img)
-        self.imagel.imgtk = imgtk
-        self.imagel.configure(image=imgtk)
-        #button to turn video on and off
-        self.toggle_button = tk.Button(self, text="Video OFF", bg= "red", fg= "white", width=10, 
-                           height=1, command=self.toggle)
-        self.toggle_button.pack(pady=10)
-        self.update()
-    def toggle(self):
-        if self.toggle_button['bg']=='red':
-            self.toggle_button.config(bg='green',text='Video ON')
-            self.update()
-        elif self.toggle_button['bg']=='green':
-            self.toggle_button.configure(bg='red',text='Video OFF')
-    def get_frame(self):
-        """get a frame from the cam and return it."""
-        ret, frame = cap.read()
-        return frame
-    def update(self):
-        """update frames."""
-        if self.toggle_button['bg']=='green':
-            frame = self.get_frame()
-            cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            img = Image.fromarray(cv2image)
-            imgtk = ImageTk.PhotoImage(image=img)
-            self.imagel.imgtk = imgtk
-            self.imagel.configure(image=imgtk)
-            self.imagel.after(15, self.update)
+    ### RPI ONLY
+    #     #main label for showing the feed 
+    #     self.imagel = tk.Label(self)
+    #     self.imagel.pack(pady=10, padx=10)
+    #     #initialize button with a picture
+    #     frame = self.get_frame()
+    #     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #     img = Image.fromarray(cv2image)
+    #     imgtk = ImageTk.PhotoImage(image=img)
+    #     self.imagel.imgtk = imgtk
+    #     self.imagel.configure(image=imgtk)
+    #     #button to turn video on and off
+    #     self.toggle_button = tk.Button(self, text="Video OFF", bg= "red", fg= "white", width=10, 
+    #                        height=1, command=self.toggle)
+    #     self.toggle_button.pack(pady=10)
+    #     self.update()
+    # def toggle(self):
+    #     if self.toggle_button['bg']=='red':
+    #         self.toggle_button.config(bg='green',text='Video ON')
+    #         self.update()
+    #     elif self.toggle_button['bg']=='green':
+    #         self.toggle_button.configure(bg='red',text='Video OFF')
+    # def get_frame(self):
+    #     """get a frame from the cam and return it."""
+    #     ret, frame = cap.read()
+    #     return frame
+    # def update(self):
+    #     """update frames."""
+    #     if self.toggle_button['bg']=='green':
+    #         frame = self.get_frame()
+    #         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #         img = Image.fromarray(cv2image)
+    #         imgtk = ImageTk.PhotoImage(image=img)
+    #         self.imagel.imgtk = imgtk
+    #         self.imagel.configure(image=imgtk)
+    #         self.imagel.after(15, self.update)
+            
 class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
-        homepath = "C://Users//Bill Yen//Desktop//NU Urban Ag//AutoAquaponics//"
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 20)
 
         #Setup for lables and button images
-        path_setup = "C://Users//Bill Yen//Desktop//NU Urban Ag//AutoAquaponics//" #Change this string to empty if not running on Rpi
-        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"] 
-        self.ctrl_panel_image_path = [path_setup + "Images//light.png", path_setup + "Images//water.png", path_setup + "Images//food.png",  path_setup + "Images//sensor.png", path_setup + "Images//oxygen.png", path_setup + "Images//backwash.png", path_setup + "Images//camera.png", path_setup +"Images//back.png"]
+        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
+                                  "Backwashing", "Fish Camera", "Back"] 
+        self.icons = ["light.png", "water.png", "food.png",  "sensor.png", "oxygen.png", 
+                                 "backwash.png", "camera.png", "back.png"]
         self.ctrl_panel_image = []
-
-        for i in range(8):
-                self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i])) #create array of images using image path
+        
+        for image in self.icons:
+                self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
