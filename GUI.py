@@ -675,19 +675,6 @@ class AltControlPanelMain(tk.Frame):
             if(j == 3):
                 i += 1
                 j = 0
-        
-        # creates pop up when one of the label is clicked
-        self.popup = tk.Tk()
-        self.popup.wm_title("Oxygenator")
-        label = ttk.Label(self.popup, text="Oxygenator", font=MEDIUM_FONT)
-        '''label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))'''
-        
-        # centers the popup window
-        popup_width = self.popup.winfo_reqwidth()
-        popup_height = self.popup.winfo_reqheight()
-        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
-        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
-        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
 
 
 app = AllWindow()
