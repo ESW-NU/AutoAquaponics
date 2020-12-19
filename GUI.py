@@ -206,7 +206,7 @@ class AllWindow(tk.Tk):
         #show the frames
         self.frames = {}
         #remember to add page to this list when making new ones
-        for F in (HomePage, ControlPanel, Settings, VideoStream, AltControlPanelMain):
+        for F in (HomePage, ControlPanel, Settings, VideoStream, AltControlPanelMain, Lights):
             frame = F(container, self)
             #set background color for the pages
             frame.config(bg='white')
@@ -654,7 +654,8 @@ class AltControlPanelMain(tk.Frame):
         self.ctrl_panel_image = []
         
         for image in self.icons:
-                self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
+            file = img_path + image
+            self.ctrl_panel_image.append(tk.PhotoImage(file)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
@@ -668,6 +669,8 @@ class AltControlPanelMain(tk.Frame):
 
             frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
+            if(counter == 0):
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Lights))
             if(counter == 7):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
             button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
@@ -676,6 +679,52 @@ class AltControlPanelMain(tk.Frame):
                 i += 1
                 j = 0
 
+class Lights(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        #title
+        tk.Label(self, text="Lights", bg="white", font=TITLE_FONT).pack(pady = 20)
+        lights = ["shelf 1", "shelf 2", "fish tank", "basking"]
+        for ii in lights:
+            tk.Label(self, text = ii, bg = "white", font = MEDIUM_FONT).pack(pady = 20)
+            # on/off button
+            self.toggle_button = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
+                           height=1, command=self.toggle)
+            self.toggle_button.pack(pady=10)
+            self.update()
+            # timer button
+            self.timer_button = tk.Button(self, text="timer", bg= "white",  width=10, 
+                           height=1, command=self.toggle)
+            self.timer_button.pack(pady=10)
+            self.update()
+        
+    def toggle(self):
+        if self.toggle_button['bg']=='red':
+            self.toggle_button.config(bg='green',text='Lights ON')
+            self.update()
+        elif self.toggle_button['bg']=='green':
+            self.toggle_button.configure(bg='red',text='Lights OFF')
+
+    def popup(self):
+        #get the input of all entries as a float value to the hundredth place
+        self.popup = tk.Tk()
+        self.popup.wm_title("Timer")
+        start_label= ttk.Label(self.popup, text="Start", font=MEDIUM_FONT)
+        end_label = ttk.Label(self.popup, text="End", font=MEDIUM_FONT)
+        start_label.grid(row=0, column=1, pady=(0,10)
+        end_label.grid(row=1, column=2, pady=(0,10)
+        
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+
+        #destroy popup window after writing file
+        self.popup.destroy()  
+            
 
 app = AllWindow()
 app.geometry('1025x672')
