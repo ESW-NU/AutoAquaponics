@@ -22,7 +22,7 @@ def DataLogger():
     logger.table(sensor_plot_table)
     temp_distance = 60 #to give an arbitrary initial value to getData for the first time the distance sensor fails
     while True:
-        temp_distance = np.round(logger.collect_data("SensorData", getData, temp_distance, tsamp=5, nsamp=5),2) #make sure tsamp > 5 seconds or distance sensor will freak
+        temp_distance = np.round(logger.collect_data("SensorData", data_fxn, temp_distance, tsamp=5, nsamp=5),2) #make sure tsamp > 5 seconds or distance sensor will freak
         logger.log_data()
         logger.commit()
         

@@ -87,11 +87,13 @@ class Logger:
         # (Running average. tsamp = time between measurements, nsamp = number of measurements)
         
         #data is stored in a numpy array...
-        leng = len(dataget(temp_distance))
+        #leng = len(dataget(temp_distance)) #use this for real sensor
+        leng = len(dataget()) #use this for fake sensor
         data_arr = np.zeros((1,leng))   #initialize the array w/out timestamp (is this line problematic?)
         ct = 0
         while ct < nsamp:
-            getdata = dataget(temp_distance)
+            #getdata = dataget(temp_distance) #use this for real sensor
+            getdata = dataget() #use this for fake sensor
             tup_arr = np.asarray([getdata]) #put the getdata() into array form
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
