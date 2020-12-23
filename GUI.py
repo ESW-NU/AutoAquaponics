@@ -28,6 +28,7 @@ style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
 from sendtext import pCheck
+from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
 
@@ -63,6 +64,22 @@ param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN
 param_ylim = [(6, 8.5), (0, 250), (20, 80), (15, 35), (15, 35), (0, 61)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
+
+
+########################
+#this is for texting
+
+allIsGood = {}
+timestamp1 = {}
+Minute = {}
+for i in param_list:
+    allIsGood[i] = True
+    timestamp1[i] = False
+    Minute[i] = None
+
+########################
+
+
 class Live_Text:
     def __init__(self, label):
         self.label = label
@@ -129,8 +146,11 @@ def _plots_initialized(): #ensures plots only intialized once though!
     pass
 initialize_plots()
 
+
+
 ###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_ANY LIST AND INSERT FRESHLY CALLED VALUE TO BE FIRST IN LIST
 def animate(ii):
+
     while True:
         most_recent_time_graphed = param_dict[param_list[0]] #first, pulls up first plot
         most_recent = reader.get_timeset(table="SensorData", num=1)
@@ -155,14 +175,37 @@ def animate(ii):
                 current_param_val = float(most_recent[0][i])
                 current_text = live_dict[key] #update to live text data summary
                 if current_param_val > float(config_settings[3][i-1]) or current_param_val < float(config_settings[4][i-1]):
-                    #if sendtext_state global variable?
-                    #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                    
+                    ###sends text if new problem arises or every 5  minutes
+                    if allIsGood[key] and Minute[key] == None:
+                        print('if')
+                        Minute[key] = datetime.now().minute
+                        #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                    elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0:
+                        #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                        pass
+                    
+
+
                     current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                     current_plot.plot_color = 'r'
+                    
+                    #setting the parameter to not ok
+                    allIsGood[key] = False
+                
                 else:
                     current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
                     current_plot.plot_color = 'g'
-            
+                    
+                    ###setting the parameter back to true and sending "ok" text 
+                    if allIsGood[key] == False:
+                        
+                        Minute[key] = None
+                        #allOk(key)
+                        pass
+                    
+                    allIsGood[key] = True
+
                 data_stream = current_plot.incoming_data
                 time_stream = current_plot.tList
                 data_stream.insert(0, most_recent[0][i])
