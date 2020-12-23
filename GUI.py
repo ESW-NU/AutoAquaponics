@@ -690,9 +690,9 @@ class AltControlPanelMain(tk.Frame):
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
-                                  "Backwashing", "Fish Camera", "Back"] 
+                                  "Backwashing", "Back"] 
         self.icons = ["light.png", "water.png", "food.png",  "sensor.png", "oxygen.png", 
-                                 "backwash.png", "camera.png", "back.png"]
+                                 "backwash.png", "back.png"]
         self.ctrl_panel_image = []
         
         for image in self.icons:
@@ -702,7 +702,7 @@ class AltControlPanelMain(tk.Frame):
         buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
         i = 0
         j = 0
-        for counter in range(8):
+        for counter in range(7):
             buttonFrame.columnconfigure(i, weight=1, minsize=300)
             buttonFrame.rowconfigure(i, weight=1, minsize=200)
     
@@ -710,13 +710,15 @@ class AltControlPanelMain(tk.Frame):
 
             frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
-            if(counter == 7):
+            if(counter == 6):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
             button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
             j += 1
             if(j == 3):
                 i += 1
                 j = 0
+                if(i == 2):
+                    j = 1
 
 
 app = AllWindow()

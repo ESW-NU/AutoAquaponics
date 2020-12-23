@@ -1,6 +1,6 @@
 from main import user_settings
 
-config_path, db_path = user_settings()
+config_path, db_path, img_path = user_settings()
 db_name = 'sensor_db.db'
 
 all_we_got_now = ('time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
