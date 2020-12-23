@@ -648,9 +648,9 @@ class AltControlPanelMain(tk.Frame):
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
-                                  "Backwashing", "Fish Camera", "Back"] 
+                                  "Backwashing", "Back"] 
         self.icons = ["light.png", "water.png", "food.png",  "sensor.png", "oxygen.png", 
-                                 "backwash.png", "camera.png", "back.png"]
+                                 "backwash.png", "back.png"]
         self.ctrl_panel_image = []
         
         for image in self.icons:
@@ -661,7 +661,7 @@ class AltControlPanelMain(tk.Frame):
         buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
         i = 0
         j = 0
-        for counter in range(8):
+        for counter in range(7):
             buttonFrame.columnconfigure(i, weight=1, minsize=300)
             buttonFrame.rowconfigure(i, weight=1, minsize=200)
     
@@ -671,13 +671,15 @@ class AltControlPanelMain(tk.Frame):
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 0):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Lights))
-            if(counter == 7):
+            if(counter == 6):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
             button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
             j += 1
             if(j == 3):
                 i += 1
                 j = 0
+                if(i == 2):
+                    j = 1
 
 class Lights(tk.Frame):
     def __init__(self, parent, controller):
@@ -711,8 +713,8 @@ class Lights(tk.Frame):
         self.popup.wm_title("Timer")
         start_label= ttk.Label(self.popup, text="Start", font=MEDIUM_FONT)
         end_label = ttk.Label(self.popup, text="End", font=MEDIUM_FONT)
-        start_label.grid(row=0, column=1, pady=(0,10)
-        end_label.grid(row=1, column=2, pady=(0,10)
+        start_label.grid(row=0, column=1, pady=(0,10))
+        end_label.grid(row=1, column=2, pady=(0,10))
         
         
         # centers the popup window
@@ -724,7 +726,7 @@ class Lights(tk.Frame):
 
         #destroy popup window after writing file
         self.popup.destroy()  
-            
+        
 
 app = AllWindow()
 app.geometry('1025x672')
