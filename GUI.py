@@ -688,7 +688,7 @@ class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
-        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 20)
+        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 10)
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
@@ -701,16 +701,16 @@ class AltControlPanelMain(tk.Frame):
                 self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
-        buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
+        buttonFrame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
         i = 0
         j = 0
         for counter in range(7):
             buttonFrame.columnconfigure(i, weight=1, minsize=300)
-            buttonFrame.rowconfigure(i, weight=1, minsize=200)
+            buttonFrame.rowconfigure(i, weight=1, minsize=100)
     
             frame = tk.Frame(master=buttonFrame)
 
-            frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
+            frame.grid(row=i, column=j, padx=2, pady=2, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 6):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
