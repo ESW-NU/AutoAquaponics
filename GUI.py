@@ -28,6 +28,7 @@ style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
 from sendtext import pCheck
+from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
 
@@ -65,6 +66,22 @@ param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN
 param_ylim = [(5, 9), (0, 1500), (20, 80), (15, 35), (15, 35), (0, 61)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
+
+
+########################
+#this is for texting
+
+allIsGood = {}
+timestamp1 = {}
+Minute = {}
+for i in param_list:
+    allIsGood[i] = True
+    timestamp1[i] = False
+    Minute[i] = None
+
+########################
+
+
 class Live_Text:
     def __init__(self, label):
         self.label = label
@@ -131,8 +148,11 @@ def _plots_initialized(): #ensures plots only intialized once though!
     pass
 initialize_plots()
 
+
+
 ###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_ANY LIST AND INSERT FRESHLY CALLED VALUE TO BE FIRST IN LIST
 def animate(ii):
+
     while True:
         most_recent_time_graphed = param_dict[param_list[0]] #first, pulls up first plot
         most_recent = reader.get_timeset(table="SensorData", num=1)
@@ -157,14 +177,37 @@ def animate(ii):
                 current_param_val = float(most_recent[0][i])
                 current_text = live_dict[key] #update to live text data summary
                 if current_param_val > float(config_settings[3][i-1]) or current_param_val < float(config_settings[4][i-1]):
-                    #if sendtext_state global variable?
-                    #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                    
+                    ###sends text if new problem arises or every 5  minutes
+                    if allIsGood[key] and Minute[key] == None:
+                        print('if')
+                        Minute[key] = datetime.now().minute
+                        #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                    elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0:
+                        #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                        pass
+                    
+
+
                     current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                     current_plot.plot_color = 'r'
+                    
+                    #setting the parameter to not ok
+                    allIsGood[key] = False
+                
                 else:
                     current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
                     current_plot.plot_color = 'g'
-            
+                    
+                    ###setting the parameter back to true and sending "ok" text 
+                    if allIsGood[key] == False:
+                        
+                        Minute[key] = None
+                        #allOk(key)
+                        pass
+                    
+                    allIsGood[key] = True
+
                 data_stream = current_plot.incoming_data
                 time_stream = current_plot.tList
                 data_stream.insert(0, most_recent[0][i])
@@ -649,9 +692,9 @@ class AltControlPanelMain(tk.Frame):
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
-                                  "Backwashing", "Fish Camera", "Back"] 
+                                  "Backwashing", "Back"] 
         self.icons = ["light.png", "water.png", "food.png",  "sensor.png", "oxygen.png", 
-                                 "backwash.png", "camera.png", "back.png"]
+                                 "backwash.png", "back.png"]
         self.ctrl_panel_image = []
         
         for image in self.icons:
@@ -661,7 +704,7 @@ class AltControlPanelMain(tk.Frame):
         buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
         i = 0
         j = 0
-        for counter in range(8):
+        for counter in range(7):
             buttonFrame.columnconfigure(i, weight=1, minsize=300)
             buttonFrame.rowconfigure(i, weight=1, minsize=200)
     
@@ -669,13 +712,15 @@ class AltControlPanelMain(tk.Frame):
 
             frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
-            if(counter == 7):
+            if(counter == 6):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
             button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
             j += 1
             if(j == 3):
                 i += 1
                 j = 0
+                if(i == 2):
+                    j = 1
 
 
 app = AllWindow()
