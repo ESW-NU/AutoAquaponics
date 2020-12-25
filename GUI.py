@@ -56,12 +56,14 @@ with open(config_path, "r") as file:
     lower_config = config_settings[4]
 
 #create figure for plots and set figure size/layout
-f = figure.Figure(figsize=(8.5,17.5), dpi=100)
-f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
+#f = figure.Figure(figsize=(8.5,17.5), dpi=100)
+f = figure.Figure(figsize=(10.2,10), dpi=100, facecolor='white')
+#f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
+f.subplots_adjust(top=0.993, bottom=0.015, left=0.04, right = 0.96, hspace=0.65)
 
 param_dict = {}
 param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
-param_ylim = [(6, 8.5), (0, 250), (20, 80), (15, 35), (15, 35), (0, 61)]
+param_ylim = [(5, 9), (0, 1500), (20, 80), (15, 35), (15, 35), (0, 61)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 
@@ -116,7 +118,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=20) 
+        most_recent = reader.get_timeset(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -269,14 +271,14 @@ class HomePage(tk.Frame):
         tk.Frame.__init__(self,parent)
         #bring up vertical scroll frame and place it
         scframe = VerticalScrolledFrame(self)
-        scframe.place(x=140, y=40)
+        scframe.place(x=225, y=40)
         #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
         #background = canvas.copy_from_bbox(f.bbox)
         canvas.draw()
         #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
-        label.place(x=460, y=10)
+        label.place(x=600, y=10)
         #embed graph into canvas
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
         #add navigation bar
@@ -489,7 +491,7 @@ class Settings(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Settings", bg='white', font = TITLE_FONT)
-        label.grid(row = 0, columnspan= 14)
+        label.grid(row = 0, columnspan= 14, pady=10)
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
@@ -686,7 +688,7 @@ class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
-        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 20)
+        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 10)
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
@@ -699,16 +701,16 @@ class AltControlPanelMain(tk.Frame):
                 self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
-        buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
+        buttonFrame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
         i = 0
         j = 0
         for counter in range(7):
             buttonFrame.columnconfigure(i, weight=1, minsize=300)
-            buttonFrame.rowconfigure(i, weight=1, minsize=200)
+            buttonFrame.rowconfigure(i, weight=1, minsize=100)
     
             frame = tk.Frame(master=buttonFrame)
 
-            frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
+            frame.grid(row=i, column=j, padx=2, pady=2, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 6):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
@@ -722,7 +724,8 @@ class AltControlPanelMain(tk.Frame):
 
 
 app = AllWindow()
-app.geometry('1025x672')
+#app.geometry('1025x672')
+app.geometry('1280x623')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
