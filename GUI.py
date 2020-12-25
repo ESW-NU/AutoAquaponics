@@ -4,8 +4,8 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
-import cv2   #open source computer vision library
 from PIL import Image, ImageTk
+import cv2   #open source computer vision library
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 #font types
@@ -29,7 +29,7 @@ style.use("seaborn-darkgrid")
 from vertical_scroll_frame import VerticalScrolledFrame
 from sendtext import pCheck
 from main import user_settings
-config_path, db_path = user_settings()
+config_path, db_path, img_path = user_settings()
 
 #initialize channel_buttons_config, entry configs, and SQLite reader
 db_name = 'sensor_db.db'
@@ -55,13 +55,14 @@ with open(config_path, "r") as file:
     lower_config = config_settings[4]
 
 #create figure for plots and set figure size/layout
-f = figure.Figure(figsize=(8.5,17.5), dpi=100)
-f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
+#f = figure.Figure(figsize=(8.5,17.5), dpi=100)
+f = figure.Figure(figsize=(10.2,10), dpi=100, facecolor='white')
+#f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
+f.subplots_adjust(top=0.993, bottom=0.015, left=0.04, right = 0.96, hspace=0.65)
 
 param_dict = {}
 param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
-param_ylim = [(6, 8.5), (0, 250), (20, 80), (15, 35
-), (15, 35), (0, 61)]
+param_ylim = [(5, 9), (0, 1500), (20, 80), (15, 35), (15, 35), (0, 61)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 class Live_Text:
@@ -100,7 +101,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=3500) #initializes plot up to 20 if possible if possible
+        most_recent = reader.get_timeset(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -227,14 +228,14 @@ class HomePage(tk.Frame):
         tk.Frame.__init__(self,parent)
         #bring up vertical scroll frame and place it
         scframe = VerticalScrolledFrame(self)
-        scframe.place(x=140, y=40)
+        scframe.place(x=225, y=40)
         #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
         #background = canvas.copy_from_bbox(f.bbox)
         canvas.draw()
         #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
-        label.place(x=460, y=10)
+        label.place(x=600, y=10)
         #embed graph into canvas
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
         #add navigation bar
@@ -423,9 +424,6 @@ class ControlPanel(tk.Frame):
                 off_buttons[i].insert(0, config_settings[2][i])
     
     def get_channel_state(self):
-        #ugh, try......counter ??? what the fuck.
-        # Make a button/channel class w/method get_channel_state
-        
         for i in range(16):
             if int(channel_buttons_config[i]) == -1: #change channel button color to green when channel is forced on
                 button_count[i].configure(bg= "green")
@@ -450,7 +448,7 @@ class Settings(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Settings", bg='white', font = TITLE_FONT)
-        label.grid(row = 0, columnspan= 14)
+        label.grid(row = 0, columnspan= 14, pady=10)
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
@@ -593,23 +591,7 @@ class Settings(tk.Frame):
             label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
             okb = ttk.Button(self.ent_popup, text="OK", command = self.ent_popup.destroy)
             okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
-            self.ent_popup.mainloop()
-
-    # def change_state(self):
-    #     #initially set to disabled
-    #     if (self.emergencyButton['state'] == tk.NORMAL):
-    #         #self.emergencyButton['state'] = "DISABLED"
-    #         print("switching to disabled mode->sending texts")
-    #         #self.emergencyButton['text'] = "Disable Emergency Texts"
-    #         self.emergencyButton.configure(bg="green")
-    #         self.emergencyButton.configure(text="Disable Emergency Texts")
-    #         self.emergencyButton.configure(state=tk.DISABLED)
-    #     else: 
-    #         #self.emergencyButton['state'] = "NORMAL" #normal means texts are disabled
-    #         print("switching to normal mode, not sending texts!")
-    #         self.emergencyButton.configure(bg="red")
-    #         self.emergencyButton.configure(text="Enable Emergency Texts")
-    #         self.emergencyButton.configure(state=tk.NORMAL)    
+            self.ent_popup.mainloop()   
         
 
 #add Video Stream page
@@ -622,7 +604,8 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-        #main label for showing the feed
+
+        #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
         #initialize button with a picture
@@ -657,21 +640,22 @@ class VideoStream(tk.Frame):
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
             self.imagel.after(15, self.update)
+            
 class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
-        homepath = "/home/pi/AutoAquaponics/"
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 20)
 
         #Setup for lables and button images
-        path_setup = "/home/pi/AutoAquaponics/" #Change this string to empty if not running on Rpi
-        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", "Backwashing", "Fish Camera", "Back"] 
-        self.ctrl_panel_image_path = [path_setup + "Images//light.png", path_setup + "Images//water.png", path_setup + "Images//food.png",  path_setup + "Images//sensor.png", path_setup + "Images//oxygen.png", path_setup + "Images//backwash.png", path_setup + "Images//camera.png", path_setup +"Images//back.png"]
+        self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
+                                  "Backwashing", "Fish Camera", "Back"] 
+        self.icons = ["light.png", "water.png", "food.png",  "sensor.png", "oxygen.png", 
+                                 "backwash.png", "camera.png", "back.png"]
         self.ctrl_panel_image = []
-
-        for i in range(8):
-                self.ctrl_panel_image.append(tk.PhotoImage(file = self.ctrl_panel_image_path[i])) #create array of images using image path
+        
+        for image in self.icons:
+                self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
@@ -695,7 +679,8 @@ class AltControlPanelMain(tk.Frame):
 
 
 app = AllWindow()
-app.geometry('1025x672')
+#app.geometry('1025x672')
+app.geometry('1280x623')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first

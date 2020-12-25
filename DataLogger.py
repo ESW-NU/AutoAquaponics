@@ -1,6 +1,6 @@
 from main import user_settings
 
-config_path, db_path = user_settings()
+config_path, db_path, img_path = user_settings()
 db_name = 'sensor_db.db'
 
 all_we_got_now = ('time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
@@ -20,9 +20,10 @@ def DataLogger():
     sensor_plot_table = {'SensorData':(all_we_got_now, now_data_types)}
     logger = Logger(db_path, db_name)
     logger.table(sensor_plot_table)
-    temp_distance = 60 #to give an arbitrary initial value to getData for the first time the distance sensor fails
+    last_distance = 60 #to give an arbitrary initial value to getData for the first time the distance sensor fails
+    last_wtemp = 21 #arbitrary initial value
     while True:
-        temp_distance = np.round(logger.collect_data("SensorData", getData, temp_distance, tsamp=5, nsamp=5),2) #make sure tsamp > 5 seconds or distance sensor will freak
+        last_distance, last_wtemp = np.round(logger.collect_data("SensorData", getData, last_distance, last_wtemp, tsamp=1, nsamp=60),2) #change tsamp and nsamp for logging time/frequency
         logger.log_data()
         logger.commit()
         
