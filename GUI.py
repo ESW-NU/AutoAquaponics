@@ -170,6 +170,7 @@ def animate(ii):
         #do I have to add an else?
     
         else:
+            print('at least it goes here')
             with open(config_path, "r") as file: #ELSE: this is a new data point, so go ahead and plot it
                 config_settings = list(csv.reader(file))
             for i, key in enumerate(param_dict, 1):
@@ -177,15 +178,16 @@ def animate(ii):
                 current_param_val = float(most_recent[0][i])
                 current_text = live_dict[key] #update to live text data summary
                 if current_param_val > float(config_settings[3][i-1]) or current_param_val < float(config_settings[4][i-1]):
-                    
+                    print('NOT OK')
                     ###sends text if new problem arises or every 5  minutes
                     if allIsGood[key] and Minute[key] == None:
-                        print('if')
+                        print('if statement')
                         Minute[key] = datetime.now().minute
-                        #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                        pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
                     elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0:
-                        #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
-                        pass
+                        print('elif')
+                        pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
+                        #pass
                     
 
 
@@ -196,14 +198,15 @@ def animate(ii):
                     allIsGood[key] = False
                 
                 else:
+                    print('else')
                     current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
                     current_plot.plot_color = 'g'
                     
                     ###setting the parameter back to true and sending "ok" text 
                     if allIsGood[key] == False:
-                        
+                        print('send mesag')
                         Minute[key] = None
-                        #allOk(key)
+                        allOk(key)
                         pass
                     
                     allIsGood[key] = True
