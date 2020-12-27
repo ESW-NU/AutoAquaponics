@@ -198,13 +198,11 @@ def animate(ii):
                     allIsGood[key] = False
                 
                 else:
-                    print('else')
                     current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
                     current_plot.plot_color = 'g'
                     
                     ###setting the parameter back to true and sending "ok" text 
                     if allIsGood[key] == False:
-                        print('send mesag')
                         Minute[key] = None
                         allOk(key)
                         pass
