@@ -91,14 +91,12 @@ class Logger:
         ct = 0
         while ct < nsamp:
             getdata = dataget(last_distance, last_wtemp)
-            tup_arr = np.asarray([getdata]) #put the getdata() into array form
-            data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             print(getdata)
+            tup_arr = np.asarray([getdata], dtype=np.float) #put the getdata() into array form, also replace None with np.nan if it appears
+            data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
             sleep(tsamp)
         
-        #replace None values with NaN
-        data_arr = np.where(data_arr==None, np.nan, data_arr)
         #find median of the columns of the array
         med = np.nanmedian(data_arr, axis=0)#avg = data_arr.sum(axis=0)/nsamp #
         data_med = tuple(np.round(med, 2))
