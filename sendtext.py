@@ -87,8 +87,8 @@ def pCheck(lower, upper, parameter, inp):
             '. It should be between ' + str(lower) + ' and ' + str(upper) + '.'
     
     numbers = {}
-    #numbers['9496905371'] = 'T-Mobile'
-    numbers['2243459408'] = 'AT&T'
+    numbers['9496905371'] = 'T-Mobile'
+    #numbers['2243459408'] = 'AT&T'
     #numbers['2029266579'] = 'T-Mobile'
     #numbers['7274853498'] = 'T-Mobile'
     if string:
@@ -100,9 +100,11 @@ def allOk(parameter):
     
     numbers = {}
     #numbers['9496905371'] = 'T-Mobile'
-    numbers['2243459408'] = 'AT&T'
+    #numbers['2243459408'] = 'AT&T'
     #numbers['2029266579'] = 'T-Mobile'
     #numbers['7274853498'] = 'T-Mobile'
     
     sendtext(string,**numbers)
     return
+
+#pCheck(1,3,'test',4)
