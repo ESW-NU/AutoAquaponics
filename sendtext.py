@@ -88,7 +88,11 @@ def pCheck(lower, upper, parameter, inp):
     
     numbers = {}
     numbers['9496905371'] = 'T-Mobile'
+<<<<<<< HEAD
+    #numbers['2243459408'] = 'AT&T'
+=======
     numbers['2243459408'] = 'AT&T'
+>>>>>>> 2a289dd7199d0cf39814ca3088b39c3d22acc9ac
     #numbers['2029266579'] = 'T-Mobile'
     #numbers['7274853498'] = 'T-Mobile'
     if string:
@@ -99,10 +103,17 @@ def allOk(parameter):
     string = 'The ' + parameter + ' is back to being within a safe range.'
     
     numbers = {}
+<<<<<<< HEAD
+    #numbers['9496905371'] = 'T-Mobile'
+    #numbers['2243459408'] = 'AT&T'
+=======
     numbers['9496905371'] = 'T-Mobile'
     numbers['2243459408'] = 'AT&T'
+>>>>>>> 2a289dd7199d0cf39814ca3088b39c3d22acc9ac
     #numbers['2029266579'] = 'T-Mobile'
     #numbers['7274853498'] = 'T-Mobile'
     
     sendtext(string,**numbers)
     return
+
+#pCheck(1,3,'test',4)
