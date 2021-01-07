@@ -514,21 +514,23 @@ class Settings(tk.Frame):
         self.phone_carrier = tk.StringVar()
         self.phone_carrier.set('Select')
         # emergency phone number entry buttons:
-        self.phone_label = tk.Label(self, bg = 'white', width = 25, anchor = 'e', text='Phone Number for Emergency Texts:')
-        self.phone_label.grid(row = 20, column = 1, columnspan = 2, padx = (0,25), pady = (20,0))
-        self.phone_entry = tk.Entry(self, width = 12, textvariable = self.phone_number)
-        self.phone_entry.grid(row = 20, column = 2, sticky = 'e', padx = (0,10), pady = (20,0))
+        self.phone_label = tk.Label(self, bg = 'white', width = 30, anchor = 'e', text='Phone Numbers for Emergency Texts:')
+        self.phone_label.grid(row = 20, column = 1, padx = (0,0), pady = (20,0))
+        
+        self.phone_entry = tk.Entry(self, width = 35, textvariable = self.phone_number)
+        self.phone_entry.grid(row = 20, column = 2, sticky = 'e', padx = (10,0), pady = (20,0))
+        self.phone_entry.insert(0, '  Ex. 1234567891')#,'prompt')
         # emergency phone carrier entry buttons:
-        self.carrier_label = tk.Label(self, bg = 'white', width = 10, anchor = 'e', text='Phone Carrier:')
-        self.carrier_label.grid(row = 20, column = 3, sticky = 'w', padx = (10,0), pady = (20,0))
+        self.carrier_label = tk.Label(self, bg = 'white', width = 11, anchor = 'e', text='Phone Carrier:')
+        self.carrier_label.grid(row = 20, column = 3, sticky = 'w', padx = (110,0), pady = (20,0))
         self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
                          'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
         self.carrier_entry = tk.OptionMenu(self, self.phone_carrier, *self.carriers)
         self.carrier_entry.config(width = 12)
-        self.carrier_entry.grid(row = 20, column = 3, columnspan = 2, padx = (0,110), pady = (20,0))
+        self.carrier_entry.grid(row = 20, column = 4, sticky = 'w', padx = (10,0), pady = (20,0))
         # emergency phone number submit button:
-        self.submitButton = ttk.Button(self, text="Submit", command=self.submit)
-        self.submitButton.grid(row = 20, column = 4, sticky = 'e', padx = (0,50), pady = (20,0))
+        #self.submitButton = ttk.Button(self, text="Submit", command=self.submit)
+        #self.submitButton.grid(row = 20, column = 4, sticky = 'e', padx = (0,50), pady = (20,0))
 
         # ENTRY WIDGETS
         self.lower_entries = [0 for i in range(len(param_list))]
