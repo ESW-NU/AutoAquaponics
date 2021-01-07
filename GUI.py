@@ -519,14 +519,14 @@ class Settings(tk.Frame):
         # for each widget, create its upper and lower label and entry, store in temp var, then place in entries list
         for i in range(len(param_list)):
             lower_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Min " + param_list[i] + ":")
-            lower_label.grid(row=i+4, column = 1, padx = (0,10))
-            lower_entry = tk.Entry(self, width = 20, textvariable = self.lower_entries[i])
-            lower_entry.grid(row=i+4, column = 2, padx = (0,50))
+            lower_label.grid(row=i+4, column = 1, padx = (0,10), pady=(0,0))
+            lower_entry = tk.Entry(self, width = 20, highlightthickness = 0, textvariable = self.lower_entries[i])
+            lower_entry.grid(row=i+4, column = 2, padx = (0,50), pady=(0,0))
             self.lower_entries[i] = lower_entry
             upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max " + param_list[i] + ":")
-            upper_label.grid(row=i+4, column = 3, padx = (0,10))
-            upper_entry = tk.Entry(self, width = 20, textvariable = self.upper_entries[i])
-            upper_entry.grid(row=i+4, column = 4, padx = (0,50))
+            upper_label.grid(row=i+4, column = 3, padx = (0,10), pady=(0,0))
+            upper_entry = tk.Entry(self, width = 20, highlightthickness = 0, textvariable = self.upper_entries[i])
+            upper_entry.grid(row=i+4, column = 4, padx = (0,50), pady=(0,0))
             self.upper_entries[i] = upper_entry
 
         self.grid_columnconfigure(0, weight=2)
@@ -559,11 +559,11 @@ class Settings(tk.Frame):
             self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
                             'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
             carrier_entry = tk.OptionMenu(bottomFrame, self.phone_carrier[ii], *self.carriers)
-            carrier_entry.config(width = 20)
+            carrier_entry.config(width = 10, highlightthickness = 0)
             carrier_entry.grid(row = ii+20, column = 3, sticky = 'w', padx = (0,40), pady = (0,0))
             self.phone_carrier[ii] = carrier_entry
         # email address label/entry buttons:
-            self.email_label = tk.Label(master=bottomFrame, bg = 'white', width = 4, anchor = 'e', text='Email:')
+            self.email_label = tk.Label(master=bottomFrame, bg = 'white', width = 5, anchor = 'e', text='Email:')
             self.email_label.grid(row = ii+20, column = 4, sticky = 'w', padx = (0,10), pady = (0,0))
             email_entry = tk.Entry(master=bottomFrame, width = 25, textvariable = self.email[ii])
             email_entry.grid(row = ii+20, column = 5, sticky = 'w', padx = (0,0), pady = (0,0))
