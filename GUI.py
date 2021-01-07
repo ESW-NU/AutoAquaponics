@@ -28,6 +28,7 @@ style.use("seaborn-darkgrid")
 #import vertical scroll bar
 from vertical_scroll_frame import VerticalScrolledFrame
 from sendtext import pCheck
+from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
 
@@ -55,14 +56,32 @@ with open(config_path, "r") as file:
     lower_config = config_settings[4]
 
 #create figure for plots and set figure size/layout
-f = figure.Figure(figsize=(8.5,17.5), dpi=100)
-f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
+#f = figure.Figure(figsize=(8.5,17.5), dpi=100)
+f = figure.Figure(figsize=(10.2,10), dpi=100, facecolor='white')
+#f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
+f.subplots_adjust(top=0.993, bottom=0.015, left=0.04, right = 0.96, hspace=0.65)
 
 param_dict = {}
 param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
-param_ylim = [(6, 8.5), (0, 250), (20, 80), (15, 35), (15, 35), (0, 61)]
+param_ylim = [(5, 9), (0, 1500), (20, 80), (15, 35), (15, 35), (0, 61)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
+
+
+########################
+#this is for texting
+
+allIsGood = {}
+timestamp1 = {}
+Minute = {}
+for i in param_list:
+    allIsGood[i] = True
+    timestamp1[i] = False
+    Minute[i] = None
+
+########################
+
+
 class Live_Text:
     def __init__(self, label):
         self.label = label
@@ -99,7 +118,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=20) 
+        most_recent = reader.get_timeset(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -129,8 +148,11 @@ def _plots_initialized(): #ensures plots only intialized once though!
     pass
 initialize_plots()
 
+
+
 ###ANIMATE FUNCTION, REMOVE LAST ITEM FROM MOST_RECENT_ANY LIST AND INSERT FRESHLY CALLED VALUE TO BE FIRST IN LIST
 def animate(ii):
+
     while True:
         most_recent_time_graphed = param_dict[param_list[0]] #first, pulls up first plot
         most_recent = reader.get_timeset(table="SensorData", num=1)
@@ -148,6 +170,7 @@ def animate(ii):
         #do I have to add an else?
     
         else:
+            print('at least it goes here')
             with open(config_path, "r") as file: #ELSE: this is a new data point, so go ahead and plot it
                 config_settings = list(csv.reader(file))
             for i, key in enumerate(param_dict, 1):
@@ -155,14 +178,37 @@ def animate(ii):
                 current_param_val = float(most_recent[0][i])
                 current_text = live_dict[key] #update to live text data summary
                 if current_param_val > float(config_settings[3][i-1]) or current_param_val < float(config_settings[4][i-1]):
-                    #if sendtext_state global variable?
-                    #pCheck(float(config_settings[4][i]),float(config_settings[3][i]),key,current_param_val) #uncomment to test emergency texts
+                    print('NOT OK')
+                    ###sends text if new problem arises or every 5  minutes
+                    if allIsGood[key] and Minute[key] == None:
+                        print('if statement')
+                        Minute[key] = datetime.now().minute
+                        pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
+                    elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0:
+                        print('elif')
+                        pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
+                        #pass
+                    
+
+
                     current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                     current_plot.plot_color = 'r'
+                    
+                    #setting the parameter to not ok
+                    allIsGood[key] = False
+                
                 else:
                     current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
                     current_plot.plot_color = 'g'
-            
+                    
+                    ###setting the parameter back to true and sending "ok" text 
+                    if allIsGood[key] == False:
+                        Minute[key] = None
+                        allOk(key)
+                        pass
+                    
+                    allIsGood[key] = True
+
                 data_stream = current_plot.incoming_data
                 time_stream = current_plot.tList
                 data_stream.insert(0, most_recent[0][i])
@@ -226,14 +272,14 @@ class HomePage(tk.Frame):
         tk.Frame.__init__(self,parent)
         #bring up vertical scroll frame and place it
         scframe = VerticalScrolledFrame(self)
-        scframe.place(x=140, y=40)
+        scframe.place(x=225, y=40)
         #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
         #background = canvas.copy_from_bbox(f.bbox)
         canvas.draw()
         #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
-        label.place(x=460, y=10)
+        label.place(x=600, y=10)
         #embed graph into canvas
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
         #add navigation bar
@@ -447,7 +493,7 @@ class Settings(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Settings", bg='white', font = TITLE_FONT)
-        label.grid(row = 0, columnspan= 14)
+        label.grid(row = 0, columnspan= 14, pady=10)
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
@@ -644,7 +690,7 @@ class AltControlPanelMain(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
-        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 20)
+        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 10)
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
@@ -658,16 +704,16 @@ class AltControlPanelMain(tk.Frame):
             self.ctrl_panel_image.append(tk.PhotoImage(file)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
-        buttonFrame.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
+        buttonFrame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
         i = 0
         j = 0
         for counter in range(7):
             buttonFrame.columnconfigure(i, weight=1, minsize=300)
-            buttonFrame.rowconfigure(i, weight=1, minsize=200)
+            buttonFrame.rowconfigure(i, weight=1, minsize=100)
     
             frame = tk.Frame(master=buttonFrame)
 
-            frame.grid(row=i, column=j, padx=3, pady=3, sticky="nsew")
+            frame.grid(row=i, column=j, padx=2, pady=2, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 0):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Lights))
@@ -783,7 +829,8 @@ class Lights(tk.Frame):
         self.popup.mainloop()       
 
 app = AllWindow()
-app.geometry('1025x672')
+#app.geometry('1025x672')
+app.geometry('1280x623')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first

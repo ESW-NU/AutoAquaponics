@@ -78,31 +78,31 @@ class Logger:
             # add table(s) to the table dictionary...
             self.table_dict[table] = info
 
-    def collect_data(self,table,dataget,temp_distance,tsamp=0,nsamp=1):
+    def collect_data(self,table,dataget,last_distance,last_wtemp,tsamp=0,nsamp=1):
         #daily table mode 
         if table == 'DAILY':
             table = self.datef
 
         #time-controlled data collection 
-        # (Running average. tsamp = time between measurements, nsamp = number of measurements)
-        
+        # (Running median. tsamp = time between measurements, nsamp = number of measurements)
         #data is stored in a numpy array...
-        leng = len(dataget(temp_distance))
+        leng = len(dataget(last_distance, last_wtemp))
         data_arr = np.zeros((1,leng))   #initialize the array w/out timestamp (is this line problematic?)
         ct = 0
         while ct < nsamp:
-            getdata = dataget(temp_distance)
-            tup_arr = np.asarray([getdata]) #put the getdata() into array form
+            getdata = dataget(last_distance, last_wtemp)
+            print(getdata)
+            tup_arr = np.asarray([getdata], dtype=np.float) #put the getdata() into array form, also replace None with np.nan if it appears
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
             sleep(tsamp)
-
-        #averaging the columns of the array
-        avg = data_arr.sum(axis=0)/nsamp
-        data_avg = tuple(np.round(avg, 2))
+        
+        #find median of the columns of the array
+        med = np.nanmedian(data_arr, axis=0)#avg = data_arr.sum(axis=0)/nsamp #
+        data_med = tuple(np.round(med, 2))
 
         #adding the timestamp
-        data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_avg
+        data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_med
         print(data_log)
         
         #assign data to tables in data_dict
@@ -111,7 +111,7 @@ class Logger:
         self.data_dict[table].append(data_log)
         
         #return the distance value for temp_distance
-        return data_avg[-1] #make sure this is the distance value
+        return data_med[-1], data_med[-2] #make sure this is the distance value
 
 
     def log_data(self):

@@ -42,7 +42,7 @@ class VerticalScrolledFrame(tk.Frame):
             self.canvas.unbind_all("<Button-4>")
             self.canvas.unbind_all("<Button-5>")
             self.canvas.unbind_all("<MouseWheel>")
-        
+
         tk.Frame.__init__(self, parent, *args, **kw)
 
         # create a canvas object and a vertical scrollbar for scrolling it
@@ -50,14 +50,15 @@ class VerticalScrolledFrame(tk.Frame):
         vscrollbar.pack(fill=tk.Y, side=tk.RIGHT, expand=tk.FALSE)
         self.canvas = tk.Canvas(self, bd=5, highlightthickness=0,bg="white",
                         yscrollcommand=vscrollbar.set)
-        self.canvas.config(width=100, height=580)
+        #self.canvas.config(width=100, height=580)
+        self.canvas.config(width=50, height=520)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.TRUE)
         vscrollbar.config(command=self.canvas.yview)
 
         # reset the view
         self.canvas.xview_moveto(0)
         self.canvas.yview_moveto(0)
-        self.canvas.canvasheight = 580
+        self.canvas.canvasheight = 520
 
         # create a frame inside the canvas which will be scrolled with it
         self.interior = interior = tk.Frame(self.canvas)
