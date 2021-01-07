@@ -87,7 +87,8 @@ class Logger:
         # (Running median. tsamp = time between measurements, nsamp = number of measurements)
         #data is stored in a numpy array...
         leng = len(dataget(last_distance, last_wtemp))
-        data_arr = np.zeros((1,leng))   #initialize the array w/out timestamp (is this line problematic?)
+        data_arr = np.empty((1,leng))   #initialize the array w/out timestamp (is this line problematic?)
+        data_arr[:] = np.nan #replace empty element with np.nan so we can ignore them
         ct = 0
         while ct < nsamp:
             getdata = dataget(last_distance, last_wtemp)
@@ -96,9 +97,9 @@ class Logger:
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
             sleep(tsamp)
-        
+ 
         #find median of the columns of the array
-        med = np.nanmedian(data_arr, axis=0)#avg = data_arr.sum(axis=0)/nsamp #
+        med = np.nanmean(data_arr, axis=0)#avg = data_arr.sum(axis=0)/nsamp #
         data_med = tuple(np.round(med, 2))
 
         #adding the timestamp

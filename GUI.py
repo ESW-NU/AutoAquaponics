@@ -118,7 +118,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
+        most_recent = reader.get_timeset(table="SensorData", num=30) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -170,7 +170,6 @@ def animate(ii):
         #do I have to add an else?
     
         else:
-            print('at least it goes here')
             with open(config_path, "r") as file: #ELSE: this is a new data point, so go ahead and plot it
                 config_settings = list(csv.reader(file))
             for i, key in enumerate(param_dict, 1):
@@ -181,11 +180,9 @@ def animate(ii):
                     print('NOT OK')
                     ###sends text if new problem arises or every 5  minutes
                     if allIsGood[key] and Minute[key] == None:
-                        print('if statement')
                         Minute[key] = datetime.now().minute
                         pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
                     elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0:
-                        print('elif')
                         pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
                         #pass
                     
