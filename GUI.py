@@ -32,6 +32,7 @@ from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
 
+
 #initialize channel_buttons_config, entry configs, and SQLite reader
 db_name = 'sensor_db.db'
 reader = Reader(db_path, db_name)
@@ -728,96 +729,92 @@ class AltControlPanelMain(tk.Frame):
                     j = 1
 
 class Lights(tk.Frame):
+    
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Lights", bg="white", font=TITLE_FONT).pack(pady = 20)
 
-        
-        ''' 
-        for ii in lights:
-            tk.Label(self, text = ii, bg = "white", font = MEDIUM_FONT).pack(pady = 20)
-        '''
-
-        '''
         #shelf1
-        self.label1 = tk.Label(self, text = "shelf 1", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
+        tk.Label(self, text = "shelf 1", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
         self.toggle1 = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
-                           height=1, command=self.toggle)
-        self.toggle1.pack(pady=10)
+                           height=1, command=self.toggle_a)
+        self.toggle1.pack(pady=5)
         self.timer1 = tk.Button(self, text="timer", bg= "white",  width=10, 
                            height=1, command=self.popup)
         self.timer1.pack(pady=10)
         #shelf2
-        self.label2 = tk.Label(self, text = "shelf 2", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
+        tk.Label(self, text = "shelf 2", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
         self.toggle2 = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
-                           height=1, command=self.toggle)
-        self.toggle2.pack(pady=10)
+                           height=1, command=self.toggle_b)
+        self.toggle2.pack(pady=5)
         self.timer2 = tk.Button(self, text="timer", bg= "white",  width=10, 
                            height=1, command=self.popup)
         self.timer2.pack(pady=10)
         #fish tank
-        self.label_tank = tk.Label(self, text = "fish tank", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
+        tk.Label(self, text = "fish tank", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
         self.toggle_tank = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
-                           height=1, command=self.toggle)
-        self.toggle_tank.pack(pady=10)
+                           height=1, command=self.toggle_c)
+        self.toggle_tank.pack(pady=5)
         self.timer_tank = tk.Button(self, text="timer", bg= "white",  width=10, 
                            height=1, command=self.popup)
         self.timer_tank.pack(pady=10)
         #basking
-        self.label_basking = tk.Label(self, text = "basking", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
+        tk.Label(self, text = "basking", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
         self.toggle_basking = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
-                           height=1, command=self.toggle)
-        self.toggle_basking.pack(pady=10)
+                           height=1, command=self.toggle_d)
+        self.toggle_basking.pack(pady=5)
         self.timer_basking = tk.Button(self, text="timer", bg= "white",  width=10, 
                            height=1, command=self.popup)
         self.timer_basking.pack(pady=10)
-        '''
         
-        
-        lights = ["shelf 1", "shelf 2", "fish tank", "basking"]
-
-
-        button1 = button2 = button3 = button4 = 0
-        timer1 = timer2 = timer3 = timer4 = 0
-        on_off_buttons = [button1, button2, button3, button4]
-        timer_buttons = [timer1, timer2, timer3, timer4]
-        
-        for i in range(4):
-            tk.Label(self, text = lights[i], bg = "white", font = MEDIUM_FONT).pack(pady = 5)
-            button = on_off_buttons[i]
-            timer = timer_buttons[i]
-            self.button = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
-                           height=1, command=self.toggle)
-            self.button.pack(pady=5)
-            self.timer = tk.Button(self, text="timer", bg= "white",  width=10, 
-                           height=1, command=self.popup)
-            self.timer.pack(pady=5)
+    # toggle... ; _ ; technically works but it'd definitely be better if tidied up
+    def toggle_a(self):
+        if self.toggle1['bg']=='red':
+            self.toggle1.config(bg='green',text='Lights ON')
             self.update()
-        
-
-    def toggle(self):
-        if self.toggle_button['bg']=='red':
-            self.toggle_button.config(bg='green',text='Lights ON')
-            self.update()
-        elif self.toggle_button['bg']=='green':
-            self.toggle_button.configure(bg='red',text='Lights OFF')
+        elif self.toggle1['bg']=='green':
+            self.toggle1.configure(bg='red',text='Lights OFF')
         self.update()
-    
+    def toggle_b(self):
+        if self.toggle2['bg']=='red':
+            self.toggle2.config(bg='green',text='Lights ON')
+            self.update()
+        elif self.toggle2['bg']=='green':
+            self.toggle2.configure(bg='red',text='Lights OFF')
+        self.update()
+    def toggle_c(self):
+        if self.toggle_tank['bg']=='red':
+            self.toggle_tank.config(bg='green',text='Lights ON')
+            self.update()
+        elif self.toggle_tank['bg']=='green':
+            self.toggle_tank.configure(bg='red',text='Lights OFF')
+        self.update()
+    def toggle_d(self):
+        if self.toggle_basking['bg']=='red':
+            self.toggle_basking.config(bg='green',text='Lights ON')
+            self.update_basking()
+        elif self.toggle_basking['bg']=='green':
+            self.toggle_basking.configure(bg='red',text='Lights OFF')
+        self.update()
     
     def popup(self):
         #get the input of all entries as a float value to the hundredth place
         self.popup = tk.Tk()
         self.popup.wm_title("Timer")
         start_label= ttk.Label(self.popup, text="Start", font=MEDIUM_FONT)
-        #start_entry = ttk.Entry(self, width=10)
+        start_entry = ttk.Entry(self, width=10)
         duration_label = ttk.Label(self.popup, text="Duration", font=MEDIUM_FONT)
-        #duration_entry = ttk.Entry(self, width=10)
-        start_label.grid(row=0, column=1, pady=(0,10))
-        duration_label.grid(row=1, column=1, pady=(0,10))
-        #start_entry.grid(row=0, column=2, pady=(0,10))
-        #duration_entry.grid(row=1, column=2, pady=(0,10))
-       
+        duration_entry = ttk.Entry(self, width=10)
+        start_label.grid(row=0, column=0, pady=(0,10))
+        duration_label.grid(row=1, column=0, pady=(0,10))
+        start_entry.grid(row=0, column=1, pady=(0,10))
+        duration_entry.grid(row=1, column=1, pady=(0,10))
+
+        save_button = ttk.Button(self.popup, text="SAVE", command = self.save)
+        save_button.grid(row=2, column=0, pady = (0,10))
+        cancel_button = ttk.Button(self.popup, text="CANCEL", command = self.popup.destroy)
+        cancel_button.grid(row=2, column=1, pady = (0,10))
         
         # centers the popup window
         popup_width = self.popup.winfo_reqwidth()
@@ -826,7 +823,12 @@ class Lights(tk.Frame):
         positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
         self.popup.geometry('300x200')
-        self.popup.mainloop()       
+        self.popup.mainloop()  
+   
+    #triggered if user press YES in popup window
+    def save(self):
+        #destroy popup window after writing file
+        self.popup.destroy()
 
 app = AllWindow()
 #app.geometry('1025x672')
