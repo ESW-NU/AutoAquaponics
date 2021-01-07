@@ -686,6 +686,13 @@ class Lights(tk.Frame):
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Lights", bg="white", font=TITLE_FONT).pack(pady = 20)
+
+        
+        ''' 
+        for ii in lights:
+            tk.Label(self, text = ii, bg = "white", font = MEDIUM_FONT).pack(pady = 20)
+        '''
+
         '''
         #shelf1
         self.label1 = tk.Label(self, text = "shelf 1", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
@@ -724,10 +731,6 @@ class Lights(tk.Frame):
         
         lights = ["shelf 1", "shelf 2", "fish tank", "basking"]
 
-        ''' 
-        for ii in lights:
-            tk.Label(self, text = ii, bg = "white", font = MEDIUM_FONT).pack(pady = 20)
-        '''
 
         button1 = button2 = button3 = button4 = 0
         timer1 = timer2 = timer3 = timer4 = 0
@@ -768,6 +771,7 @@ class Lights(tk.Frame):
         duration_label.grid(row=1, column=1, pady=(0,10))
         #start_entry.grid(row=0, column=2, pady=(0,10))
         #duration_entry.grid(row=1, column=2, pady=(0,10))
+       
         
         # centers the popup window
         popup_width = self.popup.winfo_reqwidth()
@@ -775,7 +779,7 @@ class Lights(tk.Frame):
         positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
         positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
-    
+        self.popup.geometry('300x200')
         self.popup.mainloop()       
 
 app = AllWindow()
