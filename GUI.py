@@ -509,45 +509,8 @@ class Settings(tk.Frame):
         self.emergencyButton = ttk.Checkbutton(self, text="Enable Emergency Texts", #state=tk.NORMAL
                                 variable=self.sendtext_state, onvalue = 1, offvalue = 0, style='New.TCheckbutton') #command=self.get_state)
         self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,20))
-        
-        #self.phone_number = tk.StringVar()
-        #self.phone_carrier = tk.StringVar()
-        num_contacts = 5
-        self.phone_number = [0 for i in range(num_contacts)]
-        self.phone_number = [tk.StringVar() for x in range(num_contacts)]
-        self.phone_carrier = [0 for i in range(10)]
-        self.phone_carrier = [tk.StringVar() for x in range(num_contacts)]
-        self.email = [0 for i in range(num_contacts)]
-        self.email = [tk.StringVar() for x in range(num_contacts)]
-        # emergency phone number entry buttons:
-        self.phone_label = tk.Label(self, bg = 'white', width = 25, anchor = 'e', text='Contact Info for Emergency Texts\n and Update Emails:')
-        self.phone_label.grid(row = 20, column = 0, padx = (10,10), pady = (0,0))
-        
-        # WIDGETS FOR EMERGENCY NUMBER
-        for ii in range(num_contacts):
-            phone_entry = tk.Entry(self, width = 35, textvariable = self.phone_number[ii])
-            phone_entry.grid(row = ii+20, column = 1, sticky = 'e', padx = (0,0), pady = (0,0))
-            #phone_entry.insert(0, '  Ex. 1234567891')
-            self.phone_number[ii] = phone_entry
-        # emergency phone carrier label/entry buttons:
-            self.carrier_label = tk.Label(self, bg = 'white', width = 11, anchor = 'e', text='Phone Carrier:')
-            self.carrier_label.grid(row = ii+20, column = 2, sticky = 'w', padx = (90,0), pady = (0,0))
-            self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
-                            'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
-            carrier_entry = tk.OptionMenu(self, self.phone_carrier[ii], *self.carriers)
-            carrier_entry.config(width = 12)
-            carrier_entry.grid(row = ii+20, column = 3, sticky = 'w', padx = (0,0), pady = (0,0))
-            self.phone_carrier[ii] = carrier_entry
-        # email address label/entry buttons:
-            self.email_label = tk.Label(self, bg = 'white', width = 11, anchor = 'e', text='Email:')
-            self.email_label.grid(row = ii+20, column = 4, sticky = 'e', padx = (0,0), pady = (0,0))
-            email_entry = tk.Entry(self, width = 35, textvariable = self.email[ii])
-            email_entry.grid(row = ii+20, column = 5, sticky = 'w', padx = (10,100), pady = (0,0))
-            #phone_entry.insert(0, '  Ex. 1234567891')
-            self.email[ii] = email_entry
-        # emergency phone number submit button:
-        #self.submitButton = ttk.Button(self, text="Submit", command=self.submit)
-        #self.submitButton.grid(row = 20, column = 4, sticky = 'e', padx = (0,50), pady = (20,0))
+        #Tells user what to input
+        tk.Label(self, text="*Enter Min/Max Values For The Specified Parameters", bg="white").grid(row=15, columnspan=14, pady=(10,0))
 
         # ENTRY WIDGETS
         self.lower_entries = [0 for i in range(len(param_list))]
@@ -571,9 +534,46 @@ class Settings(tk.Frame):
 
         self.grid_columnconfigure(0, weight=2)
         self.grid_columnconfigure(5, weight=2)
+        
+        bottomFrame = tk.Frame(master=self, bg='white')
+        bottomFrame.grid(row=17, columnspan=14, pady=10)
+        num_contacts = 5
+        self.phone_number = [0 for i in range(num_contacts)]
+        self.phone_number = [tk.StringVar() for x in range(num_contacts)]
+        self.phone_carrier = [0 for i in range(10)]
+        self.phone_carrier = [tk.StringVar() for x in range(num_contacts)]
+        self.email = [0 for i in range(num_contacts)]
+        self.email = [tk.StringVar() for x in range(num_contacts)]
+        # emergency phone number entry buttons:
+        #self.phone_label = tk.Label(master=bottomFrame, bg = 'gray', width = 25, justify = 'right', anchor = 'w', text='Contact Info for Emergency Texts\n and Update Emails:')
+        #self.phone_label.grid(row = 20, column = 0, padx = (10,10), pady = (0,0))
+        
+        # WIDGETS FOR EMERGENCY NUMBER
+        for ii in range(num_contacts):
+            self.phone_label = tk.Label(master=bottomFrame, bg = 'white', width = 8, justify = 'right', anchor = 'w', text='Contact ' + str(ii+1) + ':')
+            self.phone_label.grid(row = ii+20, column = 0, padx = (10,10), pady = (0,0))
+            phone_entry = tk.Entry(master=bottomFrame, width = 25, textvariable = self.phone_number[ii])
+            phone_entry.grid(row = ii+20, column = 1, sticky = 'e', padx = (0,40), pady = (0,0))
+            #phone_entry.insert(0, '  Ex. 1234567891')
+            self.phone_number[ii] = phone_entry
+        # emergency phone carrier label/entry buttons:
+            self.carrier_label = tk.Label(master=bottomFrame, bg = 'white', width = 11, anchor = 'w', text='Phone Carrier:')
+            self.carrier_label.grid(row = ii+20, column = 2, sticky = 'w', padx = (0,10), pady = (0,0))
+            self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
+                            'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
+            carrier_entry = tk.OptionMenu(bottomFrame, self.phone_carrier[ii], *self.carriers)
+            carrier_entry.config(width = 20)
+            carrier_entry.grid(row = ii+20, column = 3, sticky = 'w', padx = (0,40), pady = (0,0))
+            self.phone_carrier[ii] = carrier_entry
+        # email address label/entry buttons:
+            self.email_label = tk.Label(master=bottomFrame, bg = 'white', width = 4, anchor = 'e', text='Email:')
+            self.email_label.grid(row = ii+20, column = 4, sticky = 'w', padx = (0,10), pady = (0,0))
+            email_entry = tk.Entry(master=bottomFrame, width = 25, textvariable = self.email[ii])
+            email_entry.grid(row = ii+20, column = 5, sticky = 'w', padx = (0,0), pady = (0,0))
+            #phone_entry.insert(0, '  Ex. 1234567891')
+            self.email[ii] = email_entry
+
         self.discard()
-        #Tells user what to input
-        tk.Label(self, text="*Enter Min/Max Values For The Specified Parameters", bg="white").grid(row=15, columnspan=14, pady=(10,0))
 
     def popup(self):
         #get the input of all entries as a float value to the hundredth place
@@ -627,7 +627,7 @@ class Settings(tk.Frame):
             for i, entry in enumerate(self.upper_entries):
                 entry.insert(0, config_settings[3][i])
             for i, entry in enumerate(self.phone_number):
-                entry.insert(0, '  Ex. 1234567891')
+                entry.insert(0, ' Enter Phone Number')
 
     def submit(self):
         # submit the entered phone number & carrier to the emergency texts list
