@@ -543,33 +543,29 @@ class Settings(tk.Frame):
         self.phone_carrier = [tk.StringVar() for x in range(num_contacts)]
         self.email = [0 for i in range(num_contacts)]
         self.email = [tk.StringVar() for x in range(num_contacts)]
-        # emergency phone number entry buttons:
-        #self.phone_label = tk.Label(master=bottomFrame, bg = 'gray', width = 25, justify = 'right', anchor = 'w', text='Contact Info for Emergency Texts\n and Update Emails:')
-        #self.phone_label.grid(row = 20, column = 0, padx = (10,10), pady = (0,0))
+        self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
+                            'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
         
         # WIDGETS FOR EMERGENCY NUMBER
         for ii in range(num_contacts):
+        # emergency phone number entry boxes:    
             self.phone_label = tk.Label(master=bottomFrame, bg = 'white', width = 8, justify = 'right', anchor = 'w', text='Contact ' + str(ii+1) + ':')
             self.phone_label.grid(row = ii+20, column = 0, padx = (10,10), pady = (0,0))
             phone_entry = tk.Entry(master=bottomFrame, width = 25, textvariable = self.phone_number[ii])
             phone_entry.grid(row = ii+20, column = 1, sticky = 'e', padx = (0,40), pady = (0,0))
-            #phone_entry.insert(0, '  Ex. 1234567891')
             self.phone_number[ii] = phone_entry
-        # emergency phone carrier label/entry buttons:
+        # emergency phone carrier label/optionmenus:
             self.carrier_label = tk.Label(master=bottomFrame, bg = 'white', width = 11, anchor = 'w', text='Phone Carrier:')
             self.carrier_label.grid(row = ii+20, column = 2, sticky = 'w', padx = (0,10), pady = (0,0))
-            self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
-                            'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
             carrier_entry = tk.OptionMenu(bottomFrame, self.phone_carrier[ii], *self.carriers)
             carrier_entry.config(width = 10, highlightthickness = 0)
             carrier_entry.grid(row = ii+20, column = 3, sticky = 'w', padx = (0,40), pady = (0,0))
             self.phone_carrier[ii] = carrier_entry
-        # email address label/entry buttons:
+        # email address label/entry boxes:
             self.email_label = tk.Label(master=bottomFrame, bg = 'white', width = 5, anchor = 'e', text='Email:')
             self.email_label.grid(row = ii+20, column = 4, sticky = 'w', padx = (0,10), pady = (0,0))
             email_entry = tk.Entry(master=bottomFrame, width = 25, textvariable = self.email[ii])
             email_entry.grid(row = ii+20, column = 5, sticky = 'w', padx = (0,0), pady = (0,0))
-            #phone_entry.insert(0, '  Ex. 1234567891')
             self.email[ii] = email_entry
 
         self.discard()
