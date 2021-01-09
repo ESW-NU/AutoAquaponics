@@ -32,6 +32,7 @@ from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
 
+
 #initialize channel_buttons_config, entry configs, and SQLite reader
 db_name = 'sensor_db.db'
 reader = Reader(db_path, db_name)
@@ -118,7 +119,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
+        most_recent = reader.get_timeset(table="SensorData", num=30) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -170,7 +171,6 @@ def animate(ii):
         #do I have to add an else?
     
         else:
-            print('at least it goes here')
             with open(config_path, "r") as file: #ELSE: this is a new data point, so go ahead and plot it
                 config_settings = list(csv.reader(file))
             for i, key in enumerate(param_dict, 1):
@@ -181,11 +181,9 @@ def animate(ii):
                     print('NOT OK')
                     ###sends text if new problem arises or every 5  minutes
                     if allIsGood[key] and Minute[key] == None:
-                        print('if statement')
                         Minute[key] = datetime.now().minute
                         pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
                     elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0:
-                        print('elif')
                         pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
                         #pass
                     
@@ -252,7 +250,7 @@ class AllWindow(tk.Tk):
         #show the frames
         self.frames = {}
         #remember to add page to this list when making new ones
-        for F in (HomePage, ControlPanel, Settings, VideoStream, AltControlPanelMain):
+        for F in (HomePage, ControlPanel, Settings, VideoStream, AltControlPanelMain, Lights):
             frame = F(container, self)
             #set background color for the pages
             frame.config(bg='white')
@@ -330,6 +328,7 @@ class ControlPanel(tk.Frame):
         
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(13, weight=1)
+        
         
         def preconfig_label(count: str):
             return tk.Label(self, text=count, bg='white', font=SMALL_FONT)
@@ -508,27 +507,9 @@ class Settings(tk.Frame):
         self.s.configure('New.TCheckbutton', background='white')
         self.emergencyButton = ttk.Checkbutton(self, text="Enable Emergency Texts", #state=tk.NORMAL
                                 variable=self.sendtext_state, onvalue = 1, offvalue = 0, style='New.TCheckbutton') #command=self.get_state)
-        self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,0))
-        
-        self.phone_number = tk.StringVar()
-        self.phone_carrier = tk.StringVar()
-        self.phone_carrier.set('Select')
-        # emergency phone number entry buttons:
-        self.phone_label = tk.Label(self, bg = 'white', width = 25, anchor = 'e', text='Phone Number for Emergency Texts:')
-        self.phone_label.grid(row = 20, column = 1, columnspan = 2, padx = (0,25), pady = (20,0))
-        self.phone_entry = tk.Entry(self, width = 12, textvariable = self.phone_number)
-        self.phone_entry.grid(row = 20, column = 2, sticky = 'e', padx = (0,10), pady = (20,0))
-        # emergency phone carrier entry buttons:
-        self.carrier_label = tk.Label(self, bg = 'white', width = 10, anchor = 'e', text='Phone Carrier:')
-        self.carrier_label.grid(row = 20, column = 3, sticky = 'w', padx = (10,0), pady = (20,0))
-        self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
-                         'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
-        self.carrier_entry = tk.OptionMenu(self, self.phone_carrier, *self.carriers)
-        self.carrier_entry.config(width = 12)
-        self.carrier_entry.grid(row = 20, column = 3, columnspan = 2, padx = (0,110), pady = (20,0))
-        # emergency phone number submit button:
-        self.submitButton = ttk.Button(self, text="Submit", command=self.submit)
-        self.submitButton.grid(row = 20, column = 4, sticky = 'e', padx = (0,50), pady = (20,0))
+        self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,20))
+        #Tells user what to input
+        tk.Label(self, text="*Enter Min/Max Values For The Specified Parameters", bg="white").grid(row=15, columnspan=14, pady=(10,0))
 
         # ENTRY WIDGETS
         self.lower_entries = [0 for i in range(len(param_list))]
@@ -540,21 +521,54 @@ class Settings(tk.Frame):
         # for each widget, create its upper and lower label and entry, store in temp var, then place in entries list
         for i in range(len(param_list)):
             lower_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Min " + param_list[i] + ":")
-            lower_label.grid(row=i+4, column = 1, padx = (0,10))
-            lower_entry = tk.Entry(self, width = 20, textvariable = self.lower_entries[i])
-            lower_entry.grid(row=i+4, column = 2, padx = (0,50))
+            lower_label.grid(row=i+4, column = 1, padx = (0,10), pady=(0,0))
+            lower_entry = tk.Entry(self, width = 20, highlightthickness = 0, textvariable = self.lower_entries[i])
+            lower_entry.grid(row=i+4, column = 2, padx = (0,50), pady=(0,0))
             self.lower_entries[i] = lower_entry
             upper_label = tk.Label(self,bg = 'white', width = 25, anchor = 'e', text="Max " + param_list[i] + ":")
-            upper_label.grid(row=i+4, column = 3, padx = (0,10))
-            upper_entry = tk.Entry(self, width = 20, textvariable = self.upper_entries[i])
-            upper_entry.grid(row=i+4, column = 4, padx = (0,50))
+            upper_label.grid(row=i+4, column = 3, padx = (0,10), pady=(0,0))
+            upper_entry = tk.Entry(self, width = 20, highlightthickness = 0, textvariable = self.upper_entries[i])
+            upper_entry.grid(row=i+4, column = 4, padx = (0,50), pady=(0,0))
             self.upper_entries[i] = upper_entry
 
         self.grid_columnconfigure(0, weight=2)
-        self.grid_columnconfigure(5, weight=3)
+        self.grid_columnconfigure(5, weight=2)
+        
+        bottomFrame = tk.Frame(master=self, bg='white')
+        bottomFrame.grid(row=17, columnspan=14, pady=10)
+        num_contacts = 5
+        self.phone_number = [0 for i in range(num_contacts)]
+        self.phone_number = [tk.StringVar() for x in range(num_contacts)]
+        self.phone_carrier = [0 for i in range(10)]
+        self.phone_carrier = [tk.StringVar() for x in range(num_contacts)]
+        self.email = [0 for i in range(num_contacts)]
+        self.email = [tk.StringVar() for x in range(num_contacts)]
+        self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
+                            'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
+        
+        # WIDGETS FOR EMERGENCY NUMBER
+        for ii in range(num_contacts):
+        # emergency phone number entry boxes:    
+            self.phone_label = tk.Label(master=bottomFrame, bg = 'white', width = 8, justify = 'right', anchor = 'w', text='Contact ' + str(ii+1) + ':')
+            self.phone_label.grid(row = ii+20, column = 0, padx = (10,10), pady = (0,0))
+            phone_entry = tk.Entry(master=bottomFrame, width = 25, textvariable = self.phone_number[ii])
+            phone_entry.grid(row = ii+20, column = 1, sticky = 'e', padx = (0,40), pady = (0,0))
+            self.phone_number[ii] = phone_entry
+        # emergency phone carrier label/optionmenus:
+            self.carrier_label = tk.Label(master=bottomFrame, bg = 'white', width = 11, anchor = 'w', text='Phone Carrier:')
+            self.carrier_label.grid(row = ii+20, column = 2, sticky = 'w', padx = (0,10), pady = (0,0))
+            carrier_entry = tk.OptionMenu(bottomFrame, self.phone_carrier[ii], *self.carriers)
+            carrier_entry.config(width = 10, highlightthickness = 0)
+            carrier_entry.grid(row = ii+20, column = 3, sticky = 'w', padx = (0,40), pady = (0,0))
+            self.phone_carrier[ii] = carrier_entry
+        # email address label/entry boxes:
+            self.email_label = tk.Label(master=bottomFrame, bg = 'white', width = 5, anchor = 'e', text='Email:')
+            self.email_label.grid(row = ii+20, column = 4, sticky = 'w', padx = (0,10), pady = (0,0))
+            email_entry = tk.Entry(master=bottomFrame, width = 25, textvariable = self.email[ii])
+            email_entry.grid(row = ii+20, column = 5, sticky = 'w', padx = (0,0), pady = (0,0))
+            self.email[ii] = email_entry
+
         self.discard()
-        #Tells user what to input
-        tk.Label(self, text="*Enter Min/Max Values For The Specified Parameters", bg="white").grid(row=15, columnspan=14, pady=(10,0))
 
     def popup(self):
         #get the input of all entries as a float value to the hundredth place
@@ -598,6 +612,8 @@ class Settings(tk.Frame):
             entry.delete(0, END)
         for entry in self.upper_entries:  
             entry.delete(0, END)
+        for entry in self.phone_number:
+            entry.delete(0,END)
         #Get last saved values
         with open(config_path, "r") as file:
             config_settings = list(csv.reader(file))
@@ -605,6 +621,8 @@ class Settings(tk.Frame):
                 entry.insert(0, config_settings[4][i])
             for i, entry in enumerate(self.upper_entries):
                 entry.insert(0, config_settings[3][i])
+            for i, entry in enumerate(self.phone_number):
+                entry.insert(0, ' Enter Phone Number')
 
     def submit(self):
         # submit the entered phone number & carrier to the emergency texts list
@@ -699,7 +717,7 @@ class AltControlPanelMain(tk.Frame):
         self.ctrl_panel_image = []
         
         for image in self.icons:
-                self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
+            self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
@@ -713,6 +731,8 @@ class AltControlPanelMain(tk.Frame):
 
             frame.grid(row=i, column=j, padx=2, pady=2, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
+            if(counter == 0):
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Lights))
             if(counter == 6):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
             button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
@@ -723,6 +743,111 @@ class AltControlPanelMain(tk.Frame):
                 if(i == 2):
                     j = 1
 
+class Lights(tk.Frame):
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        #title
+        tk.Label(self, text="Lights", bg="white", font=TITLE_FONT).grid(row=0, column=1, pady=(0,10))
+        #shelf1
+        tk.Label(self, text = "shelf 1", bg = "white", font = MEDIUM_FONT).grid(row=1, column=0, pady=(0,10))
+        self.toggle1 = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
+                           height=1, command=self.toggle_a)
+        self.toggle1.grid(row=1, column=1, pady=(0,10))
+        self.timer1 = tk.Button(self, text="timer", bg= "white",  width=10, 
+                           height=1, command=self.popup)
+        self.timer1.grid(row=1, column=2, pady=(0,10))
+        #shelf2
+        tk.Label(self, text = "shelf 2", bg = "white", font = MEDIUM_FONT).grid(row=2, column=0, pady=(0,10))
+        self.toggle2 = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
+                           height=1, command=self.toggle_b)
+        self.toggle2.grid(row=2, column=1, pady=(0,10))
+        self.timer2 = tk.Button(self, text="timer", bg= "white",  width=10, 
+                           height=1, command=self.popup)
+        self.timer2.grid(row=2, column=2, pady=(0,10))
+        #fish tank
+        tk.Label(self, text = "fish tank", bg = "white", font = MEDIUM_FONT).grid(row=3, column=0, pady=(0,10))
+        self.toggle_tank = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
+                           height=1, command=self.toggle_c)
+        self.toggle_tank.grid(row=3, column=1, pady=(0,10))
+        self.timer_tank = tk.Button(self, text="timer", bg= "white",  width=10, 
+                           height=1, command=self.popup)
+        self.timer_tank.grid(row=3, column=2, pady=(0,10))
+        #basking
+        tk.Label(self, text = "basking", bg = "white", font = MEDIUM_FONT).grid(row=4, column=0, pady=(0,10))
+        self.toggle_basking = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
+                           height=1, command=self.toggle_d)
+        self.toggle_basking.grid(row=4, column=1, pady=(0,10))
+        self.timer_basking = tk.Button(self, text="timer", bg= "white",  width=10, 
+                           height=1, command=self.popup)
+        self.timer_basking.grid(row=4, column=2, pady=(0,20))
+        #back button to Alternate Control Panel
+        self.back = tk.Button(self, text="Back", bg= "white",  width=10, 
+                           height=1, command=lambda: controller.show_frame(AltControlPanelMain))
+        self.back.grid(row = 5, column = 0)
+
+    # toggle... ; _ ; technically works but it'd definitely be better if tidied up
+    def toggle_a(self):
+        if self.toggle1['bg']=='red':
+            self.toggle1.config(bg='green',text='Lights ON')
+            self.update()
+        elif self.toggle1['bg']=='green':
+            self.toggle1.configure(bg='red',text='Lights OFF')
+        self.update()
+    def toggle_b(self):
+        if self.toggle2['bg']=='red':
+            self.toggle2.config(bg='green',text='Lights ON')
+            self.update()
+        elif self.toggle2['bg']=='green':
+            self.toggle2.configure(bg='red',text='Lights OFF')
+        self.update()
+    def toggle_c(self):
+        if self.toggle_tank['bg']=='red':
+            self.toggle_tank.config(bg='green',text='Lights ON')
+            self.update()
+        elif self.toggle_tank['bg']=='green':
+            self.toggle_tank.configure(bg='red',text='Lights OFF')
+        self.update()
+    def toggle_d(self):
+        if self.toggle_basking['bg']=='red':
+            self.toggle_basking.config(bg='green',text='Lights ON')
+            self.update_basking()
+        elif self.toggle_basking['bg']=='green':
+            self.toggle_basking.configure(bg='red',text='Lights OFF')
+        self.update()
+    
+    def popup(self):
+        #get the input of all entries as a float value to the hundredth place
+        self.popup = tk.Tk()
+        self.popup.wm_title("Timer")
+        start_label= ttk.Label(self.popup, text="Start", font=MEDIUM_FONT)
+        start_entry = ttk.Entry(self.popup, width=10)
+        duration_label = ttk.Label(self.popup, text="Duration", font=MEDIUM_FONT)
+        duration_entry = ttk.Entry(self.popup, width=10)
+        start_label.grid(row=0, column=0, pady=(0,10))
+        duration_label.grid(row=1, column=0, pady=(0,10))
+        start_entry.grid(row=0, column=1, pady=(0,10))
+        duration_entry.grid(row=1, column=1, pady=(0,10))
+
+        save_button = ttk.Button(self.popup, text="SAVE", command = self.save)
+        save_button.grid(row=2, column=0, pady = (0,10))
+        cancel_button = ttk.Button(self.popup, text="CANCEL", command = self.popup.destroy)
+        cancel_button.grid(row=2, column=1, pady = (0,10))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        self.popup.geometry('300x200')
+        self.popup.mainloop()  
+   
+    #triggered if user press SAVE in popup window
+    def save(self):
+        # does something here
+        #destroy popup window after writing file
+        self.popup.destroy()
 
 app = AllWindow()
 #app.geometry('1025x672')
