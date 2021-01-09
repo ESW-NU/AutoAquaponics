@@ -239,7 +239,6 @@ class AllWindow(tk.Tk):
         navimenu.add_command(label="Control Panel", command=lambda: self.show_frame(ControlPanel))
         navimenu.add_command(label="Video Stream", command=lambda: self.show_frame(VideoStream))
         navimenu.add_command(label="Settings", command=lambda: self.show_frame(Settings))
-        navimenu.add_command(label="Alternate Control Panel", command=lambda: self.show_frame(AltControlPanelMain))
         #add separator line
         navimenu.add_separator()
         #add quit button in menu that triggers a command
@@ -250,7 +249,8 @@ class AllWindow(tk.Tk):
         #show the frames
         self.frames = {}
         #remember to add page to this list when making new ones
-        for F in (HomePage, ControlPanel, Settings, VideoStream, AltControlPanelMain, Lights):
+        for F in (HomePage, ControlPanel, Settings, VideoStream, Lights, WaterPump,
+                    FishFeeder, SensorArray, Oxygenator, Backwashing):
             frame = F(container, self)
             #set background color for the pages
             frame.config(bg='white')
@@ -300,7 +300,7 @@ class HomePage(tk.Frame):
             loading_text.place(x=140, y=65+22*i)
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
-        
+'''        
 channel_count = []
 button_count = []
 on_times = []
@@ -484,7 +484,7 @@ class ControlPanel(tk.Frame):
                 button_count[i].configure(bg= "red")
                 button_count[i].configure(text = "Channel OFF")
                 channel_buttons_config[i] = -1
-                continue
+                continue '''
 
 
 class Settings(tk.Frame):
@@ -666,7 +666,7 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-
+'''
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
@@ -701,9 +701,9 @@ class VideoStream(tk.Frame):
             imgtk = ImageTk.PhotoImage(image=img)
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
-            self.imagel.after(15, self.update)
+            self.imagel.after(15, self.update)'''
             
-class AltControlPanelMain(tk.Frame):
+class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
@@ -733,6 +733,16 @@ class AltControlPanelMain(tk.Frame):
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 0):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Lights))
+            if(counter == 1):
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(WaterPump))
+            if(counter == 2):
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(FishFeeder))
+            if(counter == 3):
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(SensorArray))
+            if(counter == 4):
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Oxygenator))
+            if(counter == 5):
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Backwashing))
             if(counter == 6):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
             button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
@@ -748,8 +758,11 @@ class Lights(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
-        tk.Label(self, text="Lights", bg="white", font=TITLE_FONT).pack(pady = 20)
-
+        tk.Label(self, text="Lights", bg="white", font=TITLE_FONT).pack(pady = 10)
+        #navigation button
+        navibutton1 = ttk.Button(self, text="Back",
+                            command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack()
         #shelf1
         tk.Label(self, text = "shelf 1", bg = "white", font = MEDIUM_FONT).pack(pady = 20)
         self.toggle1 = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
@@ -844,6 +857,61 @@ class Lights(tk.Frame):
     def save(self):
         #destroy popup window after writing file
         self.popup.destroy()
+
+class WaterPump(tk.Frame):
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        #title
+        tk.Label(self, text="Water Pump", bg="white", font=TITLE_FONT).pack(pady = 10)
+        #navigation button
+        navibutton1 = ttk.Button(self, text="Back",
+                            command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack()
+
+class FishFeeder(tk.Frame):
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        #title
+        tk.Label(self, text="Fish Feeder", bg="white", font=TITLE_FONT).pack(pady = 10)
+        #navigation button
+        navibutton1 = ttk.Button(self, text="Back",
+                            command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack()
+
+class SensorArray(tk.Frame):
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        #title
+        tk.Label(self, text="Sensor Array", bg="white", font=TITLE_FONT).pack(pady = 10)
+        #navigation button
+        navibutton1 = ttk.Button(self, text="Back",
+                            command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack()
+
+class Oxygenator(tk.Frame):
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        #title
+        tk.Label(self, text="Oxygenator", bg="white", font=TITLE_FONT).pack(pady = 10)
+        #navigation button
+        navibutton1 = ttk.Button(self, text="Back",
+                            command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack()
+
+class Backwashing(tk.Frame):
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        #title
+        tk.Label(self, text="Backwashing", bg="white", font=TITLE_FONT).pack(pady = 10)
+        #navigation button
+        navibutton1 = ttk.Button(self, text="Back",
+                            command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack()
 
 app = AllWindow()
 #app.geometry('1025x672')
