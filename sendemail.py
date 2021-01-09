@@ -1,7 +1,9 @@
 # Send an HTML email with an embedded image and a plain text message for
 # email clients that don't want to display the HTML.
 import smtplib
-import data
+from main import user_settings
+from data import Reader
+from datetime import datetime
 import os
 import matplotlib.pyplot as plt
 from email.mime.multipart import MIMEMultipart
@@ -9,7 +11,20 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 
 
-def sendEmail(reader, strTos = ['danielpetikian2023@u.northwestern.edu']):
+def sendEmail(strTos = ['danielpetikian2023@u.northwestern.edu']):
+    #if not sunday - return
+    weekday = datetime.today().weekday()
+    time =  datetime.now()
+    hour = time.hour
+    minute = time.minute
+    second = time.second
+
+    if weekday == 6 and hour == 12 and minute == 0 and second == 0:
+        pass
+    else: 
+        return
+
+
     # Define these once; use them twice!
     strFrom = 'nu.urbanagriculture@gmail.com'
 
@@ -19,8 +34,9 @@ def sendEmail(reader, strTos = ['danielpetikian2023@u.northwestern.edu']):
     #we will DEFINITELY have to 'import GUI'
 
     ###########
-
-    information = reader.get_timeset(table="SensorData", num=5)
+    _, db_path, _ = user_settings()
+    information = Reader(db_path,'sensor_db.db').get_timeset(table="SensorData", num=5) #num is the number of data points. We need to figure out what num is for a whole week
+    #Daniel will apply SQL lite later
    
     def func1(x):
         return x[1:]
