@@ -1,7 +1,7 @@
 # Send an HTML email with an embedded image and a plain text message for
 # email clients that don't want to display the HTML.
 import smtplib
-from main import user_settings
+#from main import user_settings
 from data import Reader
 from datetime import datetime
 import os
@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 
 
-def sendEmail(strTos = ['danielpetikian2023@u.northwestern.edu']):
+def sendEmail(user_settings, strTos = ['billyen2023@u.northwestern.edu']):
     #if not sunday - return
     weekday = datetime.today().weekday()
     time =  datetime.now()
@@ -19,10 +19,10 @@ def sendEmail(strTos = ['danielpetikian2023@u.northwestern.edu']):
     minute = time.minute
     second = time.second
 
-    if weekday == 6 and hour == 12 and minute == 0 and second == 0:
+    '''if weekday == 6 and hour == 12 and minute == 0 and second == 0:
         pass
     else: 
-        return
+        return'''
 
 
     # Define these once; use them twice!

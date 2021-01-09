@@ -1,3 +1,4 @@
+from typing import Optional
 from data import Reader
 from datetime import datetime 
 #import tkinter for GUI
@@ -33,28 +34,31 @@ from main import user_settings
 config_path, db_path, img_path = user_settings()
 
 
-#initialize channel_buttons_config, entry configs, and SQLite reader
+#initialize entry configs, email_config, num_config, provider_config, and SQLite reader
 db_name = 'sensor_db.db'
 reader = Reader(db_path, db_name)
 
+num_contacts = 5
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
-    if len(config_settings) != 5:
+    if len(config_settings) != 6:
         with open(config_path, 'w', newline='') as file:
             channel_buttons_config = [-1]*16
-            on_config = [0]*16
-            off_config = [0]*16
+            num_config = ['Enter Phone Number Here:']*num_contacts
+            provider_config = ['']*num_contacts
+            email_config = ['Email']*num_contacts
             upper_config = [0]*11
             lower_config = [0]*11
             writer = csv.writer(file)
-            writer.writerows([channel_buttons_config,on_config,off_config, upper_config, lower_config])
-            config_settings = [channel_buttons_config,on_config,off_config, upper_config, lower_config]
+            writer.writerows([channel_buttons_config,num_config,provider_config,email_config,upper_config, lower_config])
+            config_settings = [channel_buttons_config,num_config,provider_config,email_config, upper_config, lower_config]
             file.flush()
     channel_buttons_config = config_settings[0]
-    on_config = config_settings[1]
-    off_config = config_settings[2]
-    upper_config = config_settings[3]
-    lower_config = config_settings[4]
+    num_config = config_settings[1]
+    provider_config = config_settings[2]
+    email_config = config_settings[3]
+    upper_config = config_settings[4]
+    lower_config = config_settings[5]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
@@ -536,17 +540,18 @@ class Settings(tk.Frame):
         
         bottomFrame = tk.Frame(master=self, bg='white')
         bottomFrame.grid(row=17, columnspan=14, pady=10)
-        num_contacts = 5
+        
         self.phone_number = [0 for i in range(num_contacts)]
         self.phone_number = [tk.StringVar() for x in range(num_contacts)]
-        self.phone_carrier = [0 for i in range(10)]
+        self.phone_carrier = [0 for i in range(num_contacts)]
         self.phone_carrier = [tk.StringVar() for x in range(num_contacts)]
-        self.email = [0 for i in range(num_contacts)]
-        self.email = [tk.StringVar() for x in range(num_contacts)]
         self.carriers = ['AT&T', 'Sprint', 'T-Mobile', 'Verizon', 'Boost Mobile', 'Cricket',
                             'Metro PCS', 'Tracfone', 'U.S. Cellular', 'Virgin Mobile']
+        self.options = []
+        self.email = [0 for i in range(num_contacts)]
+        self.email = [tk.StringVar() for x in range(num_contacts)]
         
-        # WIDGETS FOR EMERGENCY NUMBER
+        # WIDGETS FOR CONTACTS
         for ii in range(num_contacts):
         # emergency phone number entry boxes:    
             self.phone_label = tk.Label(master=bottomFrame, bg = 'white', width = 8, justify = 'right', anchor = 'w', text='Contact ' + str(ii+1) + ':')
@@ -557,10 +562,11 @@ class Settings(tk.Frame):
         # emergency phone carrier label/optionmenus:
             self.carrier_label = tk.Label(master=bottomFrame, bg = 'white', width = 11, anchor = 'w', text='Phone Carrier:')
             self.carrier_label.grid(row = ii+20, column = 2, sticky = 'w', padx = (0,10), pady = (0,0))
-            carrier_entry = tk.OptionMenu(bottomFrame, self.phone_carrier[ii], *self.carriers)
-            carrier_entry.config(width = 10, highlightthickness = 0)
+            self.v = self.phone_carrier[ii]
+            carrier_entry = tk.OptionMenu(bottomFrame, self.v, *self.carriers)
+            carrier_entry.config(width = 12, highlightthickness = 0)
             carrier_entry.grid(row = ii+20, column = 3, sticky = 'w', padx = (0,40), pady = (0,0))
-            self.phone_carrier[ii] = carrier_entry
+            self.options.append(self.v) #keep list of the options
         # email address label/entry boxes:
             self.email_label = tk.Label(master=bottomFrame, bg = 'white', width = 5, anchor = 'e', text='Email:')
             self.email_label.grid(row = ii+20, column = 4, sticky = 'w', padx = (0,10), pady = (0,0))
@@ -594,13 +600,14 @@ class Settings(tk.Frame):
         with open(config_path, 'r', newline='') as file:
             config_settings = list(csv.reader(file))
             channel_buttons_config = config_settings[0]
-            on_config = config_settings[1]
-            off_config = config_settings[2]
+            num_config = [entry.get() for entry in self.phone_number]
+            provider_config = [option.get() for option in self.options]
+            email_config = [entry.get() for entry in self.email]
             upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]  
             lower_config = [round(float(entry.get()),2) for entry in self.lower_entries]
             with open(config_path, 'w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerows([channel_buttons_config, on_config, off_config, upper_config, lower_config])
+                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config])
                 file.flush()
         #destroy popup window after writing file
         self.popup.destroy()
@@ -608,21 +615,28 @@ class Settings(tk.Frame):
     #fcn triggered by discard button
     def discard(self):
         #Delete current values
-        for entry in self.lower_entries:  
-            entry.delete(0, END)
-        for entry in self.upper_entries:  
-            entry.delete(0, END)
         for entry in self.phone_number:
             entry.delete(0,END)
+        for entry in self.email:
+            entry.delete(0,END)
+        for entry in self.upper_entries:  
+            entry.delete(0, END)
+        for entry in self.lower_entries:  
+            entry.delete(0, END)
         #Get last saved values
         with open(config_path, "r") as file:
             config_settings = list(csv.reader(file))
-            for i, entry in enumerate(self.lower_entries):
-                entry.insert(0, config_settings[4][i])
-            for i, entry in enumerate(self.upper_entries):
-                entry.insert(0, config_settings[3][i])
             for i, entry in enumerate(self.phone_number):
-                entry.insert(0, ' Enter Phone Number')
+                entry.insert(0, config_settings[1][i])
+            for i, option in enumerate(self.phone_carrier):
+                option.set(config_settings[2][i])
+            for i, entry in enumerate(self.email):
+                entry.insert(0, config_settings[3][i])
+            for i, entry in enumerate(self.upper_entries):
+                entry.insert(0, config_settings[4][i])
+            for i, entry in enumerate(self.lower_entries):
+                entry.insert(0, config_settings[5][i])
+            
 
     def submit(self):
         # submit the entered phone number & carrier to the emergency texts list

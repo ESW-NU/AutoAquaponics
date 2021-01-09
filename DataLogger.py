@@ -15,7 +15,7 @@ def data_fxn(last_distance, last_wtemp):
 
 def DataLogger():
     from data import Reader, Logger
-    from getData import getData #comment out if you are testing on computer
+    #from getData import getData #comment out if you are testing on computer
     import numpy as np
     sensor_plot_table = {'SensorData':(all_we_got_now, now_data_types)}
     logger = Logger(db_path, db_name)
@@ -24,7 +24,7 @@ def DataLogger():
     last_wtemp = 21 #arbitrary initial value
     while True:
         #change getData to data_fxn if you are testing on your computer
-        last_distance, last_wtemp = np.round(logger.collect_data("SensorData", getData, last_distance, last_wtemp, tsamp=1, nsamp=5),2) #change tsamp and nsamp for logging time/frequency
+        last_distance, last_wtemp = np.round(logger.collect_data("SensorData", data_fxn, last_distance, last_wtemp, tsamp=1, nsamp=5),2) #change tsamp and nsamp for logging time/frequency
         logger.log_data()
         logger.commit()
         

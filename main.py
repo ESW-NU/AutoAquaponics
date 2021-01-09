@@ -54,7 +54,7 @@ def start_data_logging():
     DataLogger()
 
 def emailSender():
-    sendemail.sendEmail() #figure out the arguments because settings
+    sendemail.sendEmail(user_settings) #figure out the arguments because settings
 
 if(__name__ == '__main__'):
     p1 = Process(target=start_data_logging)
