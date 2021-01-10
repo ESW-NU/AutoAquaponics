@@ -556,7 +556,7 @@ class Settings(tk.Frame):
         # emergency phone number entry boxes:    
             self.phone_label = tk.Label(master=bottomFrame, bg = 'white', width = 8, justify = 'right', anchor = 'w', text='Contact ' + str(ii+1) + ':')
             self.phone_label.grid(row = ii+20, column = 0, padx = (10,10), pady = (0,0))
-            phone_entry = tk.Entry(master=bottomFrame, width = 25, textvariable = self.phone_number[ii])
+            phone_entry = tk.Entry(master=bottomFrame, width = 15, textvariable = self.phone_number[ii])
             phone_entry.grid(row = ii+20, column = 1, sticky = 'e', padx = (0,40), pady = (0,0))
             self.phone_number[ii] = phone_entry
         # emergency phone carrier label/optionmenus:
@@ -570,7 +570,7 @@ class Settings(tk.Frame):
         # email address label/entry boxes:
             self.email_label = tk.Label(master=bottomFrame, bg = 'white', width = 5, anchor = 'e', text='Email:')
             self.email_label.grid(row = ii+20, column = 4, sticky = 'w', padx = (0,10), pady = (0,0))
-            email_entry = tk.Entry(master=bottomFrame, width = 25, textvariable = self.email[ii])
+            email_entry = tk.Entry(master=bottomFrame, width = 35, textvariable = self.email[ii])
             email_entry.grid(row = ii+20, column = 5, sticky = 'w', padx = (0,0), pady = (0,0))
             self.email[ii] = email_entry
 
