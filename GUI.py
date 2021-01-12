@@ -181,14 +181,14 @@ def animate(ii):
                 current_plot = param_dict[key]
                 current_param_val = float(most_recent[0][i])
                 current_text = live_dict[key] #update to live text data summary
-                if current_param_val > float(config_settings[3][i-1]) or current_param_val < float(config_settings[4][i-1]):
+                if current_param_val > float(config_settings[5][i-1]) or current_param_val < float(config_settings[4][i-1]):
                     print('NOT OK')
                     ###sends text if new problem arises or every 5  minutes
                     if allIsGood[key] and Minute[key] == None:
                         Minute[key] = datetime.now().minute
-                        pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
+                        pCheck(float(config_settings[5][i-1]),float(config_settings[4][i-1]),key,current_param_val) #uncomment to test emergency texts
                     elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0:
-                        pCheck(float(config_settings[4][i-1]),float(config_settings[3][i-1]),key,current_param_val) #uncomment to test emergency texts
+                        pCheck(float(config_settings[5][i-1]),float(config_settings[4][i-1]),key,current_param_val) #uncomment to test emergency texts
                         #pass
                     
 
