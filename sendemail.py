@@ -19,10 +19,10 @@ def sendEmail(user_settings, strTos = ['billyen2023@u.northwestern.edu']):
     minute = time.minute
     second = time.second
 
-    '''if weekday == 6 and hour == 12 and minute == 0 and second == 0:
+    if weekday == 6 and hour == 12 and minute == 0 and second == 0:
         pass
     else: 
-        return'''
+        return
 
 
     # Define these once; use them twice!
@@ -42,8 +42,8 @@ def sendEmail(user_settings, strTos = ['billyen2023@u.northwestern.edu']):
         return x[1:]
     
     information = list(map(func1,information))
-    print('information')
-    print(information)
+    #print('information')
+    #print(information)
 
     param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
     plt.figure(figsize = (12,12))
@@ -54,8 +54,8 @@ def sendEmail(user_settings, strTos = ['billyen2023@u.northwestern.edu']):
             return x[i]
         
         partOfInfo = list(map(func2,information))
-        print('part of info')
-        print(partOfInfo)
+        #print('part of info')
+        #print(partOfInfo)
         #allOfData[param_list[i]] = partOfInfo
         plt.subplot(2,3,1+i)
         plt.plot(partOfInfo)
@@ -143,3 +143,4 @@ def sendEmail(user_settings, strTos = ['billyen2023@u.northwestern.edu']):
 
     os.remove(title)
     return
+
