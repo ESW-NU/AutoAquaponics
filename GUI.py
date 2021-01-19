@@ -77,11 +77,12 @@ live_dict = {}
 #this is for texting
 
 allIsGood = {}
-timestamp1 = {}
+minuta = {}
+#minuta is used to make sure that you're not bombarded with texts
 Minute = {}
 for i in param_list:
     allIsGood[i] = True
-    timestamp1[i] = False
+    minuta[i] = None
     Minute[i] = None
 
 ########################
@@ -182,13 +183,17 @@ def animate(ii):
                 current_param_val = float(most_recent[0][i])
                 current_text = live_dict[key] #update to live text data summary
                 if current_param_val > float(config_settings[4][i-1]) or current_param_val < float(config_settings[5][i-1]):
-                    print('NOT OK')
+                    #print('NOT OK')
                     ###sends text if new problem arises or every 5  minutes
                     if allIsGood[key] and Minute[key] == None:
+                        print('new problem')
                         Minute[key] = datetime.now().minute
-                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val) #uncomment to test emergency texts
-                    elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0:
-                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val) #uncomment to test emergency texts
+                        minuta[key] = Minute[key]
+                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,num_config,provider_config) #uncomment to test emergency texts
+                    elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0 and not (minuta[key] == datetime.now().minute):
+                        print('same problem')
+                        minuta[key] = datetime.now().minute
+                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,num_config,provider_config) #uncomment to test emergency texts
                         #pass
                     
 
@@ -206,7 +211,7 @@ def animate(ii):
                     ###setting the parameter back to true and sending "ok" text 
                     if allIsGood[key] == False:
                         Minute[key] = None
-                        allOk(key)
+                        allOk(key,num_config,provider_config)
                         pass
                     
                     allIsGood[key] = True

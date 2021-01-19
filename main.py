@@ -68,7 +68,7 @@ if(__name__ == '__main__'):
     print("Loading Data...")
 
     p2.start()
- 
+    p3.start()
     #start GUI
     p1.join()
     p2.join()
