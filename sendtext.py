@@ -12,7 +12,7 @@ from email.mime.multipart import MIMEMultipart
 #   sendtext("your text message", **numbers) 
 
 def sendtext(message, **numbers):
-    
+    print(numbers)
     numberlist =[]
     for number, carrier in numbers.items(): 
         if carrier == "AT&T":
@@ -75,7 +75,11 @@ def sendtext(message, **numbers):
         
         server.sendmail(email,sms_gateway,sms)
 
-def pCheck(lower, upper, parameter, inp):
+def pCheck(lower, upper, parameter, inp, nums = ['9496905371'], providers=['T-Mobile']):
+    if nums[0] == 'Enter Phone Number Here:':
+        print('Returning')
+        return
+    
     string = None
     if '°' in parameter:
         parameter = parameter.replace('°','')
@@ -86,19 +90,38 @@ def pCheck(lower, upper, parameter, inp):
         string = 'Warning! The ' + parameter + ' is too high. It is ' + str(inp) + \
             '. It should be between ' + str(lower) + ' and ' + str(upper) + '.'
     
+    
+
     numbers = {}
-    numbers['2243459408'] = 'AT&T'
+    for i in range(len(nums)):
+        
+        if nums[i] == 'Enter Phone Number Here:':
+            continue
+    
+        numbers[ nums[i] ] = providers[i]
+       
+    #numbers['2243459408'] = 'AT&T'
     #numbers['2029266579'] = 'T-Mobile'
     #numbers['7274853498'] = 'T-Mobile'
     if string:
         sendtext(string,**numbers)
+        print('sending...')
     return
 
-def allOk(parameter):
+def allOk(parameter, nums = ['9496905371'], providers=['T-Mobile']):
+    
+    if nums[0] == 'Enter Phone Number Here:':
+        return
+
     string = 'The ' + parameter + ' is back to being within a safe range.'
     
     numbers = {}
-    numbers['9496905371'] = 'T-Mobile'
+    for i in range(len(nums)):
+        
+        if nums[i] == 'Enter Phone Number Here:':
+            continue
+
+        numbers[ nums[i] ] = providers[i]
     #numbers['2243459408'] = 'AT&T'
     #numbers['2029266579'] = 'T-Mobile'
     #numbers['7274853498'] = 'T-Mobile'
