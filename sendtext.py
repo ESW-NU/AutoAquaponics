@@ -75,11 +75,12 @@ def sendtext(message, **numbers):
         
         server.sendmail(email,sms_gateway,sms)
 
-def pCheck(lower, upper, parameter, inp, nums = ['9496905371'], providers=['T-Mobile']):
+def pCheck(upper, lower, parameter, inp, nums, providers):
     if nums[0] == 'Enter Phone Number Here:':
         print('Returning')
         return
-    
+    #print('lower ', lower)
+    #print('upper ', upper)
     string = None
     if '°' in parameter:
         parameter = parameter.replace('°','')
@@ -108,7 +109,7 @@ def pCheck(lower, upper, parameter, inp, nums = ['9496905371'], providers=['T-Mo
         print('sending...')
     return
 
-def allOk(parameter, nums = ['9496905371'], providers=['T-Mobile']):
+def allOk(parameter, nums, providers):
     
     if nums[0] == 'Enter Phone Number Here:':
         return
