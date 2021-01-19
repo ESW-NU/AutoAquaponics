@@ -189,11 +189,11 @@ def animate(ii):
                         print('new problem')
                         Minute[key] = datetime.now().minute
                         minuta[key] = Minute[key]
-                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,num_config,provider_config) #uncomment to test emergency texts
+                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,config_settings[1],config_settings[2]) #uncomment to test emergency texts
                     elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0 and not (minuta[key] == datetime.now().minute):
                         print('same problem')
                         minuta[key] = datetime.now().minute
-                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,num_config,provider_config) #uncomment to test emergency texts
+                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,config_settings[1],config_settings[2]) #uncomment to test emergency texts
                         #pass
                     
 
@@ -211,7 +211,7 @@ def animate(ii):
                     ###setting the parameter back to true and sending "ok" text 
                     if allIsGood[key] == False:
                         Minute[key] = None
-                        allOk(key,num_config,provider_config)
+                        allOk(key,config_settings[1],config_settings[2])
                         pass
                     
                     allIsGood[key] = True
