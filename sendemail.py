@@ -43,8 +43,10 @@ def sendEmail(user_settings):
         #we will DEFINITELY have to 'import GUI'
 
         ###########
-        
-        information = Reader(db_path,'sensor_db.db').get_timeset(table="SensorData", num=5) #num is the number of data points. We need to figure out what num is for a whole week
+        sec_per_week = 7 * 24 * 60 * 60
+        tsamp = 1
+        nsamp = 5
+        information = Reader(db_path,'sensor_db.db').get_timeset(table="SensorData", num= sec_per_week / (tsamp * nsamp)) #num is the number of data points. We need to figure out what num is for a whole week
         #Daniel will apply SQL lite later
     
         def func1(x):
