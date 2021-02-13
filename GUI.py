@@ -6,9 +6,9 @@ import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
 from PIL import Image, ImageTk
-import cv2   #open source computer vision library
+'''import cv2   #open source computer vision library
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)'''
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
@@ -47,11 +47,12 @@ with open(config_path, "r") as file:
             num_config = ['Enter Phone Number Here:']*num_contacts
             provider_config = ['']*num_contacts
             email_config = ['Email']*num_contacts
-            upper_config = [0]*11
+            upper_config = [1000]*11
             lower_config = [0]*11
+            pump_config = [0, 0, None, "off"]
             writer = csv.writer(file)
-            writer.writerows([channel_buttons_config,num_config,provider_config,email_config,upper_config, lower_config])
-            config_settings = [channel_buttons_config,num_config,provider_config,email_config, upper_config, lower_config]
+            writer.writerows([channel_buttons_config,num_config,provider_config,email_config,upper_config, lower_config, pump_config])
+            config_settings = [channel_buttons_config,num_config,provider_config,email_config, upper_config, lower_config, pump_config]
             file.flush()
     channel_buttons_config = config_settings[0]
     num_config = config_settings[1]
@@ -605,9 +606,10 @@ class Settings(tk.Frame):
             email_config = [entry.get() for entry in self.email]
             upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]  
             lower_config = [round(float(entry.get()),2) for entry in self.lower_entries]
+            pump_config = config_settings[6]
             with open(config_path, 'w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config])
+                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config])
                 file.flush()
         #destroy popup window after writing file
         self.popup.destroy()
@@ -880,9 +882,58 @@ class WaterPump(tk.Frame):
         #title
         tk.Label(self, text="Water Pump", bg="white", font=TITLE_FONT).pack(pady = 10)
         #navigation button
-        navibutton1 = ttk.Button(self, text="Back",
-                            command=lambda: controller.show_frame(ControlPanel))
-        navibutton1.pack()
+        navibutton1 = tk.Button(self, text="Back", command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack(pady = (0,10))
+        
+        self.rateA, self.rateB, self.time, self.mode = tk.IntVar(), tk.IntVar(), tk.IntVar(), "off"
+
+        self.buttonFrame = tk.Frame(master=self, bg='white')
+        self.buttonFrame.pack()
+        tk.Label(master=self.buttonFrame, text="").grid(row=0, column=0)
+        tk.Label(master=self.buttonFrame, text="Flow Control:").grid(row=0, column=0)
+        tk.Label(master=self.buttonFrame, text="Bed A Flow Rate (gal/hr):").grid(row=1, column=0)
+        tk.Label(master=self.buttonFrame, text="Bed B Flow Rate (gal/hr):").grid(row=2, column=0)
+
+        self.control = tk.Button(master=self.buttonFrame, text="Off", fg="red", command=self.switch)
+        self.control.grid(row=0, column=1, padx=(5,0), pady=8, sticky="W")
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateA).grid(row=1, column=1, padx=5, pady=5, columnspan=2)
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateB).grid(row=2, column=1, padx=5, pady=5, columnspan=2)
+        
+        tk.Button(self, text="Save", command=self.save).pack(pady = (10,0))
+
+    def switch(self):
+        if self.mode == "off":
+            self.mode = "on"
+            self.control.config(text="On", fg="green")
+        elif self.mode == "on":
+            self.mode = "timer"
+            self.control.config(text="Timer", fg="black")
+            self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
+            self.timer.grid(row=0, column=2, padx=(0,5), pady=5, columnspan=1)
+        elif self.mode == "timer":
+            self.mode = "off"
+            self.control.config(text="Off", fg="red")
+            self.timer.destroy()
+    
+    def save(self):
+        if self.mode == "timer":
+            real_time = self.timer.get()
+        else:
+            real_time = None
+        with open(config_path, 'r', newline='') as file:
+            config_settings = list(csv.reader(file))
+            channel_buttons_config = config_settings[0]
+            num_config = config_settings[1]
+            provider_config = config_settings[2]
+            email_config = config_settings[3]
+            upper_config = config_settings[4]
+            lower_config = config_settings[5]
+            pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
+            with open(config_path, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config])
+                file.flush()
+        
 
 class FishFeeder(tk.Frame):
     
