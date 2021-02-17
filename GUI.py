@@ -894,10 +894,10 @@ class WaterPump(tk.Frame):
 
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
-        tk.Label(master=self.buttonFrame, text="").grid(row=0, column=0)
-        tk.Label(master=self.buttonFrame, text="Flow Control:").grid(row=0, column=0)
-        tk.Label(master=self.buttonFrame, text="Bed A Flow Rate (gal/hr):").grid(row=1, column=0)
-        tk.Label(master=self.buttonFrame, text="Bed B Flow Rate (gal/hr):").grid(row=2, column=0)
+        tk.Label(master=self.buttonFrame, bg="white", text="").grid(row=0, column=0)
+        tk.Label(master=self.buttonFrame, bg="white", text="Flow Control:").grid(row=0, column=0)
+        tk.Label(master=self.buttonFrame, bg="white", text="Bed A Flow Rate (gal/hr):").grid(row=1, column=0)
+        tk.Label(master=self.buttonFrame, bg="white", text="Bed B Flow Rate (gal/hr):").grid(row=2, column=0)
 
         self.control = tk.Button(master=self.buttonFrame, text="Off", fg="red", command=self.switch)
         self.control.grid(row=0, column=1, padx=(5,0), pady=8, sticky="W")
