@@ -887,24 +887,25 @@ class WaterPump(tk.Frame):
         #title
         tk.Label(self, text="Water Pump", bg="white", font=TITLE_FONT).pack(pady = 10)
         #navigation button
-        navibutton1 = tk.Button(self, text="Back", command=lambda: controller.show_frame(ControlPanel))
+        navibutton1 = tk.Button(self, text="Back", width=9, command=lambda: controller.show_frame(ControlPanel))
         navibutton1.pack(pady = (0,10))
         
         self.rateA, self.rateB, self.time, self.mode = tk.IntVar(), tk.IntVar(), tk.IntVar(), "off"
 
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
-        tk.Label(master=self.buttonFrame, text="").grid(row=0, column=0)
-        tk.Label(master=self.buttonFrame, text="Flow Control:").grid(row=0, column=0)
-        tk.Label(master=self.buttonFrame, text="Bed A Flow Rate (gal/hr):").grid(row=1, column=0)
-        tk.Label(master=self.buttonFrame, text="Bed B Flow Rate (gal/hr):").grid(row=2, column=0)
+        tk.Label(master=self.buttonFrame, text="aaaaaaaaaaaaa", fg="white").grid(row=1, column=0)
+        tk.Label(master=self.buttonFrame, text="aaaaaaaaaaaaa", fg="white").grid(row=1, column=3, columnspan=2)
+        tk.Label(master=self.buttonFrame, text="Flow Control:").grid(row=0, column=1)
+        tk.Label(master=self.buttonFrame, text="Bed A Flow Rate (gal/hr):").grid(row=1, column=1)
+        tk.Label(master=self.buttonFrame, text="Bed B Flow Rate (gal/hr):").grid(row=2, column=1)
 
-        self.control = tk.Button(master=self.buttonFrame, text="Off", fg="red", command=self.switch)
-        self.control.grid(row=0, column=1, padx=(5,0), pady=8, sticky="W")
-        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateA).grid(row=1, column=1, padx=5, pady=5, columnspan=2)
-        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateB).grid(row=2, column=1, padx=5, pady=5, columnspan=2)
+        self.control = tk.Button(master=self.buttonFrame, text="Off", fg="red", width=9, command=self.switch)
+        self.control.grid(row=0, column=2, padx=5, pady=8)
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateA).grid(row=1, column=2, padx=5, pady=5)
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateB).grid(row=2, column=2, padx=5, pady=5)
         
-        tk.Button(self, text="Save", command=self.save).pack(pady = (10,0))
+        tk.Button(self, text="Save", width=9, command=self.save).pack(pady = (10,0))
 
     def switch(self):
         if self.mode == "off":
@@ -913,11 +914,14 @@ class WaterPump(tk.Frame):
         elif self.mode == "on":
             self.mode = "timer"
             self.control.config(text="Timer", fg="black")
+            self.mins = tk.Label(master=self.buttonFrame, text="(min):")
+            self.mins.grid(row=0, column=3)
             self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
-            self.timer.grid(row=0, column=2, padx=(0,5), pady=5, columnspan=1)
+            self.timer.grid(row=0, column=4, padx=(0,5), pady=5, columnspan=1)
         elif self.mode == "timer":
             self.mode = "off"
             self.control.config(text="Off", fg="red")
+            self.mins.destroy()
             self.timer.destroy()
     
     def save(self):
