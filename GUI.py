@@ -41,7 +41,7 @@ reader = Reader(db_path, db_name)
 num_contacts = 5
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
-    if len(config_settings) != 6:
+    if len(config_settings) != 7:
         with open(config_path, 'w', newline='') as file:
             channel_buttons_config = [-1]*16
             num_config = ['Enter Phone Number Here:']*num_contacts
@@ -324,11 +324,9 @@ class ControlPanel(tk.Frame):
         
         #title
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).grid(row=0, columnspan=14)
-
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard", command=lambda: controller.show_frame(HomePage))
         navibutton1.grid(row = 1, columnspan = 14)
-
         #Save button
         self.saveButton= ttk.Button(self, text="Save", command=self.popup)
         self.saveButton.grid(row=2, columnspan=14, pady=(0,0))
@@ -407,7 +405,6 @@ class ControlPanel(tk.Frame):
         self.discard()
         
         
-
     #fcn triggered by save button
     def popup(self):
         #get the input of all entries as a float value to the hundredth place
@@ -423,14 +420,11 @@ class ControlPanel(tk.Frame):
         positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
         
-
         YesB = ttk.Button(self.popup, text="YES", command = self.save)
         YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
         NoB.grid(row=1, column=2, pady = (0,10))
         self.popup.mainloop()
-
-
     #triggered if user press YES in popup window    
     def save(self):
         for i in range(16):
@@ -483,7 +477,6 @@ class ControlPanel(tk.Frame):
                 button_count[i].configure(text = "Channel ON")
                 channel_buttons_config[i] = 1
                 continue
-
             elif int(channel_buttons_config[i]) == 1: #change channel button color to purple to run on timer
                 button_count[i].configure(bg= "purple")
                 button_count[i].configure(text = "Timer ON")
