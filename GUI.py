@@ -905,7 +905,7 @@ class WaterPump(tk.Frame):
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateA).grid(row=1, column=2, padx=5, pady=5)
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateB).grid(row=2, column=2, padx=5, pady=5)
         
-        tk.Button(self, text="Save", width=9, command=self.save).pack(pady = (10,0))
+        tk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
 
     def switch(self):
         if self.mode == "off":
@@ -923,6 +923,25 @@ class WaterPump(tk.Frame):
             self.control.config(text="Off", fg="red")
             self.mins.destroy()
             self.timer.destroy()
+
+    def popup(self):
+        self.popup = tk.Tk()
+        self.popup.wm_title("Alert")
+        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        
+        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+        YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
+        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+        NoB.grid(row=1, column=2, pady = (0,10))
+        self.popup.mainloop()
     
     def save(self):
         if self.mode == "timer":
