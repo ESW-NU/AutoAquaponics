@@ -41,7 +41,7 @@ reader = Reader(db_path, db_name)
 num_contacts = 5
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
-    if len(config_settings) != 7:
+    if len(config_settings) != 8:
         with open(config_path, 'w', newline='') as file:
             channel_buttons_config = [-1]*16
             num_config = ['Enter Phone Number Here:']*num_contacts
@@ -50,9 +50,10 @@ with open(config_path, "r") as file:
             upper_config = [1000]*11
             lower_config = [0]*11
             pump_config = [0, 0, None, "off"]
+            oxygen_config = [0]
             writer = csv.writer(file)
-            writer.writerows([channel_buttons_config,num_config,provider_config,email_config,upper_config, lower_config, pump_config])
-            config_settings = [channel_buttons_config,num_config,provider_config,email_config, upper_config, lower_config, pump_config]
+            writer.writerows([channel_buttons_config,num_config,provider_config,email_config,upper_config, lower_config, pump_config, oxygen_config])
+            config_settings = [channel_buttons_config,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config]
             file.flush()
     channel_buttons_config = config_settings[0]
     num_config = config_settings[1]
@@ -324,9 +325,11 @@ class ControlPanel(tk.Frame):
         
         #title
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).grid(row=0, columnspan=14)
+
         #navigation button
         navibutton1 = ttk.Button(self, text="Back to Dashboard", command=lambda: controller.show_frame(HomePage))
         navibutton1.grid(row = 1, columnspan = 14)
+
         #Save button
         self.saveButton= ttk.Button(self, text="Save", command=self.popup)
         self.saveButton.grid(row=2, columnspan=14, pady=(0,0))
@@ -405,6 +408,7 @@ class ControlPanel(tk.Frame):
         self.discard()
         
         
+
     #fcn triggered by save button
     def popup(self):
         #get the input of all entries as a float value to the hundredth place
@@ -420,11 +424,14 @@ class ControlPanel(tk.Frame):
         positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
         
+
         YesB = ttk.Button(self.popup, text="YES", command = self.save)
         YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
         NoB.grid(row=1, column=2, pady = (0,10))
         self.popup.mainloop()
+
+
     #triggered if user press YES in popup window    
     def save(self):
         for i in range(16):
@@ -477,6 +484,7 @@ class ControlPanel(tk.Frame):
                 button_count[i].configure(text = "Channel ON")
                 channel_buttons_config[i] = 1
                 continue
+
             elif int(channel_buttons_config[i]) == 1: #change channel button color to purple to run on timer
                 button_count[i].configure(bg= "purple")
                 button_count[i].configure(text = "Timer ON")
@@ -605,9 +613,10 @@ class Settings(tk.Frame):
             upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]  
             lower_config = [round(float(entry.get()),2) for entry in self.lower_entries]
             pump_config = config_settings[6]
+            oxygen_config = config_settings[7]
             with open(config_path, 'w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config])
+                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config])
                 file.flush()
         #destroy popup window after writing file
         self.popup.destroy()
@@ -889,7 +898,7 @@ class WaterPump(tk.Frame):
         self.buttonFrame.pack()
         tk.Label(master=self.buttonFrame, text="aaaaaaaaaaaaa", fg="white").grid(row=1, column=0)
         tk.Label(master=self.buttonFrame, text="aaaaaaaaaaaaa", fg="white").grid(row=1, column=3, columnspan=2)
-        tk.Label(master=self.buttonFrame, text="Flow Control:").grid(row=0, column=1)
+        tk.Label(master=self.buttonFrame, text="Flow Control:").grid(row=0, column=1, sticky="E")
         tk.Label(master=self.buttonFrame, text="Bed A Flow Rate (gal/hr):").grid(row=1, column=1)
         tk.Label(master=self.buttonFrame, text="Bed B Flow Rate (gal/hr):").grid(row=2, column=1)
 
@@ -950,9 +959,10 @@ class WaterPump(tk.Frame):
             upper_config = config_settings[4]
             lower_config = config_settings[5]
             pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
+            oxygen_config = config_settings[7]
             with open(config_path, 'w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config])
+                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config])
                 file.flush()
         
 
@@ -985,9 +995,53 @@ class Oxygenator(tk.Frame):
         #title
         tk.Label(self, text="Oxygenator", bg="white", font=TITLE_FONT).pack(pady = 10)
         #navigation button
-        navibutton1 = ttk.Button(self, text="Back",
-                            command=lambda: controller.show_frame(ControlPanel))
-        navibutton1.pack()
+        navibutton1 = ttk.Button(self, text="Back", command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack(pady = (0,10))
+
+        self.min = tk.IntVar()
+        
+        self.buttonFrame = tk.Frame(master=self, bg='white')
+        self.buttonFrame.pack()
+        tk.Label(master=self.buttonFrame, text="Current DO (ppm):").grid(row=0, column=0)
+
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.min).grid(row=0, column=1, padx=5, pady=5)
+        
+        tk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
+
+    def popup(self):
+        self.popup = tk.Tk()
+        self.popup.wm_title("Alert")
+        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        
+        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+        YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
+        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+        NoB.grid(row=1, column=2, pady = (0,10))
+        self.popup.mainloop()
+    
+    def save(self):
+        with open(config_path, 'r', newline='') as file:
+            config_settings = list(csv.reader(file))
+            channel_buttons_config = config_settings[0]
+            num_config = config_settings[1]
+            provider_config = config_settings[2]
+            email_config = config_settings[3]
+            upper_config = config_settings[4]
+            lower_config = config_settings[5]
+            pump_config = config_settings[6]
+            oxygen_config = [self.min.get()]
+            with open(config_path, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config])
+                file.flush()
 
 class Backwashing(tk.Frame):
     
