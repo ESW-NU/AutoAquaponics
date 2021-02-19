@@ -41,9 +41,9 @@ reader = Reader(db_path, db_name)
 num_contacts = 5
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
-    if len(config_settings) != 6:
+    if len(config_settings) != 7:
         with open(config_path, 'w', newline='') as file:
-            channel_buttons_config = [-1]*16
+            enable_text = [str(False)]
             num_config = ['Enter Phone Number Here:']*num_contacts
             provider_config = ['']*num_contacts
             email_config = ['Email']*num_contacts
@@ -51,15 +51,16 @@ with open(config_path, "r") as file:
             lower_config = [0]*11
             pump_config = [0, 0, None, "off"]
             writer = csv.writer(file)
-            writer.writerows([channel_buttons_config,num_config,provider_config,email_config,upper_config, lower_config, pump_config])
-            config_settings = [channel_buttons_config,num_config,provider_config,email_config, upper_config, lower_config, pump_config]
+            writer.writerows([enable_text,num_config,provider_config,email_config,upper_config, lower_config, pump_config])
+            config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config]
             file.flush()
-    channel_buttons_config = config_settings[0]
+    enable_text = config_settings[0]
     num_config = config_settings[1]
     provider_config = config_settings[2]
     email_config = config_settings[3]
     upper_config = config_settings[4]
     lower_config = config_settings[5]
+    pump_config = config_settings[6]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
@@ -184,26 +185,26 @@ def animate(ii):
                 current_param_val = float(most_recent[0][i])
                 current_text = live_dict[key] #update to live text data summary
                 if current_param_val > float(config_settings[4][i-1]) or current_param_val < float(config_settings[5][i-1]):
-                    #print('NOT OK')
+                    #only send text if enable_text is True
+                    if config_settings[0] == [str(True)]:
+                        print(config_settings[0])
                     ###sends text if new problem arises or every 5  minutes
-                    if allIsGood[key] and Minute[key] == None:
-                        print('new problem')
-                        Minute[key] = datetime.now().minute
-                        minuta[key] = Minute[key]
-                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,config_settings[1],config_settings[2]) #uncomment to test emergency texts
-                    elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0 and not (minuta[key] == datetime.now().minute):
-                        print('same problem')
-                        minuta[key] = datetime.now().minute
-                        pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,config_settings[1],config_settings[2]) #uncomment to test emergency texts
-                        #pass
-                    
-
+                        if allIsGood[key] and Minute[key] == None:
+                            print('new problem')
+                            Minute[key] = datetime.now().minute
+                            minuta[key] = Minute[key]
+                            pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,config_settings[1],config_settings[2]) #uncomment to test emergency texts
+                        elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0 and not (minuta[key] == datetime.now().minute):
+                            print('same problem')
+                            minuta[key] = datetime.now().minute
+                            pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,config_settings[1],config_settings[2]) #uncomment to test emergency texts
+                            #pass
+                        
+                        #setting the parameter to not ok
+                        allIsGood[key] = False
 
                     current_text.label.config(text=most_recent[0][i], fg="red", bg="white")
                     current_plot.plot_color = 'r'
-                    
-                    #setting the parameter to not ok
-                    allIsGood[key] = False
                 
                 else:
                     current_text.label.config(text=most_recent[0][i], fg="black", bg="white")
@@ -512,12 +513,16 @@ class Settings(tk.Frame):
         #Discard button
         self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
         self.discardButton.grid(row = 3, columnspan = 14, pady = (0,20))
-        self.sendtext_state = tk.IntVar()
+        self.sendtext_state = tk.IntVar() #variable to hold checkbutton state
         self.s = ttk.Style() #make a new style for checkbutton so bg can be white
         self.s.configure('New.TCheckbutton', background='white')
-        self.emergencyButton = ttk.Checkbutton(self, text="Enable Emergency Texts", #state=tk.NORMAL
-                                variable=self.sendtext_state, onvalue = 1, offvalue = 0, style='New.TCheckbutton') #command=self.get_state)
-        self.emergencyButton.grid(row = 16, columnspan = 14, pady=(10,20))
+        self.textButton = ttk.Checkbutton(self, text="Enable Emergency Texts",
+                                variable=self.sendtext_state, onvalue = 1, offvalue = 0, style='New.TCheckbutton', command=self.change_state)
+        self.textButton.grid(row = 16, columnspan = 14, pady=(10,20))
+        if enable_text == [str(True)]: #initialize state of checkbutton depending on enable_text value
+            self.sendtext_state.set(1)
+        else:
+            self.sendtext_state.set(0)
         #Tells user what to input
         tk.Label(self, text="*Enter Min/Max Values For The Specified Parameters", bg="white").grid(row=15, columnspan=14, pady=(10,0))
 
@@ -605,7 +610,7 @@ class Settings(tk.Frame):
     def save(self):
         with open(config_path, 'r', newline='') as file:
             config_settings = list(csv.reader(file))
-            channel_buttons_config = config_settings[0]
+            enable_text = [str(self.textButton.instate(['selected']))]
             num_config = [entry.get() for entry in self.phone_number]
             provider_config = [option.get() for option in self.options]
             email_config = [entry.get() for entry in self.email]
@@ -614,7 +619,7 @@ class Settings(tk.Frame):
             pump_config = config_settings[6]
             with open(config_path, 'w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config])
+                writer.writerows([enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config])
                 file.flush()
         #destroy popup window after writing file
         self.popup.destroy()
@@ -675,7 +680,16 @@ class Settings(tk.Frame):
             okb = ttk.Button(self.ent_popup, text="OK", command = self.ent_popup.destroy)
             okb.grid(row=1, column=1, padx = (20,0), pady = (0,15))
             self.ent_popup.mainloop()   
-        
+    
+    #saves the checkbutton's new state into the CSV
+    def change_state(self):
+        enable_text = [str(self.textButton.instate(['selected']))]
+        print(enable_text)
+        with open(config_path, 'r', newline='') as file:
+            with open(config_path, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows([enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config])
+                file.flush()
 
 #add Video Stream page
 class VideoStream(tk.Frame):
