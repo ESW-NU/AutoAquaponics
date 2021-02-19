@@ -62,6 +62,7 @@ with open(config_path, "r") as file:
     upper_config = config_settings[4]
     lower_config = config_settings[5]
     pump_config = config_settings[6]
+    oxygen_config = config_settings[7]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
@@ -188,7 +189,6 @@ def animate(ii):
                 if current_param_val > float(config_settings[4][i-1]) or current_param_val < float(config_settings[5][i-1]):
                     #only send text if enable_text is True
                     if config_settings[0] == [str(True)]:
-                        print(config_settings[0])
                     ###sends text if new problem arises or every 5  minutes
                         if allIsGood[key] and Minute[key] == None:
                             print('new problem')
@@ -686,7 +686,6 @@ class Settings(tk.Frame):
     #saves the checkbutton's new state into the CSV
     def change_state(self):
         enable_text = [str(self.textButton.instate(['selected']))]
-        print(enable_text)
         with open(config_path, 'r', newline='') as file:
             with open(config_path, 'w', newline='') as file:
                 writer = csv.writer(file)
