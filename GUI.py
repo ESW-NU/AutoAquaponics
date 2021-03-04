@@ -902,25 +902,25 @@ class WaterPump(tk.Frame):
         #title
         tk.Label(self, text="Water Pump", bg="white", font=TITLE_FONT).pack(pady = 10)
         #navigation button
-        navibutton1 = tk.Button(self, text="Back", width=9, command=lambda: controller.show_frame(ControlPanel))
+        navibutton1 = tk.Button(self, text="Back", width=9, bg="white", command=lambda: controller.show_frame(ControlPanel))
         navibutton1.pack(pady = (0,10))
         
         self.rateA, self.rateB, self.time, self.mode = tk.IntVar(), tk.IntVar(), tk.IntVar(), "off"
 
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
-        tk.Label(master=self.buttonFrame, text="aaaaaaaaaaaaa", fg="white").grid(row=1, column=0)
-        tk.Label(master=self.buttonFrame, text="aaaaaaaaaaaaa", fg="white").grid(row=1, column=3, columnspan=2)
-        tk.Label(master=self.buttonFrame, text="Flow Control:").grid(row=0, column=1, sticky="E")
-        tk.Label(master=self.buttonFrame, text="Bed A Flow Rate (gal/hr):").grid(row=1, column=1)
-        tk.Label(master=self.buttonFrame, text="Bed B Flow Rate (gal/hr):").grid(row=2, column=1)
+        tk.Label(master=self.buttonFrame, text="aaaaaaaaaaaaa", bg="white", fg="white").grid(row=1, column=0)
+        tk.Label(master=self.buttonFrame, text="aaaaaaaaaaaaa", bg="white", fg="white").grid(row=1, column=3, columnspan=2)
+        tk.Label(master=self.buttonFrame, text="Flow Control:", bg="white").grid(row=0, column=1, sticky="E")
+        tk.Label(master=self.buttonFrame, text="Bed A Flow Rate (gal/hr):", bg="white").grid(row=1, column=1)
+        tk.Label(master=self.buttonFrame, text="Bed B Flow Rate (gal/hr):", bg="white").grid(row=2, column=1)
 
         self.control = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=self.switch)
         self.control.grid(row=0, column=2, padx=5, pady=8)
-        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateA).grid(row=1, column=2, padx=5, pady=5)
-        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateB).grid(row=2, column=2, padx=5, pady=5)
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateA, bg="white").grid(row=1, column=2, padx=5, pady=5)
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateB, bg="white").grid(row=2, column=2, padx=5, pady=5)
         
-        tk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
+        tk.Button(self, text="Save", width=9, command=self.popup, bg="white").pack(pady = (10,0))
 
     def switch(self):
         if self.mode == "off":
@@ -1015,9 +1015,9 @@ class Oxygenator(tk.Frame):
         
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
-        tk.Label(master=self.buttonFrame, text="Current DO (ppm):").grid(row=0, column=0)
+        tk.Label(master=self.buttonFrame, text="Current DO (ppm):", bg="white").grid(row=0, column=0)
 
-        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.min).grid(row=0, column=1, padx=5, pady=5)
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.min, bg="white").grid(row=0, column=1, padx=5, pady=5)
         
         tk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
 
