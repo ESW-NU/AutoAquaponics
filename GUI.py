@@ -902,7 +902,7 @@ class WaterPump(tk.Frame):
         #title
         tk.Label(self, text="Water Pump", bg="white", font=TITLE_FONT).pack(pady = 10)
         #navigation button
-        navibutton1 = tk.Button(self, text="Back", width=9, bg="white", command=lambda: controller.show_frame(ControlPanel))
+        navibutton1 = tk.Button(self, text="Back", width=9, command=lambda: controller.show_frame(ControlPanel))
         navibutton1.pack(pady = (0,10))
         
         self.rateA, self.rateB, self.time, self.mode = tk.IntVar(), tk.IntVar(), tk.IntVar(), "off"
@@ -920,7 +920,7 @@ class WaterPump(tk.Frame):
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateA, bg="white").grid(row=1, column=2, padx=5, pady=5)
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateB, bg="white").grid(row=2, column=2, padx=5, pady=5)
         
-        tk.Button(self, text="Save", width=9, command=self.popup, bg="white").pack(pady = (10,0))
+        tk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
 
     def switch(self):
         if self.mode == "off":
@@ -929,7 +929,7 @@ class WaterPump(tk.Frame):
         elif self.mode == "on":
             self.mode = "timer"
             self.control.config(text="Timer ON", fg="purple")
-            self.mins = tk.Label(master=self.buttonFrame, text="(min):")
+            self.mins = tk.Label(master=self.buttonFrame, text="(min):", bg = 'white')
             self.mins.grid(row=0, column=3)
             self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
             self.timer.grid(row=0, column=4, padx=(0,5), pady=5, columnspan=1)
@@ -1019,7 +1019,7 @@ class Oxygenator(tk.Frame):
 
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.min, bg="white").grid(row=0, column=1, padx=5, pady=5)
         
-        tk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
+        ttk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
 
     def popup(self):
         self.popup = tk.Tk()
