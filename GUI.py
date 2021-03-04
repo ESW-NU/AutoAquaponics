@@ -915,7 +915,7 @@ class WaterPump(tk.Frame):
         tk.Label(master=self.buttonFrame, text="Bed A Flow Rate (gal/hr):").grid(row=1, column=1)
         tk.Label(master=self.buttonFrame, text="Bed B Flow Rate (gal/hr):").grid(row=2, column=1)
 
-        self.control = tk.Button(master=self.buttonFrame, text="Off", fg="red", width=9, command=self.switch)
+        self.control = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=self.switch)
         self.control.grid(row=0, column=2, padx=5, pady=8)
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateA).grid(row=1, column=2, padx=5, pady=5)
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateB).grid(row=2, column=2, padx=5, pady=5)
@@ -925,17 +925,17 @@ class WaterPump(tk.Frame):
     def switch(self):
         if self.mode == "off":
             self.mode = "on"
-            self.control.config(text="On", fg="green")
+            self.control.config(text="ON", fg="green")
         elif self.mode == "on":
             self.mode = "timer"
-            self.control.config(text="Timer", fg="black")
+            self.control.config(text="Timer ON", fg="purple")
             self.mins = tk.Label(master=self.buttonFrame, text="(min):")
             self.mins.grid(row=0, column=3)
             self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
             self.timer.grid(row=0, column=4, padx=(0,5), pady=5, columnspan=1)
         elif self.mode == "timer":
             self.mode = "off"
-            self.control.config(text="Off", fg="red")
+            self.control.config(text="OFF", fg="red")
             self.mins.destroy()
             self.timer.destroy()
 
