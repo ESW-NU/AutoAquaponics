@@ -498,6 +498,14 @@ class ControlPanel(tk.Frame):
                 channel_buttons_config[i] = -1
                 continue '''
 
+def csv_write(row_number, to_write):
+    with open(config_path, 'r', newline='') as file:
+            config_settings = list(csv.reader(file))
+            config_settings[row_number] = to_write
+            with open(config_path, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(config_settings)
+                file.flush()
 
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
@@ -609,20 +617,15 @@ class Settings(tk.Frame):
         self.popup.mainloop()
     #triggered if user press YES in popup window
     def save(self):
-        with open(config_path, 'r', newline='') as file:
-            config_settings = list(csv.reader(file))
-            enable_text = [str(self.textButton.instate(['selected']))]
-            num_config = [entry.get() for entry in self.phone_number]
-            provider_config = [option.get() for option in self.options]
-            email_config = [entry.get() for entry in self.email]
-            upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]  
-            lower_config = [round(float(entry.get()),2) for entry in self.lower_entries]
-            pump_config = config_settings[6]
-            oxygen_config = config_settings[7]
-            with open(config_path, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerows([enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config])
-                file.flush()
+        enable_text = [str(self.textButton.instate(['selected']))]
+        num_config = [entry.get() for entry in self.phone_number]
+        provider_config = [option.get() for option in self.options]
+        email_config = [entry.get() for entry in self.email]
+        upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]  
+        lower_config = [round(float(entry.get()),2) for entry in self.lower_entries]
+        to_write = [enable_text, num_config, provider_config, email_config, upper_config, lower_config]
+        for i, to_wr in enumerate(to_write):
+            csv_write(i, to_wr)
         #destroy popup window after writing file
         self.popup.destroy()
         
@@ -686,11 +689,9 @@ class Settings(tk.Frame):
     #saves the checkbutton's new state into the CSV
     def change_state(self):
         enable_text = [str(self.textButton.instate(['selected']))]
-        with open(config_path, 'r', newline='') as file:
-            with open(config_path, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerows([enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config])
-                file.flush()
+        to_write = [enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config]
+        for i, to_wr in enumerate(to_write):
+            csv_write(i, to_wr)
 
 #add Video Stream page
 class VideoStream(tk.Frame):
@@ -905,7 +906,14 @@ class WaterPump(tk.Frame):
         navibutton1 = tk.Button(self, text="Back", width=9, command=lambda: controller.show_frame(ControlPanel))
         navibutton1.pack(pady = (0,10))
         
-        self.rateA, self.rateB, self.time, self.mode = tk.IntVar(), tk.IntVar(), tk.IntVar(), "off"
+        self.rateA, self.rateB, self.time = tk.IntVar(), tk.IntVar(), tk.IntVar()
+        with open(config_path, 'r', newline='') as file:
+            config_settings = list(csv.reader(file))
+            pump_config = config_settings[6]
+        self.rateA.set(pump_config[0])
+        self.rateB.set(pump_config[1])
+        self.time.set(pump_config[2])
+        self.mode = pump_config[3]
 
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
@@ -921,6 +929,14 @@ class WaterPump(tk.Frame):
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateB, bg="white").grid(row=2, column=2, padx=5, pady=5)
         
         tk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
+
+        if self.mode == "off":
+            self.mode == "timer"
+        elif self.mode == "on":
+            self.mode = "off"
+        else:
+            self.mode = "on"
+        self.switch()
 
     def switch(self):
         if self.mode == "off":
@@ -938,6 +954,10 @@ class WaterPump(tk.Frame):
             self.control.config(text="OFF", fg="red")
             self.mins.destroy()
             self.timer.destroy()
+        with open(config_path, 'r', newline='') as file:
+            config_settings = list(csv.reader(file))
+            pump_config = [config_settings[6][0], config_settings[6][1], config_settings[6][2], self.mode]
+        csv_write(6, pump_config)
 
     def popup(self):
         self.popup = tk.Tk()
@@ -963,20 +983,8 @@ class WaterPump(tk.Frame):
             real_time = self.timer.get()
         else:
             real_time = None
-        with open(config_path, 'r', newline='') as file:
-            config_settings = list(csv.reader(file))
-            channel_buttons_config = config_settings[0]
-            num_config = config_settings[1]
-            provider_config = config_settings[2]
-            email_config = config_settings[3]
-            upper_config = config_settings[4]
-            lower_config = config_settings[5]
-            pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
-            oxygen_config = config_settings[7]
-            with open(config_path, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config])
-                file.flush()
+        pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
+        csv_write(6, pump_config)
         
 
 class FishFeeder(tk.Frame):
@@ -1012,6 +1020,10 @@ class Oxygenator(tk.Frame):
         navibutton1.pack(pady = (0,10))
 
         self.min = tk.IntVar()
+        with open(config_path, 'r', newline='') as file:
+            config_settings = list(csv.reader(file))
+            oxygen_config = config_settings[7]
+        self.min.set(oxygen_config[0])
         
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
@@ -1041,20 +1053,7 @@ class Oxygenator(tk.Frame):
         self.popup.mainloop()
     
     def save(self):
-        with open(config_path, 'r', newline='') as file:
-            config_settings = list(csv.reader(file))
-            channel_buttons_config = config_settings[0]
-            num_config = config_settings[1]
-            provider_config = config_settings[2]
-            email_config = config_settings[3]
-            upper_config = config_settings[4]
-            lower_config = config_settings[5]
-            pump_config = config_settings[6]
-            oxygen_config = [self.min.get()]
-            with open(config_path, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerows([channel_buttons_config, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config])
-                file.flush()
+        csv_write(7, [self.min.get()])
 
 class Backwashing(tk.Frame):
     
