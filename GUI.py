@@ -5,8 +5,8 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
-from PIL import Image, ImageTk
-'''import cv2   #open source computer vision library
+'''from PIL import Image, ImageTk
+import cv2   #open source computer vision library
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)'''
 #font types
