@@ -931,7 +931,7 @@ class WaterPump(tk.Frame):
         tk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
 
         if self.mode == "off":
-            self.mode == "timer"
+            self.mode = "go to off"
         elif self.mode == "on":
             self.mode = "off"
         else:
@@ -954,6 +954,9 @@ class WaterPump(tk.Frame):
             self.control.config(text="OFF", fg="red")
             self.mins.destroy()
             self.timer.destroy()
+        elif self.mode == "go to off":
+            self.mode = "off"
+            self.control.config(text="OFF", fg="red")
         with open(config_path, 'r', newline='') as file:
             config_settings = list(csv.reader(file))
             pump_config = [config_settings[6][0], config_settings[6][1], config_settings[6][2], self.mode]
