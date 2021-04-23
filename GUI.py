@@ -33,6 +33,14 @@ from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
 
+def csv_write(row_number, to_write):
+    with open(config_path, 'r', newline='') as file:
+            config_settings = list(csv.reader(file))
+            config_settings[row_number] = to_write
+            with open(config_path, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(config_settings)
+                file.flush()
 
 #initialize entry configs, email_config, num_config, provider_config, and SQLite reader
 db_name = 'sensor_db.db'
@@ -41,28 +49,14 @@ reader = Reader(db_path, db_name)
 num_contacts = 5
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
-    if len(config_settings) != 8:
-        with open(config_path, 'w', newline='') as file:
-            enable_text = [str(False)]
-            num_config = ['Enter Phone Number Here:']*num_contacts
-            provider_config = ['']*num_contacts
-            email_config = ['Email']*num_contacts
-            upper_config = [1000]*11
-            lower_config = [0]*11
-            pump_config = [0, 0, None, "off"]
-            oxygen_config = [0]
-            writer = csv.writer(file)
-            writer.writerows([enable_text,num_config,provider_config,email_config,upper_config, lower_config, pump_config, oxygen_config])
-            config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config]
-            file.flush()
-    enable_text = config_settings[0]
-    num_config = config_settings[1]
-    provider_config = config_settings[2]
-    email_config = config_settings[3]
-    upper_config = config_settings[4]
-    lower_config = config_settings[5]
-    pump_config = config_settings[6]
-    oxygen_config = config_settings[7]
+if len(config_settings) != 8:
+    enable_text, num_config, provider_config = [str(False)], ['Enter Phone Number Here:']*num_contacts, ['']*num_contacts
+    email_config, upper_config, lower_config, pump_config, oxygen_config = ['Email']*num_contacts, [1000]*11, [0]*11, [0, 0, None, "off"], [0]
+    config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config]
+    for i, to_wr in enumerate(config_settings):
+        csv_write(i, to_wr)
+else:
+    enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config = [x for x in config_settings]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
@@ -312,200 +306,6 @@ class HomePage(tk.Frame):
             loading_text.place(x=140, y=65+22*i)
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
-'''        
-channel_count = []
-button_count = []
-on_times = []
-off_times = []
-on_buttons = []
-off_buttons = []
-#add control panel page
-class ControlPanel(tk.Frame):
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        
-        #title
-        tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).grid(row=0, columnspan=14)
-
-        #navigation button
-        navibutton1 = ttk.Button(self, text="Back to Dashboard", command=lambda: controller.show_frame(HomePage))
-        navibutton1.grid(row = 1, columnspan = 14)
-
-        #Save button
-        self.saveButton= ttk.Button(self, text="Save", command=self.popup)
-        self.saveButton.grid(row=2, columnspan=14, pady=(0,0))
-        #Discard button
-        self.discardButton= ttk.Button(self, text="Discard", command=self.discard)
-        self.discardButton.grid(row=3, columnspan=14, pady=(0,20))
-        
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(13, weight=1)
-        
-        
-        def preconfig_label(count: str):
-            return tk.Label(self, text=count, bg='white', font=SMALL_FONT)
-        for count in range(1, 17):
-            channel_count.append(preconfig_label(str(count)))
-    
-        preconfig_button = tk.Button(self, text="Channel OFF", bg= "red", fg= "white", width=10, 
-                           height=1, command=self.get_channel_state) #command will change state
-        for count in range(16):
-            button_count.append(preconfig_button)
-        
-        
-        #Labels, buttons, and entries, oh my!
-        for i in range(16):
-            if i > 7 and i < 15:
-                row = i - 4
-                channel_count[i].grid(row=row, column=7, padx=(40,0))
-                button_count[i].grid(row=row, column=8)
-                tk.Label(self, text="Turn on for:", bg="white").grid(row=row, column=9)
-                tk.Label(self, text="Turn off for:", bg="white").grid(row=row, column=11)
-                on_element = (tk.Entry(self, width=10))
-                on_buttons.append(on_element)
-                on_element.grid(row=row, column=10) #on entry
-                off_element = (tk.Entry(self, width=10))
-                off_buttons.append(off_element)
-                off_element.grid(row=row, column=12) #off entry
-            elif i == 7:
-                row = i + 4
-                channel_count[i].grid(row=row, column=1, pady=(0,20))
-                button_count[i].grid(row=row, column=2, pady=(0,20))
-                tk.Label(self, text="Turn on for:", bg="white").grid(row=row, column=3, pady=(0,10))
-                tk.Label(self, text="Turn off for:", bg="white").grid(row=row, column=5, pady=(0,10))
-                on_element = (tk.Entry(self, width=10))
-                on_buttons.append(on_element)
-                on_element.grid(row=row, column=4, pady=(0,10)) #on entry
-                off_element = (tk.Entry(self, width=10))
-                off_buttons.append(off_element)
-                off_element.grid(row=row, column=6, pady=(0,10)) #off entry
-            elif i == 15:
-                row = i - 4
-                channel_count[i].grid(row=row, column=7, padx=(40,0), pady=(0,20))
-                button_count[i].grid(row=row, column=8, pady=(0,20))
-                tk.Label(self, text="Turn on for:", bg="white").grid(row=row, column=9, pady=(0,10))
-                tk.Label(self, text="Turn off for:", bg="white").grid(row=row, column=11, pady=(0,10))
-                on_element = (tk.Entry(self, width=10))
-                on_buttons.append(on_element)
-                on_element.grid(row=row, column=10, pady=(0,10)) #on entry
-                off_element = (tk.Entry(self, width=10))
-                off_buttons.append(off_element)
-                off_element.grid(row=row, column=12, pady=(0,10)) #off entry
-            else:
-                row = i + 4
-                channel_count[i].grid(row=row, column=1)
-                button_count[i].grid(row=row, column=2)
-                tk.Label(self, text="Turn on for:", bg="white").grid(row=row, column=3)
-                tk.Label(self, text="Turn off for:", bg="white").grid(row=row, column=5)
-                on_element = (tk.Entry(self, width=10))
-                on_buttons.append(on_element)
-                on_element.grid(row=row, column=4) #on entry
-                off_element = (tk.Entry(self, width=10))
-                off_buttons.append(off_element)
-                off_element.grid(row=row, column=6) #off entry
-        #Tells user what to input
-        tk.Label(self, text="*Input Time in Hours", bg="white").grid(row=12, columnspan=14)
-        
-        self.discard()
-        
-        
-
-    #fcn triggered by save button
-    def popup(self):
-        #get the input of all entries as a float value to the hundredth place
-        self.popup = tk.Tk()
-        self.popup.wm_title("Alert")
-        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
-        label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
-        
-        # centers the popup window
-        popup_width = self.popup.winfo_reqwidth()
-        popup_height = self.popup.winfo_reqheight()
-        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
-        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
-        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
-        
-
-        YesB = ttk.Button(self.popup, text="YES", command = self.save)
-        YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
-        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
-        NoB.grid(row=1, column=2, pady = (0,10))
-        self.popup.mainloop()
-
-
-    #triggered if user press YES in popup window    
-    def save(self):
-        for i in range(16):
-            try:
-                user_ON = int(on_buttons[i].get())
-                on_times.append(user_ON)
-            except ValueError:
-                on_times.append(0) #if left blank, fill w/zeros
-            except AttributeError:
-                on_times.append(0) #if you put not Integers, fill w/zeros
-        for i in range(16):
-            try:
-                user_OFF = int(off_buttons[i].get())
-                off_times.append(user_OFF)
-            except ValueError:
-                off_times.append(0) #if left blank, fill w/zeros
-            except AttributeError:
-                off_times.append(0) #if you put noy Integers, fill w/zeros
-        # save channel button settings
-        with open(config_path, 'r', newline='') as file:
-            config_settings = list(csv.reader(file))
-            channel_buttons_config = config_settings[0]
-            on_config = on_times
-            off_config = off_times
-            upper_config = config_settings[3]
-            lower_config = config_settings[4]
-            with open(config_path, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerows([channel_buttons_config, on_config, off_config, upper_config, lower_config])
-                file.flush()
-        #destroy popup window after writing file
-        self.popup.destroy()
-        
-    #fcn triggered by discard button
-    def discard(self):
-        #Get last saved values
-        with open(config_path, "r") as file:
-            config_settings = list(csv.reader(file))
-            for i in range(16):
-                channel_buttons_config[i] = config_settings[0][i]
-                on_buttons[i].delete(0, END)
-                off_buttons[i].delete(0, END)
-                on_buttons[i].insert(0, config_settings[1][i])  
-                off_buttons[i].insert(0, config_settings[2][i])
-    
-    def get_channel_state(self):
-        for i in range(16):
-            if int(channel_buttons_config[i]) == -1: #change channel button color to green when channel is forced on
-                button_count[i].configure(bg= "green")
-                button_count[i].configure(text = "Channel ON")
-                channel_buttons_config[i] = 1
-                continue
-
-            elif int(channel_buttons_config[i]) == 1: #change channel button color to purple to run on timer
-                button_count[i].configure(bg= "purple")
-                button_count[i].configure(text = "Timer ON")
-                channel_buttons_config[i] = 0
-                continue
-  
-            else:
-                button_count[i].configure(bg= "red")
-                button_count[i].configure(text = "Channel OFF")
-                channel_buttons_config[i] = -1
-                continue '''
-
-def csv_write(row_number, to_write):
-    with open(config_path, 'r', newline='') as file:
-            config_settings = list(csv.reader(file))
-            config_settings[row_number] = to_write
-            with open(config_path, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerows(config_settings)
-                file.flush()
 
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
