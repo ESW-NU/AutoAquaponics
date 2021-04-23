@@ -23,9 +23,11 @@ def DataLogger():
     logger.table(sensor_plot_table)
     last_distance = np.nan #to give an arbitrary initial value to getData for the first time the distance sensor fails
     last_wtemp = 21 #arbitrary initial value
+    last_hum = np.nan
+    last_atemp = np.nan
     while True:
         #change getData(last_distance, last_wtemp) to data_fxn if you are testing on your computer
-        last_distance, last_wtemp = np.round(logger.collect_data("SensorData", getData(last_distance, last_wtemp), last_distance, last_wtemp, tsamp=1, nsamp=5),2) #change tsamp and nsamp for logging time/frequency
+        last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", getData(last_distance, last_wtemp, last_hum, last_atemp), last_distance, last_wtemp, last_hum, last_atemp, tsamp=1, nsamp=5),2) #change tsamp and nsamp for logging time/frequency
         logger.log_data()
         logger.commit()
         

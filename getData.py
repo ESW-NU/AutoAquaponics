@@ -33,7 +33,7 @@ chan1 = AnalogIn(ads, ADS.P1)
 #import numpy for NaN
 import numpy as np
 
-def getData(last_distance, last_wtemp):
+def getData(last_distance, last_wtemp, last_hum, last_atemp):
 #read w1 water temp sensor
     wtemp = wt_sensor.get_temperature()
     GPIO.output(pin_num,GPIO.HIGH) #turn TDS sensor on
@@ -52,6 +52,8 @@ def getData(last_distance, last_wtemp):
     #pH = chan.voltage
 #read air temp and air humidity
     hum, atemp = getDHT()#dht.read_retry(dht.DHT22, DHT)
+    if hum == np.nan or atemp == np.nan:
+        hum, atemp = last_hum, last_atemp
 #setup distance sensing stuff
     new_reading = False
     counter = 0
@@ -119,10 +121,9 @@ def getDHT():
         dhtDevice.exit()
         raise error
     return temperature_c, humidity
-
-from time import sleep
-from datetime import datetime
-while True:
-     print('updating...')
-     print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1))
-     sleep(5)
+#from time import sleep
+#from datetime import datetime
+#while True:
+#     print('updating...')
+#     print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1, 1, 1))
+#     sleep(5)
