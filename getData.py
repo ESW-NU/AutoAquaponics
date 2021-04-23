@@ -103,27 +103,35 @@ def getTDS(wtemp):
     EC = EC_raw/(1+0.02*(wtemp-25)) #use current temp for temp compensation
     TDS = EC/2 #TDS is just half of electrical conductivity in ppm
     return TDS
-
+import math
 def getDHT():
-    try:
-        # get temp and humidity
-        temperature_c = dhtDevice.temperature
-        humidity = dhtDevice.humidity
+    temperature_c = np.nan
+    humidity = np.nan
+    while is_nan(temperature_c) or is_nan(humidity):#test to see if the value is still nan
+        print('Rerunning DHT...')
+        try:
+            # get temp and humidity
+            temperature_c = dhtDevice.temperature
+            humidity = dhtDevice.humidity
 
-    except RuntimeError as error:
-        # Errors happen fairly often, DHT's are hard to read, just keep going
-        #print(error.args[0])
-        #time.sleep(2.0)
-        temperature_c = np.nan
-        humidity = np.nan
-        #continue
-    except Exception as error:
-        dhtDevice.exit()
-        raise error
+        except RuntimeError as error:
+            # Errors happen fairly often, DHT's are hard to read, just keep going
+            #print(error.args[0])
+            #time.sleep(2.0)
+            temperature_c = float('NaN')
+            humidity = float('NaN')
+            #continue
+        except Exception as error:
+            dhtDevice.exit()
+            raise error
     return temperature_c, humidity
+
+def is_nan(x):
+    return (x is np.nan or x != x)
+
 #from time import sleep
 #from datetime import datetime
 #while True:
 #     print('updating...')
 #     print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1, 1, 1))
-#     sleep(5)
+#     sleep(1)
