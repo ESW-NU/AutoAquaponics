@@ -17,8 +17,10 @@ import adafruit_ads1x15.ads1115 as ADS
 #import ADS1x15 library's version of AnalogIn
 from adafruit_ads1x15.analog_in import AnalogIn
 #import Adafruit DHT22 stuff (humidty)
-import Adafruit_DHT as dht
-DHT = 14 #set DHT's GPIO pin number
+#import Adafruit_DHT as dht
+import adafruit_dht
+#DHT = 14 #set DHT's GPIO pin number
+dhtDevice = adafruit_dht.DHT22(board.D14, use_pulseio=False)
 #import the w1 water temp sensor module
 from w1thermsensor import W1ThermSensor
 wt_sensor = W1ThermSensor()
@@ -49,7 +51,7 @@ def getData(last_distance, last_wtemp):
     pH = -5.82*chan.voltage + 22.1 #calibrated equation
     #pH = chan.voltage
 #read air temp and air humidity
-    hum, atemp = dht.read_retry(dht.DHT22, DHT)
+    hum, atemp = getDHT()#dht.read_retry(dht.DHT22, DHT)
 #setup distance sensing stuff
     new_reading = False
     counter = 0
@@ -100,9 +102,27 @@ def getTDS(wtemp):
     TDS = EC/2 #TDS is just half of electrical conductivity in ppm
     return TDS
 
-'''from time import sleep
+def getDHT():
+    try:
+        # get temp and humidity
+        temperature_c = dhtDevice.temperature
+        humidity = dhtDevice.humidity
+
+    except RuntimeError as error:
+        # Errors happen fairly often, DHT's are hard to read, just keep going
+        #print(error.args[0])
+        #time.sleep(2.0)
+        temperature_c = np.nan
+        humidity = np.nan
+        #continue
+    except Exception as error:
+        dhtDevice.exit()
+        raise error
+    return temperature_c, humidity
+
+from time import sleep
 from datetime import datetime
 while True:
      print('updating...')
-     print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1))
-     sleep(5)'''
+     print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1))
+     sleep(5)
