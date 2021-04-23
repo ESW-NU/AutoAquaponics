@@ -6,9 +6,9 @@ import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
 from PIL import Image, ImageTk
-'''import cv2   #open source computer vision library
+import cv2   #open source computer vision library
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)'''
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
@@ -703,7 +703,7 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-'''
+
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
@@ -738,7 +738,7 @@ class VideoStream(tk.Frame):
             imgtk = ImageTk.PhotoImage(image=img)
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
-            self.imagel.after(15, self.update)'''
+            self.imagel.after(15, self.update)
             
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
