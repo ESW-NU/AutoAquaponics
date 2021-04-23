@@ -5,10 +5,10 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
-'''from PIL import Image, ImageTk
+from PIL import Image, ImageTk
 import cv2   #open source computer vision library
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)'''
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
@@ -33,6 +33,14 @@ from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
 
+def csv_write(row_number, to_write):
+    with open(config_path, 'r', newline='') as file:
+            config_settings = list(csv.reader(file))
+            config_settings[row_number] = to_write
+            with open(config_path, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(config_settings)
+                file.flush()
 
 #initialize entry configs, email_config, num_config, provider_config, and SQLite reader
 db_name = 'sensor_db.db'
@@ -41,28 +49,14 @@ reader = Reader(db_path, db_name)
 num_contacts = 5
 with open(config_path, "r") as file:
     config_settings = list(csv.reader(file))
-    if len(config_settings) != 8:
-        with open(config_path, 'w', newline='') as file:
-            enable_text = [str(False)]
-            num_config = ['Enter Phone Number Here:']*num_contacts
-            provider_config = ['']*num_contacts
-            email_config = ['Email']*num_contacts
-            upper_config = [1000]*11
-            lower_config = [0]*11
-            pump_config = [0, 0, None, "off"]
-            oxygen_config = [0]
-            writer = csv.writer(file)
-            writer.writerows([enable_text,num_config,provider_config,email_config,upper_config, lower_config, pump_config, oxygen_config])
-            config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config]
-            file.flush()
-    enable_text = config_settings[0]
-    num_config = config_settings[1]
-    provider_config = config_settings[2]
-    email_config = config_settings[3]
-    upper_config = config_settings[4]
-    lower_config = config_settings[5]
-    pump_config = config_settings[6]
-    oxygen_config = config_settings[7]
+if len(config_settings) != 8:
+    enable_text, num_config, provider_config = [str(False)], ['Enter Phone Number Here:']*num_contacts, ['']*num_contacts
+    email_config, upper_config, lower_config, pump_config, oxygen_config = ['Email']*num_contacts, [1000]*11, [0]*11, [0, 0, None, "off"], [0]
+    config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config]
+    for i, to_wr in enumerate(config_settings):
+        csv_write(i, to_wr)
+else:
+    enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config = [x for x in config_settings]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
@@ -313,15 +307,6 @@ class HomePage(tk.Frame):
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
 
-def csv_write(row_number, to_write):
-    with open(config_path, 'r', newline='') as file:
-            config_settings = list(csv.reader(file))
-            config_settings[row_number] = to_write
-            with open(config_path, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerows(config_settings)
-                file.flush()
-
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -518,7 +503,7 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-'''
+
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
@@ -553,7 +538,7 @@ class VideoStream(tk.Frame):
             imgtk = ImageTk.PhotoImage(image=img)
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
-            self.imagel.after(15, self.update)'''
+            self.imagel.after(15, self.update)
             
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):

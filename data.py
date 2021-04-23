@@ -78,7 +78,7 @@ class Logger:
             # add table(s) to the table dictionary...
             self.table_dict[table] = info
 
-    def collect_data(self,table,dataget,last_distance,last_wtemp,tsamp=0,nsamp=1):
+    def collect_data(self,table,dataget,last_distance,last_wtemp,last_hum,last_atemp,tsamp=0,nsamp=1):
         #daily table mode 
         if table == 'DAILY':
             table = self.datef
@@ -86,12 +86,14 @@ class Logger:
         #time-controlled data collection 
         # (Running median. tsamp = time between measurements, nsamp = number of measurements)
         #data is stored in a numpy array...
-        leng = len(dataget(last_distance, last_wtemp))
+        #leng = len(dataget(last_distance, last_wtemp, last_hum, last_atemp))
+        leng = len(dataget)
         data_arr = np.empty((1,leng))   #initialize the array w/out timestamp (is this line problematic?)
         data_arr[:] = np.nan #replace empty element with np.nan so we can ignore them
         ct = 0
         while ct < nsamp:
-            getdata = dataget(last_distance, last_wtemp)
+            #print(dataget)
+            getdata = dataget
             print(getdata)
             tup_arr = np.asarray([getdata], dtype=np.float) #put the getdata() into array form, also replace None with np.nan if it appears
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
@@ -111,8 +113,8 @@ class Logger:
             self.data_dict[table] = []
         self.data_dict[table].append(data_log)
         
-        #return the distance value for temp_distance
-        return data_med[-1], data_med[-2] #make sure this is the distance value
+        #return the last values for last_distance, last_wtemp, last_atemp, and last_hum
+        return data_med[-1], data_med[-2], data_med[-3], data_med[-4] #make sure these are the last distance, wtemp, atemp, and hum values
 
 
     def log_data(self):
