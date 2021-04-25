@@ -33,6 +33,10 @@ from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
 
+def csv_read():
+    with open(config_path, "r") as file:
+        return list(csv.reader(file))
+
 def csv_write(row_number, to_write):
     with open(config_path, 'r', newline='') as file:
             config_settings = list(csv.reader(file))
@@ -47,12 +51,12 @@ db_name = 'sensor_db.db'
 reader = Reader(db_path, db_name)
 
 num_contacts = 5
-with open(config_path, "r") as file:
-    config_settings = list(csv.reader(file))
+config_settings = csv_read()
 if len(config_settings) != 8:
     enable_text, num_config, provider_config = [str(False)], ['Enter Phone Number Here:']*num_contacts, ['']*num_contacts
     email_config, upper_config, lower_config, pump_config, oxygen_config = ['Email']*num_contacts, [1000]*11, [0]*11, [0, 0, None, "off"], [0]
-    config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config]
+    sensor_config = ["off" for _ in range(4)]
+    config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config, sensor_config]
     for i, to_wr in enumerate(config_settings):
         csv_write(i, to_wr)
 else:
@@ -174,8 +178,7 @@ def animate(ii):
         #do I have to add an else?
     
         else:
-            with open(config_path, "r") as file: #ELSE: this is a new data point, so go ahead and plot it
-                config_settings = list(csv.reader(file))
+            config_settings = csv_read()
             for i, key in enumerate(param_dict, 1):
                 current_plot = param_dict[key]
                 current_param_val = float(most_recent[0][i])
@@ -441,18 +444,17 @@ class Settings(tk.Frame):
         for entry in self.lower_entries:  
             entry.delete(0, END)
         #Get last saved values
-        with open(config_path, "r") as file:
-            config_settings = list(csv.reader(file))
-            for i, entry in enumerate(self.phone_number):
-                entry.insert(0, config_settings[1][i])
-            for i, option in enumerate(self.phone_carrier):
-                option.set(config_settings[2][i])
-            for i, entry in enumerate(self.email):
-                entry.insert(0, config_settings[3][i])
-            for i, entry in enumerate(self.upper_entries):
-                entry.insert(0, config_settings[4][i])
-            for i, entry in enumerate(self.lower_entries):
-                entry.insert(0, config_settings[5][i])
+        config_settings = csv_read()
+        for i, entry in enumerate(self.phone_number):
+            entry.insert(0, config_settings[1][i])
+        for i, option in enumerate(self.phone_carrier):
+            option.set(config_settings[2][i])
+        for i, entry in enumerate(self.email):
+            entry.insert(0, config_settings[3][i])
+        for i, entry in enumerate(self.upper_entries):
+            entry.insert(0, config_settings[4][i])
+        for i, entry in enumerate(self.lower_entries):
+            entry.insert(0, config_settings[5][i])
             
 
     def submit(self):
@@ -503,7 +505,7 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-
+'''
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
@@ -538,7 +540,7 @@ class VideoStream(tk.Frame):
             imgtk = ImageTk.PhotoImage(image=img)
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
-            self.imagel.after(15, self.update)
+            self.imagel.after(15, self.update)'''
             
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
@@ -707,9 +709,8 @@ class WaterPump(tk.Frame):
         navibutton1.pack(pady = (0,10))
         
         self.rateA, self.rateB, self.time = tk.IntVar(), tk.IntVar(), tk.IntVar()
-        with open(config_path, 'r', newline='') as file:
-            config_settings = list(csv.reader(file))
-            pump_config = config_settings[6]
+        config_settings = csv_read()
+        pump_config = config_settings[6]
         self.rateA.set(pump_config[0])
         self.rateB.set(pump_config[1])
         self.time.set(pump_config[2])
@@ -757,9 +758,8 @@ class WaterPump(tk.Frame):
         elif self.mode == "go to off":
             self.mode = "off"
             self.control.config(text="OFF", fg="red")
-        with open(config_path, 'r', newline='') as file:
-            config_settings = list(csv.reader(file))
-            pump_config = [config_settings[6][0], config_settings[6][1], config_settings[6][2], self.mode]
+        config_settings = csv_read()
+        pump_config = [config_settings[6][0], config_settings[6][1], config_settings[6][2], self.mode]
         csv_write(6, pump_config)
 
     def popup(self):
@@ -802,15 +802,162 @@ class FishFeeder(tk.Frame):
         navibutton1.pack()
 
 class SensorArray(tk.Frame):
-    
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Sensor Array", bg="white", font=TITLE_FONT).pack(pady = 10)
         #navigation button
-        navibutton1 = ttk.Button(self, text="Back",
-                            command=lambda: controller.show_frame(ControlPanel))
-        navibutton1.pack()
+        navibutton1 = ttk.Button(self, text="Back", command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack(pady = (0,10))
+
+        self.min = tk.IntVar()
+        config_settings = csv_read()
+        oxygen_config = config_settings[7]
+        self.min.set(oxygen_config[0])
+        
+        self.buttonFrame = tk.Frame(master=self, bg='white')
+        self.buttonFrame.pack()
+        
+        tk.Label(master=self.buttonFrame, text="pH", bg="white").grid(row=0, column=0)
+        tk.Label(master=self.buttonFrame, text="TDS", bg="white").grid(row=1, column=0)
+        tk.Label(master=self.buttonFrame, text="Nitrate", bg="white").grid(row=2, column=0)
+        tk.Label(master=self.buttonFrame, text="Ammonia", bg="white").grid(row=3, column=0)
+
+        self.phTog = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(0))
+        self.tdsTog = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(1))
+        self.nitTog = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(2))
+        self.amTog = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(3))
+
+        self.phTog.grid(row=0, column=1, padx=5, pady=8)
+        self.tdsTog.grid(row=1, column=1, padx=5, pady=8)
+        self.nitTog.grid(row=2, column=1, padx=5, pady=8)
+        self.amTog.grid(row=3, column=1, padx=5, pady=8)
+
+        tk.Button(master=self.buttonFrame, text="Calibrate", width=9, command=self.popPh).grid(row=0, column=2, padx=5, pady=8)
+        tk.Button(master=self.buttonFrame, text="Calibrate", width=9, command=self.popTds).grid(row=1, column=2, padx=5, pady=8)
+        tk.Button(master=self.buttonFrame, text="Calibrate", width=9, command=self.popNit).grid(row=2, column=2, padx=5, pady=8)
+        tk.Button(master=self.buttonFrame, text="Calibrate", width=9, command=self.popAm).grid(row=3, column=2, padx=5, pady=8)
+
+    def switch(self, i):
+        config_settings = csv_read()
+        pump_config = config_settings[8]
+        if pump_config[i] == "off":
+            pump_config[i] = "on"
+            if i == 0:
+                self.phTog.config(text="ON", fg="green")
+            elif i == 1:
+                self.tdsTog.config(text="ON", fg="green")
+            elif i == 2:
+                self.nitTog.config(text="ON", fg="green")
+            elif i == 3:
+                self.amTog.config(text="ON", fg="green")
+        else:
+            pump_config[i] = "off"
+            if i == 0:
+                self.phTog.config(text="OFF", fg="red")
+            elif i == 1:
+                self.tdsTog.config(text="OFF", fg="red")
+            elif i == 2:
+                self.nitTog.config(text="OFF", fg="red")
+            elif i == 3:
+                self.amTog.config(text="OFF", fg="red")
+        csv_write(8, pump_config)
+    
+    def popPh(self):
+        self.popPh = tk.Tk()
+        self.popPh.wm_title("Calibrate pH")
+        popup_width = self.popPh.winfo_reqwidth()
+        popup_height = self.popPh.winfo_reqheight()
+        positionRight = int(self.popPh.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popPh.winfo_screenheight()/2 - popup_height/2 )
+        self.popPh.geometry("+{}+{}".format(positionRight, positionDown))
+
+        tk.Label(self.popPh, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popPh, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
+        tk.Label(self.popPh, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
+        tk.Label(self.popPh, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+
+        tk.Entry(self.popPh, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
+        tk.Entry(self.popPh, width=9, bg="white").grid(row=2, column=1)
+        tk.Entry(self.popPh, width=9, bg="white").grid(row=3, column=1)
+        tk.Entry(self.popPh, width=9, bg="white").grid(row=4, column=1, pady=(0,20))
+
+        tk.Button(self.popPh, text="SET", width=9).grid(row=2, column=3, padx=(20,20))
+        tk.Button(self.popPh, text="CLEAR", width=9).grid(row=3, column=3)
+
+        self.popPh.mainloop()
+
+    def popTds(self):
+        self.popTds = tk.Tk()
+        self.popTds.wm_title("Calibrate TDS")
+        popup_width = self.popTds.winfo_reqwidth()
+        popup_height = self.popTds.winfo_reqheight()
+        positionRight = int(self.popTds.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popTds.winfo_screenheight()/2 - popup_height/2 )
+        self.popTds.geometry("+{}+{}".format(positionRight, positionDown))
+
+        tk.Label(self.popTds, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popTds, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
+        tk.Label(self.popTds, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
+        tk.Label(self.popTds, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+
+        tk.Entry(self.popTds, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
+        tk.Entry(self.popTds, width=9, bg="white").grid(row=2, column=1)
+        tk.Entry(self.popTds, width=9, bg="white").grid(row=3, column=1)
+        tk.Entry(self.popTds, width=9, bg="white").grid(row=4, column=1, pady=(0,20))
+
+        tk.Button(self.popTds, text="SET", width=9).grid(row=2, column=3, padx=(20,20))
+        tk.Button(self.popTds, text="CLEAR", width=9).grid(row=3, column=3)
+
+        self.popTds.mainloop()
+    
+    def popNit(self):
+        self.popNit = tk.Tk()
+        self.popNit.wm_title("Calibrate Nitrate")
+        popup_width = self.popNit.winfo_reqwidth()
+        popup_height = self.popNit.winfo_reqheight()
+        positionRight = int(self.popNit.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popNit.winfo_screenheight()/2 - popup_height/2 )
+        self.popNit.geometry("+{}+{}".format(positionRight, positionDown))
+
+        tk.Label(self.popNit, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popNit, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
+        tk.Label(self.popNit, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
+        tk.Label(self.popNit, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+
+        tk.Entry(self.popNit, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
+        tk.Entry(self.popNit, width=9, bg="white").grid(row=2, column=1)
+        tk.Entry(self.popNit, width=9, bg="white").grid(row=3, column=1)
+        tk.Entry(self.popNit, width=9, bg="white").grid(row=4, column=1, pady=(0,20))
+
+        tk.Button(self.popNit, text="SET", width=9).grid(row=2, column=3, padx=(20,20))
+        tk.Button(self.popNit, text="CLEAR", width=9).grid(row=3, column=3)
+
+        self.popNit.mainloop()
+    
+    def popAm(self):
+        self.popAm = tk.Tk()
+        self.popAm.wm_title("Calibrate Ammonia")
+        popup_width = self.popAm.winfo_reqwidth()
+        popup_height = self.popAm.winfo_reqheight()
+        positionRight = int(self.popAm.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popAm.winfo_screenheight()/2 - popup_height/2 )
+        self.popAm.geometry("+{}+{}".format(positionRight, positionDown))
+
+        tk.Label(self.popAm, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popAm, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
+        tk.Label(self.popAm, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
+        tk.Label(self.popAm, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+
+        tk.Entry(self.popAm, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
+        tk.Entry(self.popAm, width=9, bg="white").grid(row=2, column=1)
+        tk.Entry(self.popAm, width=9, bg="white").grid(row=3, column=1)
+        tk.Entry(self.popAm, width=9, bg="white").grid(row=4, column=1, pady=(0,20))
+
+        tk.Button(self.popAm, text="SET", width=9).grid(row=2, column=3, padx=(20,20))
+        tk.Button(self.popAm, text="CLEAR", width=9).grid(row=3, column=3)
+
+        self.popAm.mainloop()
 
 class Oxygenator(tk.Frame):
     
@@ -823,9 +970,8 @@ class Oxygenator(tk.Frame):
         navibutton1.pack(pady = (0,10))
 
         self.min = tk.IntVar()
-        with open(config_path, 'r', newline='') as file:
-            config_settings = list(csv.reader(file))
-            oxygen_config = config_settings[7]
+        config_settings = csv_read()
+        oxygen_config = config_settings[7]
         self.min.set(oxygen_config[0])
         
         self.buttonFrame = tk.Frame(master=self, bg='white')
