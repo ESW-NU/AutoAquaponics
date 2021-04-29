@@ -22,8 +22,15 @@ import adafruit_dht
 #DHT = 14 #set DHT's GPIO pin number
 dhtDevice = adafruit_dht.DHT22(board.D14, use_pulseio=False)
 #import the w1 water temp sensor module
-from w1thermsensor import W1ThermSensor
-wt_sensor = W1ThermSensor()
+#from w1thermsensor import W1ThermSensor
+#wt_sensor = W1ThermSensor()
+import glob
+import time
+
+base_dir = '/sys/bus/w1/devices/'
+device_folder = glob.glob(base_dir + '28*')[0]
+device_file = device_folder + '/w1_slave'
+
 #create ADS object
 ads = ADS.ADS1115(i2c)
 ads.gain = 2/3
@@ -35,7 +42,7 @@ import numpy as np
 
 def getData(last_distance, last_wtemp, last_hum, last_atemp):
 #read w1 water temp sensor
-    wtemp = wt_sensor.get_temperature()
+    wtemp = read_temp()
     GPIO.output(pin_num,GPIO.HIGH) #turn TDS sensor on
     #GPIO.output(pin_num2,GPIO.HIGH)
     sleep(0.5)
@@ -92,6 +99,28 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp):
     #make sure distance is the last value on this list
     return pH, TDS, hum, atemp, wtemp, distance
 
+#DS18B20 functions
+def read_temp_raw():
+    f = open(device_file, 'r')
+    lines = f.readlines()
+    f.close()
+    return lines
+
+def read_temp():
+    lines = read_temp_raw()
+    if len(lines[0].strip()) > 0: #ony index below if lines is not empty
+        while lines[0].strip()[-3:] != 'YES':
+            time.sleep(0.2)
+            lines = read_temp_raw()
+        equals_pos = lines[1].find('t=')
+        if equals_pos != -1:
+            temp_string = lines[1][equals_pos+2:]
+            temp_c = float(temp_string) / 1000.0
+            return temp_c
+    else:
+        read_temp() #rerun function again
+        
+#TDS sensor function
 def getTDS(wtemp):
     Vtds_raw = chan1.voltage #raw reading from sensor right now
     TheoEC = 684 #theoretical EC of calibration fluid
@@ -103,12 +132,12 @@ def getTDS(wtemp):
     EC = EC_raw/(1+0.02*(wtemp-25)) #use current temp for temp compensation
     TDS = EC/2 #TDS is just half of electrical conductivity in ppm
     return TDS
-import math
+#DHT function
 def getDHT():
     temperature_c = np.nan
     humidity = np.nan
     while is_nan(temperature_c) or is_nan(humidity):#test to see if the value is still nan
-        print('Rerunning DHT...')
+        print('Rerunning DHT...') #can comment out later, just here to test reliability
         try:
             # get temp and humidity
             temperature_c = dhtDevice.temperature
@@ -126,7 +155,7 @@ def getDHT():
             raise error
     return temperature_c, humidity
 
-def is_nan(x):
+def is_nan(x): #used in DHT function
     return (x is np.nan or x != x)
 
 #from time import sleep
