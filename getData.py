@@ -40,9 +40,9 @@ chan1 = AnalogIn(ads, ADS.P1)
 #import numpy for NaN
 import numpy as np
 
-def getData(last_distance, last_wtemp, last_hum, last_atemp):
+def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function that calls on all other functions to generate data list
 #read w1 water temp sensor
-    wtemp = read_temp()
+    wtemp = getWTemp()
     GPIO.output(pin_num,GPIO.HIGH) #turn TDS sensor on
     #GPIO.output(pin_num2,GPIO.HIGH)
     sleep(0.5)
@@ -58,10 +58,76 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp):
     pH = -5.82*chan.voltage + 22.1 #calibrated equation
     #pH = chan.voltage
 #read air temp and air humidity
-    hum, atemp = getDHT()#dht.read_retry(dht.DHT22, DHT)
+    atemp, hum = getDHT()#dht.read_retry(dht.DHT22, DHT)
     if hum == np.nan or atemp == np.nan:
         hum, atemp = last_hum, last_atemp
-#setup distance sensing stuff
+    distance = getDistance(last_distance)
+    #make sure distance is the last value on this list
+    return pH, TDS, hum, atemp, wtemp, distance
+
+#DS18B20 functions
+def read_temp_raw():
+    f = open(device_file, 'r')
+    lines = f.readlines()
+    f.close()
+    return lines
+
+def getWTemp():
+    lines = read_temp_raw()
+    #print(lines)
+    if len(lines) > 0: #only index below if lines is not empty
+        while lines[0].strip()[-3:] != 'YES':
+            time.sleep(0.2)
+            lines = read_temp_raw()
+        equals_pos = lines[1].find('t=')
+        if equals_pos != -1:
+            temp_string = lines[1][equals_pos+2:]
+            temp_c = float(temp_string) / 1000.0
+            #print("temp_c = " + str(temp_c))
+            return temp_c
+    else:
+        print("READING DS18B20 AGAIN!")
+        return getWTemp() #rerun function again
+        
+#TDS sensor function
+def getTDS(wtemp):
+    Vtds_raw = chan1.voltage #raw reading from sensor right now
+    TheoEC = 684 #theoretical EC of calibration fluid
+    Vc = 1.085751885 #v reading of sensor when calibrating
+    temp_calibrate = 23.25 #measured water temp when calibrating
+    rawECsol = TheoEC*(1+0.02*(temp_calibrate-25)) #temp compensate the calibrated values
+    K = (rawECsol)/(133.42*(Vc**3)-255.86*(Vc**2)+857.39*Vc)#defined calibration factor K
+    EC_raw = K*(133.42*(Vtds_raw**3)-255.86*(Vtds_raw**2)+857.39*Vtds_raw)
+    EC = EC_raw/(1+0.02*(wtemp-25)) #use current temp for temp compensation
+    TDS = EC/2 #TDS is just half of electrical conductivity in ppm
+    return TDS
+
+#DHT function
+def getDHT():
+    temperature_c = np.nan
+    humidity = np.nan
+    while is_nan(temperature_c) or is_nan(humidity):#test to see if the value is still nan
+        #print('Running DHT...') #can comment out later, just here to test reliability
+        try:
+            # get temp and humidity
+            temperature_c = dhtDevice.temperature
+            humidity = dhtDevice.humidity
+
+        except RuntimeError as error:
+            # Errors happen fairly often, DHT's are hard to read, just keep going
+            temperature_c = float('NaN')
+            humidity = float('NaN')
+            #continue
+        except Exception as error:
+            dhtDevice.exit()
+            raise error
+    return temperature_c, humidity
+
+def is_nan(x): #used in DHT function
+    return (x is np.nan or x != x)
+
+def getDistance(last_distance): #output distance in cm
+    #setup distance sensing stuff
     new_reading = False
     counter = 0
     GPIO_TRIGGER = 6 #set GPIO Pins
@@ -93,74 +159,14 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp):
     # multiply with the sonic speed (34300 cm/s)
     # and divide by 2, because there and back
     if new_reading:
-        distance = last_distance
+        return last_distance
     else:
-        distance = (TimeElapsed * 34300)/2
-    #make sure distance is the last value on this list
-    return pH, TDS, hum, atemp, wtemp, distance
-
-#DS18B20 functions
-def read_temp_raw():
-    f = open(device_file, 'r')
-    lines = f.readlines()
-    f.close()
-    return lines
-
-def read_temp():
-    lines = read_temp_raw()
-    if len(lines[0].strip()) > 0: #ony index below if lines is not empty
-        while lines[0].strip()[-3:] != 'YES':
-            time.sleep(0.2)
-            lines = read_temp_raw()
-        equals_pos = lines[1].find('t=')
-        if equals_pos != -1:
-            temp_string = lines[1][equals_pos+2:]
-            temp_c = float(temp_string) / 1000.0
-            return temp_c
-    else:
-        read_temp() #rerun function again
-        
-#TDS sensor function
-def getTDS(wtemp):
-    Vtds_raw = chan1.voltage #raw reading from sensor right now
-    TheoEC = 684 #theoretical EC of calibration fluid
-    Vc = 1.085751885 #v reading of sensor when calibrating
-    temp_calibrate = 23.25 #measured water temp when calibrating
-    rawECsol = TheoEC*(1+0.02*(temp_calibrate-25)) #temp compensate the calibrated values
-    K = (rawECsol)/(133.42*(Vc**3)-255.86*(Vc**2)+857.39*Vc)#defined calibration factor K
-    EC_raw = K*(133.42*(Vtds_raw**3)-255.86*(Vtds_raw**2)+857.39*Vtds_raw)
-    EC = EC_raw/(1+0.02*(wtemp-25)) #use current temp for temp compensation
-    TDS = EC/2 #TDS is just half of electrical conductivity in ppm
-    return TDS
-#DHT function
-def getDHT():
-    temperature_c = np.nan
-    humidity = np.nan
-    while is_nan(temperature_c) or is_nan(humidity):#test to see if the value is still nan
-        print('Rerunning DHT...') #can comment out later, just here to test reliability
-        try:
-            # get temp and humidity
-            temperature_c = dhtDevice.temperature
-            humidity = dhtDevice.humidity
-
-        except RuntimeError as error:
-            # Errors happen fairly often, DHT's are hard to read, just keep going
-            #print(error.args[0])
-            #time.sleep(2.0)
-            temperature_c = float('NaN')
-            humidity = float('NaN')
-            #continue
-        except Exception as error:
-            dhtDevice.exit()
-            raise error
-    return temperature_c, humidity
-
-def is_nan(x): #used in DHT function
-    return (x is np.nan or x != x)
-
-#from time import sleep
-#from datetime import datetime
-#while True:
-#     print('updating...')
-#     print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1, 1, 1))
-#     sleep(1)
+        return (TimeElapsed * 34300)/2
+'''
+from time import sleep
+from datetime import datetime
+while True:
+     print('updating...')
+     print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1, 1, 1))
+     sleep(1)
+'''

@@ -505,7 +505,7 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-'''
+
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
@@ -540,7 +540,7 @@ class VideoStream(tk.Frame):
             imgtk = ImageTk.PhotoImage(image=img)
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
-            self.imagel.after(15, self.update)'''
+            self.imagel.after(15, self.update)
             
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
