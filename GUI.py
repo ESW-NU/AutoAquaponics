@@ -597,106 +597,194 @@ class Lights(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
-        tk.Label(self, text="Lights", bg="white", font=TITLE_FONT).grid(row=0, column=1, pady=(0,10))
-        #shelf1
-        tk.Label(self, text = "shelf 1", bg = "white", font = MEDIUM_FONT).grid(row=1, column=0, pady=(0,10))
-        self.toggle1 = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
-                           height=1, command=self.toggle_a)
-        self.toggle1.grid(row=1, column=1, pady=(0,10))
-        self.timer1 = tk.Button(self, text="timer", bg= "white",  width=10, 
-                           height=1, command=self.popup)
-        self.timer1.grid(row=1, column=2, pady=(0,10))
-        #shelf2
-        tk.Label(self, text = "shelf 2", bg = "white", font = MEDIUM_FONT).grid(row=2, column=0, pady=(0,10))
-        self.toggle2 = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
-                           height=1, command=self.toggle_b)
-        self.toggle2.grid(row=2, column=1, pady=(0,10))
-        self.timer2 = tk.Button(self, text="timer", bg= "white",  width=10, 
-                           height=1, command=self.popup)
-        self.timer2.grid(row=2, column=2, pady=(0,10))
-        #fish tank
-        tk.Label(self, text = "fish tank", bg = "white", font = MEDIUM_FONT).grid(row=3, column=0, pady=(0,10))
-        self.toggle_tank = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
-                           height=1, command=self.toggle_c)
-        self.toggle_tank.grid(row=3, column=1, pady=(0,10))
-        self.timer_tank = tk.Button(self, text="timer", bg= "white",  width=10, 
-                           height=1, command=self.popup)
-        self.timer_tank.grid(row=3, column=2, pady=(0,10))
-        #basking
-        tk.Label(self, text = "basking", bg = "white", font = MEDIUM_FONT).grid(row=4, column=0, pady=(0,10))
-        self.toggle_basking = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
-                           height=1, command=self.toggle_d)
-        self.toggle_basking.grid(row=4, column=1, pady=(0,10))
-        self.timer_basking = tk.Button(self, text="timer", bg= "white",  width=10, 
-                           height=1, command=self.popup)
-        self.timer_basking.grid(row=4, column=2, pady=(0,20))
-        #back button to Alternate Control Panel
-        self.back = tk.Button(self, text="Back", bg= "white",  width=10, 
-                           height=1, command=lambda: controller.show_frame(ControlPanel))
-        self.back.grid(row = 5, column = 0)
+        tk.Label(self, text="Lights", bg="white", font=TITLE_FONT).pack(pady=10)
+        navibutton1 = ttk.Button(self, text="Back", command=lambda: controller.show_frame(ControlPanel))
+        navibutton1.pack(pady = (0,10))
+        self.buttonFrame = tk.Frame(master=self, bg='white')
+        self.buttonFrame.pack()
 
-    # toggle... ; _ ; technically works but it'd definitely be better if tidied up
-    def toggle_a(self):
-        if self.toggle1['bg']=='red':
-            self.toggle1.config(bg='green',text='Lights ON')
-            self.update()
-        elif self.toggle1['bg']=='green':
-            self.toggle1.configure(bg='red',text='Lights OFF')
-        self.update()
-    def toggle_b(self):
-        if self.toggle2['bg']=='red':
-            self.toggle2.config(bg='green',text='Lights ON')
-            self.update()
-        elif self.toggle2['bg']=='green':
-            self.toggle2.configure(bg='red',text='Lights OFF')
-        self.update()
-    def toggle_c(self):
-        if self.toggle_tank['bg']=='red':
-            self.toggle_tank.config(bg='green',text='Lights ON')
-            self.update()
-        elif self.toggle_tank['bg']=='green':
-            self.toggle_tank.configure(bg='red',text='Lights OFF')
-        self.update()
-    def toggle_d(self):
-        if self.toggle_basking['bg']=='red':
-            self.toggle_basking.config(bg='green',text='Lights ON')
-            self.update_basking()
-        elif self.toggle_basking['bg']=='green':
-            self.toggle_basking.configure(bg='red',text='Lights OFF')
-        self.update()
-    
-    def popup(self):
-        #get the input of all entries as a float value to the hundredth place
-        self.popup = tk.Tk()
-        self.popup.wm_title("Timer")
-        start_label= ttk.Label(self.popup, text="Start", font=MEDIUM_FONT)
-        start_entry = ttk.Entry(self.popup, width=10)
-        duration_label = ttk.Label(self.popup, text="Duration", font=MEDIUM_FONT)
-        duration_entry = ttk.Entry(self.popup, width=10)
-        start_label.grid(row=0, column=0, pady=(0,10))
-        duration_label.grid(row=1, column=0, pady=(0,10))
-        start_entry.grid(row=0, column=1, pady=(0,10))
-        duration_entry.grid(row=1, column=1, pady=(0,10))
-
-        save_button = ttk.Button(self.popup, text="SAVE", command = self.save)
-        save_button.grid(row=2, column=0, pady = (0,10))
-        cancel_button = ttk.Button(self.popup, text="CANCEL", command = self.popup.destroy)
-        cancel_button.grid(row=2, column=1, pady = (0,10))
+        tk.Label(self.buttonFrame, text = "Shelf 1", bg = "white").grid(row=0, column=0)
+        tk.Label(self.buttonFrame, text = "Shelf 2", bg = "white").grid(row=1, column=0)
+        tk.Label(self.buttonFrame, text = "Fish Tank", bg = "white").grid(row=2, column=0)
+        tk.Label(self.buttonFrame, text = "Basking", bg = "white").grid(row=3, column=0)
         
-        # centers the popup window
-        popup_width = self.popup.winfo_reqwidth()
-        popup_height = self.popup.winfo_reqheight()
-        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
-        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
-        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
-        self.popup.geometry('300x200')
-        self.popup.mainloop()  
-   
-    #triggered if user press SAVE in popup window
-    def save(self):
-        # does something here
-        #destroy popup window after writing file
-        self.popup.destroy()
+        self.tog1 = tk.Button(self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(0))
+        self.tog2 = tk.Button(self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(1))
+        self.togTank = tk.Button(self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(2))
+        self.togBask = tk.Button(self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(3))
+
+        self.tog1.grid(row=0, column=1, padx=5, pady=8)
+        self.tog2.grid(row=1, column=1, padx=5, pady=8)
+        self.togTank.grid(row=2, column=1, padx=5, pady=8)
+        self.togBask.grid(row=3, column=1, padx=5, pady=8)
+
+        self.time1 = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.pop1)
+        self.time2 = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.pop2)
+        self.timeTank = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.popTank)
+        self.timeBask = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.popBask)
+
+        self.time1.grid(row=0, column=2, padx=5, pady=8)
+        self.time2.grid(row=1, column=2, padx=5, pady=8)
+        self.timeTank.grid(row=2, column=2, padx=5, pady=8)
+        self.timeBask.grid(row=3, column=2, padx=5, pady=8)
+
+        lights_config = csv_read()[9]
+        for i in range(4):
+            if lights_config[i] == "on":
+                lights_config[i] = "off"
+                csv_write(9, lights_config)
+                self.switch(i)
+        
+
+    def switch(self, i):
+        config_settings = csv_read()
+        lights_config = config_settings[9]
+        if lights_config[i] == "off":
+            lights_config[i] = "on"
+            if i == 0:
+                self.tog1.config(text="ON", fg="green")
+            elif i == 1:
+                self.tog2.config(text="ON", fg="green")
+            elif i == 2:
+                self.togTank.config(text="ON", fg="green")
+            elif i == 3:
+                self.togBask.config(text="ON", fg="green")
+        else:
+            lights_config[i] = "off"
+            if i == 0:
+                self.tog1.config(text="OFF", fg="red")
+            elif i == 1:
+                self.tog2.config(text="OFF", fg="red")
+            elif i == 2:
+                self.togTank.config(text="OFF", fg="red")
+            elif i == 3:
+                self.togBask.config(text="OFF", fg="red")
+        csv_write(9, lights_config)
+
+    def pop1(self):
+        self.pop1 = tk.Tk()
+        self.pop1.wm_title("Shelf 1")
+        popup_width = self.pop1.winfo_reqwidth()
+        popup_height = self.pop1.winfo_reqheight()
+        positionRight = int(self.pop1.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.pop1.winfo_screenheight()/2 - popup_height/2 )
+        self.pop1.geometry("+{}+{}".format(positionRight, positionDown))
+
+        lights_config = csv_read()[9]
+        self.start1, self.dur1 = tk.IntVar(self.pop1), tk.IntVar(self.pop1)
+        self.start1.set(lights_config[4])
+        self.dur1.set(lights_config[8])
+
+        tk.Label(self.pop1, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,20))
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,20))
+
+        tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+
+        self.pop1.mainloop()
+
+    def save1(self):
+        config_settings = csv_read()
+        lights_config = config_settings[9]
+        lights_config[4] = self.start1.get()
+        lights_config[8] = self.dur1.get()
+        csv_write(9, lights_config)
+
+    def pop2(self):
+        self.pop2 = tk.Tk()
+        self.pop2.wm_title("Shelf 2")
+        popup_width = self.pop2.winfo_reqwidth()
+        popup_height = self.pop2.winfo_reqheight()
+        positionRight = int(self.pop2.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.pop2.winfo_screenheight()/2 - popup_height/2 )
+        self.pop2.geometry("+{}+{}".format(positionRight, positionDown))
+
+        lights_config = csv_read()[9]
+        self.start2, self.dur2 = tk.IntVar(self.pop2), tk.IntVar(self.pop2)
+        self.start2.set(lights_config[5])
+        self.dur2.set(lights_config[9])
+
+        tk.Label(self.pop2, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop2, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+
+        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.start2).grid(row=0, column=1, pady=(20,0), padx=(0,20))
+        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,20))
+
+        tk.Button(self.pop2, text="SAVE", width=9, command=lambda: [self.save2(), self.pop2.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+
+        self.pop2.mainloop()
+
+    def save2(self):
+        config_settings = csv_read()
+        lights_config = config_settings[9]
+        lights_config[5] = self.start2.get()
+        lights_config[9] = self.dur2.get()
+        csv_write(9, lights_config)
+
+    def popTank(self):
+        self.popTank = tk.Tk()
+        self.popTank.wm_title("Fish Tank")
+        popup_width = self.popTank.winfo_reqwidth()
+        popup_height = self.popTank.winfo_reqheight()
+        positionRight = int(self.popTank.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popTank.winfo_screenheight()/2 - popup_height/2 )
+        self.popTank.geometry("+{}+{}".format(positionRight, positionDown))
+
+        lights_config = csv_read()[9]
+        self.startTank, self.durTank = tk.IntVar(self.popTank), tk.IntVar(self.popTank)
+        self.startTank.set(lights_config[6])
+        self.durTank.set(lights_config[10])
+
+        tk.Label(self.popTank, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popTank, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+
+        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.startTank).grid(row=0, column=1, pady=(20,0), padx=(0,20))
+        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,20))
+
+        tk.Button(self.popTank, text="SAVE", width=9, command=lambda: [self.saveTank(), self.popTank.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+
+        self.popTank.mainloop()
+
+    def saveTank(self):
+        config_settings = csv_read()
+        lights_config = config_settings[9]
+        lights_config[6] = self.startTank.get()
+        lights_config[10] = self.durTank.get()
+        csv_write(9, lights_config)
+
+    def popBask(self):
+        self.popBask = tk.Tk()
+        self.popBask.wm_title("Basking")
+        popup_width = self.popBask.winfo_reqwidth()
+        popup_height = self.popBask.winfo_reqheight()
+        positionRight = int(self.popBask.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popBask.winfo_screenheight()/2 - popup_height/2 )
+        self.popBask.geometry("+{}+{}".format(positionRight, positionDown))
+
+        lights_config = csv_read()[9]
+        self.startBask, self.durBask = tk.IntVar(self.popBask), tk.IntVar(self.popBask)
+        self.startBask.set(lights_config[7])
+        self.durBask.set(lights_config[11])
+
+        tk.Label(self.popBask, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popBask, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+
+        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.startBask).grid(row=0, column=1, pady=(20,0), padx=(0,20))
+        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,20))
+
+        tk.Button(self.popBask, text="SAVE", width=9, command=lambda: [self.saveBask(), self.popBask.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+
+        self.popBask.mainloop()
+
+    def saveBask(self):
+        config_settings = csv_read()
+        lights_config = config_settings[9]
+        lights_config[7] = self.startBask.get()
+        lights_config[11] = self.durBask.get()
+        csv_write(9, lights_config)
+
 
 class WaterPump(tk.Frame):
     
@@ -809,11 +897,6 @@ class SensorArray(tk.Frame):
         #navigation button
         navibutton1 = ttk.Button(self, text="Back", command=lambda: controller.show_frame(ControlPanel))
         navibutton1.pack(pady = (0,10))
-
-        self.min = tk.IntVar()
-        config_settings = csv_read()
-        oxygen_config = config_settings[7]
-        self.min.set(oxygen_config[0])
         
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
