@@ -1099,7 +1099,7 @@ class Backwashing(tk.Frame):
         navibutton1.pack()
 
 app = AllWindow()
-#app.geometry('1025x672')
+#app.geometry('1920x1080')
 app.geometry('1280x623')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)

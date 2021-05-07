@@ -162,11 +162,10 @@ def getDistance(last_distance): #output distance in cm
         return last_distance
     else:
         return (TimeElapsed * 34300)/2
-'''
+
 from time import sleep
 from datetime import datetime
 while True:
      print('updating...')
      print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1, 1, 1))
      sleep(1)
-'''
