@@ -6,9 +6,12 @@ import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
 from PIL import Image, ImageTk
+'''
+uncomment later
 import cv2   #open source computer vision library
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+#cap = cv2.VideoCapture(0)
+#cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+'''
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
@@ -40,7 +43,10 @@ def csv_read():
 def csv_write(row_number, to_write):
     with open(config_path, 'r', newline='') as file:
             config_settings = list(csv.reader(file))
-            config_settings[row_number] = to_write
+            if len(config_settings) > row_number:
+                config_settings[row_number] = to_write
+            else:
+                config_settings.append(to_write)
             with open(config_path, 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerows(config_settings)
@@ -52,15 +58,15 @@ reader = Reader(db_path, db_name)
 
 num_contacts = 5
 config_settings = csv_read()
-if len(config_settings) != 8:
+if len(config_settings) != 10:
     enable_text, num_config, provider_config = [str(False)], ['Enter Phone Number Here:']*num_contacts, ['']*num_contacts
     email_config, upper_config, lower_config, pump_config, oxygen_config = ['Email']*num_contacts, [1000]*11, [0]*11, [0, 0, None, "off"], [0]
-    sensor_config = ["off" for _ in range(4)]
-    config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config, sensor_config]
+    sensor_config, lights_config = ['off', 'off', 'off', 'off'], ['off', 'off', 'off', 'off', 0, 0, 0, 0, 0, 0, 0, 0]
+    config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config, sensor_config, lights_config]
     for i, to_wr in enumerate(config_settings):
         csv_write(i, to_wr)
 else:
-    enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config = [x for x in config_settings]
+    enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config, sensor_config, lights_config = [x for x in config_settings]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
@@ -509,6 +515,8 @@ class VideoStream(tk.Frame):
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
+        '''
+        uncomment later
         #initialize button with a picture
         frame = self.get_frame()
         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -541,6 +549,7 @@ class VideoStream(tk.Frame):
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
             self.imagel.after(15, self.update)
+            '''
             
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
