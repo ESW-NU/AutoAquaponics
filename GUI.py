@@ -33,14 +33,22 @@ from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
 
+# returns the current csv in a 2D list, where list[i][j] is the jth element of the ith row of the list
 def csv_read():
     with open(config_path, "r") as file:
         return list(csv.reader(file))
 
-def csv_write(row_number, to_write):
+# given a row name string and list to write, replaces the given row with the new list
+# make sure to give this function the row string exactly as it exists in the dictionary
+# make sure the list to write is the proper length and contains the proper values
+def csv_write(row_name, to_write):
+    row_number = config_dict[row_name]
     with open(config_path, 'r', newline='') as file:
             config_settings = list(csv.reader(file))
-            config_settings[row_number] = to_write
+            if len(config_settings) > row_number:
+                config_settings[row_number] = to_write
+            else:
+                config_settings.append(to_write)
             with open(config_path, 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerows(config_settings)
@@ -49,18 +57,46 @@ def csv_write(row_number, to_write):
 #initialize entry configs, email_config, num_config, provider_config, and SQLite reader
 db_name = 'sensor_db.db'
 reader = Reader(db_path, db_name)
-
 num_contacts = 5
+
+# Enter row title here when adding a new row to the csv:
+# Index can be any value, as long as 0 through (#rows-1) are present in the list of indices
+config_dict = {
+    'enable_text':0,
+    'num_config':1,
+    'provider_config':2,
+    'email_config':3,
+    'upper_config':4,
+    'lower_config':5,
+    'pump_config':6,
+    'oxygen_config':7,
+    'sensor_config':8,
+    'lights_config':9
+    }
+
+# Enter row title here when adding a new row to the csv:
+# Make sure to use the same title as was used in config_dict
+# Enter the desired initialization as the dictionary value
+init_dict = {
+    'enable_text': [str(False)],
+    'num_config': ['Enter Phone Number Here:']*num_contacts,
+    'provider_config': ['']*num_contacts,
+    'email_config': ['Email']*num_contacts,
+    'upper_config': [1000]*11,
+    'lower_config': [0]*11,
+    'pump_config': [0, 0, None, "off"],
+    'oxygen_config': [0],
+    'sensor_config': ['off']*4,
+    'lights_config': ['off']*4+[0]*8
+}
+
+# initializes csv, if not properly initialized
 config_settings = csv_read()
-if len(config_settings) != 8:
-    enable_text, num_config, provider_config = [str(False)], ['Enter Phone Number Here:']*num_contacts, ['']*num_contacts
-    email_config, upper_config, lower_config, pump_config, oxygen_config = ['Email']*num_contacts, [1000]*11, [0]*11, [0, 0, None, "off"], [0]
-    sensor_config = ["off" for _ in range(4)]
-    config_settings = [enable_text,num_config,provider_config,email_config, upper_config, lower_config, pump_config, oxygen_config, sensor_config]
-    for i, to_wr in enumerate(config_settings):
-        csv_write(i, to_wr)
-else:
-    enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config = [x for x in config_settings]
+if len(config_settings) != len(config_dict):
+    for name in config_dict:
+        csv_write(name, init_dict[name])
+config_settings = csv_read()
+enable_text = config_settings[config_dict['enable_text']]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
@@ -179,23 +215,25 @@ def animate(ii):
     
         else:
             config_settings = csv_read()
+            c0, c1, c2 = config_dict['enable_text'], config_dict['num_config'], config_dict['provider_config']
+            c3, c4, c5 = config_dict['email_config'], config_dict['upper_config'], config_dict['lower_config']
             for i, key in enumerate(param_dict, 1):
                 current_plot = param_dict[key]
                 current_param_val = float(most_recent[0][i])
                 current_text = live_dict[key] #update to live text data summary
-                if current_param_val > float(config_settings[4][i-1]) or current_param_val < float(config_settings[5][i-1]):
+                if current_param_val > float(config_settings[c4][i-1]) or current_param_val < float(config_settings[c5][i-1]):
                     #only send text if enable_text is True
-                    if config_settings[0] == [str(True)]:
+                    if config_settings[c0] == [str(True)]:
                     ###sends text if new problem arises or every 5  minutes
                         if allIsGood[key] and Minute[key] == None:
                             print('new problem')
                             Minute[key] = datetime.now().minute
                             minuta[key] = Minute[key]
-                            pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,config_settings[1],config_settings[2]) #uncomment to test emergency texts
+                            pCheck(float(config_settings[c4][i-1]),float(config_settings[c5][i-1]),key,current_param_val,config_settings[c1],config_settings[c2]) #uncomment to test emergency texts
                         elif allIsGood[key] == False and abs(Minute[key] - datetime.now().minute) % 5 == 0 and not (minuta[key] == datetime.now().minute):
                             print('same problem')
                             minuta[key] = datetime.now().minute
-                            pCheck(float(config_settings[4][i-1]),float(config_settings[5][i-1]),key,current_param_val,config_settings[1],config_settings[2]) #uncomment to test emergency texts
+                            pCheck(float(config_settings[c4][i-1]),float(config_settings[c5][i-1]),key,current_param_val,config_settings[c1],config_settings[c2]) #uncomment to test emergency texts
                             #pass
                         
                         #setting the parameter to not ok
@@ -211,7 +249,7 @@ def animate(ii):
                     ###setting the parameter back to true and sending "ok" text 
                     if allIsGood[key] == False:
                         Minute[key] = None
-                        allOk(key,config_settings[1],config_settings[2])
+                        allOk(key,config_settings[c1],config_settings[c2])
                         pass
                     
                     allIsGood[key] = True
@@ -427,8 +465,9 @@ class Settings(tk.Frame):
         upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]  
         lower_config = [round(float(entry.get()),2) for entry in self.lower_entries]
         to_write = [enable_text, num_config, provider_config, email_config, upper_config, lower_config]
-        for i, to_wr in enumerate(to_write):
-            csv_write(i, to_wr)
+        names = ['enable_text', 'num_config', 'provider_config', 'email_config', 'upper_config', 'lower_config']
+        for i in range(len(to_write)):
+            csv_write(names[i], to_write[i])
         #destroy popup window after writing file
         self.popup.destroy()
         
@@ -446,15 +485,15 @@ class Settings(tk.Frame):
         #Get last saved values
         config_settings = csv_read()
         for i, entry in enumerate(self.phone_number):
-            entry.insert(0, config_settings[1][i])
+            entry.insert(0, config_settings[config_dict['num_config']][i])
         for i, option in enumerate(self.phone_carrier):
-            option.set(config_settings[2][i])
+            option.set(config_settings[config_dict['provider_config']][i])
         for i, entry in enumerate(self.email):
-            entry.insert(0, config_settings[3][i])
+            entry.insert(0, config_settings[config_dict['email_config']][i])
         for i, entry in enumerate(self.upper_entries):
-            entry.insert(0, config_settings[4][i])
+            entry.insert(0, config_settings[config_dict['upper_config']][i])
         for i, entry in enumerate(self.lower_entries):
-            entry.insert(0, config_settings[5][i])
+            entry.insert(0, config_settings[config_dict['lower_config']][i])
             
 
     def submit(self):
@@ -491,9 +530,7 @@ class Settings(tk.Frame):
     #saves the checkbutton's new state into the CSV
     def change_state(self):
         enable_text = [str(self.textButton.instate(['selected']))]
-        to_write = [enable_text, num_config, provider_config, email_config, upper_config, lower_config, pump_config, oxygen_config]
-        for i, to_wr in enumerate(to_write):
-            csv_write(i, to_wr)
+        csv_write('enable_text', enable_text)
 
 #add Video Stream page
 class VideoStream(tk.Frame):
@@ -505,7 +542,7 @@ class VideoStream(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back to Dashboard",
                             command=lambda: controller.show_frame(HomePage))
         navibutton1.pack()
-'''
+
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
@@ -540,7 +577,7 @@ class VideoStream(tk.Frame):
             imgtk = ImageTk.PhotoImage(image=img)
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
-            self.imagel.after(15, self.update)'''
+            self.imagel.after(15, self.update)
             
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
@@ -603,42 +640,43 @@ class Lights(tk.Frame):
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
 
+        # initialize param text
         tk.Label(self.buttonFrame, text = "Shelf 1", bg = "white").grid(row=0, column=0)
         tk.Label(self.buttonFrame, text = "Shelf 2", bg = "white").grid(row=1, column=0)
         tk.Label(self.buttonFrame, text = "Fish Tank", bg = "white").grid(row=2, column=0)
         tk.Label(self.buttonFrame, text = "Basking", bg = "white").grid(row=3, column=0)
         
+        # initialize param buttons
         self.tog1 = tk.Button(self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(0))
         self.tog2 = tk.Button(self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(1))
         self.togTank = tk.Button(self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(2))
         self.togBask = tk.Button(self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(3))
-
         self.tog1.grid(row=0, column=1, padx=5, pady=8)
         self.tog2.grid(row=1, column=1, padx=5, pady=8)
         self.togTank.grid(row=2, column=1, padx=5, pady=8)
         self.togBask.grid(row=3, column=1, padx=5, pady=8)
 
+        # initialize timer buttons
         self.time1 = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.pop1)
         self.time2 = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.pop2)
         self.timeTank = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.popTank)
         self.timeBask = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.popBask)
-
         self.time1.grid(row=0, column=2, padx=5, pady=8)
         self.time2.grid(row=1, column=2, padx=5, pady=8)
         self.timeTank.grid(row=2, column=2, padx=5, pady=8)
         self.timeBask.grid(row=3, column=2, padx=5, pady=8)
 
-        lights_config = csv_read()[9]
+        # intialize param buttons to proper state based on current csv value
         for i in range(4):
+            lights_config = csv_read()[config_dict['lights_config']]
             if lights_config[i] == "on":
                 lights_config[i] = "off"
-                csv_write(9, lights_config)
+                csv_write('lights_config', lights_config)
                 self.switch(i)
         
-
+    # given a param index, switches its csv value and button text (between 'on'/'off')
     def switch(self, i):
-        config_settings = csv_read()
-        lights_config = config_settings[9]
+        lights_config = csv_read()[config_dict['lights_config']]
         if lights_config[i] == "off":
             lights_config[i] = "on"
             if i == 0:
@@ -659,8 +697,9 @@ class Lights(tk.Frame):
                 self.togTank.config(text="OFF", fg="red")
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
-        csv_write(9, lights_config)
+        csv_write('lights_config', lights_config)
 
+    # shelf 1 popup window: for setting start and duration times
     def pop1(self):
         self.pop1 = tk.Tk()
         self.pop1.wm_title("Shelf 1")
@@ -670,7 +709,7 @@ class Lights(tk.Frame):
         positionDown = int(self.pop1.winfo_screenheight()/2 - popup_height/2 )
         self.pop1.geometry("+{}+{}".format(positionRight, positionDown))
 
-        lights_config = csv_read()[9]
+        lights_config = csv_read()[config_dict['lights_config']]
         self.start1, self.dur1 = tk.IntVar(self.pop1), tk.IntVar(self.pop1)
         self.start1.set(lights_config[4])
         self.dur1.set(lights_config[8])
@@ -685,13 +724,14 @@ class Lights(tk.Frame):
 
         self.pop1.mainloop()
 
+    # saves shelf 1 start/duration values
     def save1(self):
-        config_settings = csv_read()
-        lights_config = config_settings[9]
+        lights_config = csv_read()[config_dict['lights_config']]
         lights_config[4] = self.start1.get()
         lights_config[8] = self.dur1.get()
-        csv_write(9, lights_config)
+        csv_write('lights_config', lights_config)
 
+    # shelf 2 popup window: for setting start and duration times
     def pop2(self):
         self.pop2 = tk.Tk()
         self.pop2.wm_title("Shelf 2")
@@ -701,7 +741,7 @@ class Lights(tk.Frame):
         positionDown = int(self.pop2.winfo_screenheight()/2 - popup_height/2 )
         self.pop2.geometry("+{}+{}".format(positionRight, positionDown))
 
-        lights_config = csv_read()[9]
+        lights_config = csv_read()[config_dict['lights_config']]
         self.start2, self.dur2 = tk.IntVar(self.pop2), tk.IntVar(self.pop2)
         self.start2.set(lights_config[5])
         self.dur2.set(lights_config[9])
@@ -716,13 +756,14 @@ class Lights(tk.Frame):
 
         self.pop2.mainloop()
 
+    # saves shelf 2 start/duration values
     def save2(self):
-        config_settings = csv_read()
-        lights_config = config_settings[9]
+        lights_config = csv_read()[config_dict['lights_config']]
         lights_config[5] = self.start2.get()
         lights_config[9] = self.dur2.get()
-        csv_write(9, lights_config)
+        csv_write('lights_config', lights_config)
 
+    # fish tank popup window: for setting start and duration times
     def popTank(self):
         self.popTank = tk.Tk()
         self.popTank.wm_title("Fish Tank")
@@ -732,7 +773,7 @@ class Lights(tk.Frame):
         positionDown = int(self.popTank.winfo_screenheight()/2 - popup_height/2 )
         self.popTank.geometry("+{}+{}".format(positionRight, positionDown))
 
-        lights_config = csv_read()[9]
+        lights_config = csv_read()[config_dict['lights_config']]
         self.startTank, self.durTank = tk.IntVar(self.popTank), tk.IntVar(self.popTank)
         self.startTank.set(lights_config[6])
         self.durTank.set(lights_config[10])
@@ -747,13 +788,14 @@ class Lights(tk.Frame):
 
         self.popTank.mainloop()
 
+    # saves fish tank start/duration values
     def saveTank(self):
-        config_settings = csv_read()
-        lights_config = config_settings[9]
+        lights_config = csv_read()[config_dict['lights_config']]
         lights_config[6] = self.startTank.get()
         lights_config[10] = self.durTank.get()
-        csv_write(9, lights_config)
+        csv_write('lights_config', lights_config)
 
+    # basking popup window: for setting start and duration times
     def popBask(self):
         self.popBask = tk.Tk()
         self.popBask.wm_title("Basking")
@@ -763,7 +805,7 @@ class Lights(tk.Frame):
         positionDown = int(self.popBask.winfo_screenheight()/2 - popup_height/2 )
         self.popBask.geometry("+{}+{}".format(positionRight, positionDown))
 
-        lights_config = csv_read()[9]
+        lights_config = csv_read()[config_dict['lights_config']]
         self.startBask, self.durBask = tk.IntVar(self.popBask), tk.IntVar(self.popBask)
         self.startBask.set(lights_config[7])
         self.durBask.set(lights_config[11])
@@ -778,12 +820,12 @@ class Lights(tk.Frame):
 
         self.popBask.mainloop()
 
+    # saves basking start/duration values
     def saveBask(self):
-        config_settings = csv_read()
-        lights_config = config_settings[9]
+        lights_config = csv_read()[config_dict['lights_config']]
         lights_config[7] = self.startBask.get()
         lights_config[11] = self.durBask.get()
-        csv_write(9, lights_config)
+        csv_write('lights_config', lights_config)
 
 
 class WaterPump(tk.Frame):
@@ -796,14 +838,15 @@ class WaterPump(tk.Frame):
         navibutton1 = tk.Button(self, text="Back", width=9, command=lambda: controller.show_frame(ControlPanel))
         navibutton1.pack(pady = (0,10))
         
+        # initialize tkinter variables for rate and time values
         self.rateA, self.rateB, self.time = tk.IntVar(), tk.IntVar(), tk.IntVar()
-        config_settings = csv_read()
-        pump_config = config_settings[6]
+        pump_config = csv_read()[config_dict['pump_config']]
         self.rateA.set(pump_config[0])
         self.rateB.set(pump_config[1])
         self.time.set(pump_config[2])
         self.mode = pump_config[3]
 
+        # initialize param text and padding text
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
         tk.Label(master=self.buttonFrame, text="aaaaaaaaaaaaa", bg="white", fg="white").grid(row=1, column=0)
@@ -812,6 +855,7 @@ class WaterPump(tk.Frame):
         tk.Label(master=self.buttonFrame, text="Bed A Flow Rate (gal/hr):", bg="white").grid(row=1, column=1)
         tk.Label(master=self.buttonFrame, text="Bed B Flow Rate (gal/hr):", bg="white").grid(row=2, column=1)
 
+        # initialize entry boxes and buttons
         self.control = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=self.switch)
         self.control.grid(row=0, column=2, padx=5, pady=8)
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rateA, bg="white").grid(row=1, column=2, padx=5, pady=5)
@@ -819,6 +863,7 @@ class WaterPump(tk.Frame):
         
         tk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
 
+        # initialize correct button state
         if self.mode == "off":
             self.mode = "go to off"
         elif self.mode == "on":
@@ -827,6 +872,7 @@ class WaterPump(tk.Frame):
             self.mode = "on"
         self.switch()
 
+    # switches the button state betwee 'off'/'on'/'timer'
     def switch(self):
         if self.mode == "off":
             self.mode = "on"
@@ -847,9 +893,11 @@ class WaterPump(tk.Frame):
             self.mode = "off"
             self.control.config(text="OFF", fg="red")
         config_settings = csv_read()
-        pump_config = [config_settings[6][0], config_settings[6][1], config_settings[6][2], self.mode]
-        csv_write(6, pump_config)
+        pump_config = [config_settings[config_dict['pump_config']][0], config_settings[config_dict['pump_config']][1], \
+            config_settings[config_dict['pump_config']][2], self.mode]
+        csv_write('pump_config', pump_config)
 
+    # save popup
     def popup(self):
         self.popup = tk.Tk()
         self.popup.wm_title("Alert")
@@ -869,13 +917,14 @@ class WaterPump(tk.Frame):
         NoB.grid(row=1, column=2, pady = (0,10))
         self.popup.mainloop()
     
+    # saves data to the csv
     def save(self):
         if self.mode == "timer":
             real_time = self.timer.get()
         else:
             real_time = None
         pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
-        csv_write(6, pump_config)
+        csv_write('pump_config', pump_config)
         
 
 class FishFeeder(tk.Frame):
@@ -901,31 +950,41 @@ class SensorArray(tk.Frame):
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
         
+        # init labels
         tk.Label(master=self.buttonFrame, text="pH", bg="white").grid(row=0, column=0)
         tk.Label(master=self.buttonFrame, text="TDS", bg="white").grid(row=1, column=0)
         tk.Label(master=self.buttonFrame, text="Nitrate", bg="white").grid(row=2, column=0)
         tk.Label(master=self.buttonFrame, text="Ammonia", bg="white").grid(row=3, column=0)
 
+        # init on/off buttons
         self.phTog = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(0))
         self.tdsTog = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(1))
         self.nitTog = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(2))
         self.amTog = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=lambda: self.switch(3))
-
         self.phTog.grid(row=0, column=1, padx=5, pady=8)
         self.tdsTog.grid(row=1, column=1, padx=5, pady=8)
         self.nitTog.grid(row=2, column=1, padx=5, pady=8)
         self.amTog.grid(row=3, column=1, padx=5, pady=8)
 
+        # init calibrate buttons
         tk.Button(master=self.buttonFrame, text="Calibrate", width=9, command=self.popPh).grid(row=0, column=2, padx=5, pady=8)
         tk.Button(master=self.buttonFrame, text="Calibrate", width=9, command=self.popTds).grid(row=1, column=2, padx=5, pady=8)
         tk.Button(master=self.buttonFrame, text="Calibrate", width=9, command=self.popNit).grid(row=2, column=2, padx=5, pady=8)
         tk.Button(master=self.buttonFrame, text="Calibrate", width=9, command=self.popAm).grid(row=3, column=2, padx=5, pady=8)
 
+        # init on/off values
+        for i in range(4):
+            sensor_config = csv_read()[config_dict['sensor_config']]
+            if sensor_config[i] == "on":
+                sensor_config[i] = "off"
+                csv_write('sensor_config', sensor_config)
+                self.switch(i)
+
+    # given param index, switches it between 'on'/'off'
     def switch(self, i):
-        config_settings = csv_read()
-        pump_config = config_settings[8]
-        if pump_config[i] == "off":
-            pump_config[i] = "on"
+        sensor_config = csv_read()[config_dict['sensor_config']]
+        if sensor_config[i] == "off":
+            sensor_config[i] = "on"
             if i == 0:
                 self.phTog.config(text="ON", fg="green")
             elif i == 1:
@@ -935,7 +994,7 @@ class SensorArray(tk.Frame):
             elif i == 3:
                 self.amTog.config(text="ON", fg="green")
         else:
-            pump_config[i] = "off"
+            sensor_config[i] = "off"
             if i == 0:
                 self.phTog.config(text="OFF", fg="red")
             elif i == 1:
@@ -944,8 +1003,9 @@ class SensorArray(tk.Frame):
                 self.nitTog.config(text="OFF", fg="red")
             elif i == 3:
                 self.amTog.config(text="OFF", fg="red")
-        csv_write(8, pump_config)
+        csv_write('sensor_config', sensor_config)
     
+    # ph popup window: for sample calibration values
     def popPh(self):
         self.popPh = tk.Tk()
         self.popPh.wm_title("Calibrate pH")
@@ -970,6 +1030,7 @@ class SensorArray(tk.Frame):
 
         self.popPh.mainloop()
 
+    # tds popup window: for sample calibration values
     def popTds(self):
         self.popTds = tk.Tk()
         self.popTds.wm_title("Calibrate TDS")
@@ -994,6 +1055,7 @@ class SensorArray(tk.Frame):
 
         self.popTds.mainloop()
     
+    # nitrogen popup window: for sample calibration values
     def popNit(self):
         self.popNit = tk.Tk()
         self.popNit.wm_title("Calibrate Nitrate")
@@ -1018,6 +1080,7 @@ class SensorArray(tk.Frame):
 
         self.popNit.mainloop()
     
+    # ammonia popup window: for sample calibration values
     def popAm(self):
         self.popAm = tk.Tk()
         self.popAm.wm_title("Calibrate Ammonia")
@@ -1043,7 +1106,6 @@ class SensorArray(tk.Frame):
         self.popAm.mainloop()
 
 class Oxygenator(tk.Frame):
-    
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
@@ -1052,19 +1114,19 @@ class Oxygenator(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back", command=lambda: controller.show_frame(ControlPanel))
         navibutton1.pack(pady = (0,10))
 
+        # init tkinter var
         self.min = tk.IntVar()
-        config_settings = csv_read()
-        oxygen_config = config_settings[7]
+        oxygen_config = csv_read()[config_dict['oxygen_config']]
         self.min.set(oxygen_config[0])
         
+        # init frame
         self.buttonFrame = tk.Frame(master=self, bg='white')
         self.buttonFrame.pack()
         tk.Label(master=self.buttonFrame, text="Current DO (ppm):", bg="white").grid(row=0, column=0)
-
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.min, bg="white").grid(row=0, column=1, padx=5, pady=5)
-        
         ttk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
 
+    # save popup
     def popup(self):
         self.popup = tk.Tk()
         self.popup.wm_title("Alert")
@@ -1084,8 +1146,9 @@ class Oxygenator(tk.Frame):
         NoB.grid(row=1, column=2, pady = (0,10))
         self.popup.mainloop()
     
+    # saves value to csv
     def save(self):
-        csv_write(7, [self.min.get()])
+        csv_write('oxygen_config', [self.min.get()])
 
 class Backwashing(tk.Frame):
     
