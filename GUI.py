@@ -6,12 +6,12 @@ import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
 from PIL import Image, ImageTk
-'''
-uncomment later
+
+#uncomment later
 import cv2   #open source computer vision library
-#cap = cv2.VideoCapture(0)
-#cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
-'''
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
@@ -515,8 +515,8 @@ class VideoStream(tk.Frame):
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
-        '''
-        uncomment later
+        
+        #uncomment later
         #initialize button with a picture
         frame = self.get_frame()
         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -549,7 +549,7 @@ class VideoStream(tk.Frame):
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
             self.imagel.after(15, self.update)
-            '''
+            
             
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
