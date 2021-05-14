@@ -714,8 +714,8 @@ class Lights(tk.Frame):
         self.start1.set(lights_config[4])
         self.dur1.set(lights_config[8])
 
-        tk.Label(self.pop1, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(20,0))
 
         tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,20))
         tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,20))
@@ -746,8 +746,8 @@ class Lights(tk.Frame):
         self.start2.set(lights_config[5])
         self.dur2.set(lights_config[9])
 
-        tk.Label(self.pop2, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.pop2, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.pop2, text="Start").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop2, text="Duration").grid(row=1, column=0, padx=(20,0))
 
         tk.Entry(self.pop2, width=9, bg="white", textvariable=self.start2).grid(row=0, column=1, pady=(20,0), padx=(0,20))
         tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,20))
@@ -778,8 +778,8 @@ class Lights(tk.Frame):
         self.startTank.set(lights_config[6])
         self.durTank.set(lights_config[10])
 
-        tk.Label(self.popTank, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popTank, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.popTank, text="Start").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popTank, text="Duration").grid(row=1, column=0, padx=(20,0))
 
         tk.Entry(self.popTank, width=9, bg="white", textvariable=self.startTank).grid(row=0, column=1, pady=(20,0), padx=(0,20))
         tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,20))
@@ -810,8 +810,8 @@ class Lights(tk.Frame):
         self.startBask.set(lights_config[7])
         self.durBask.set(lights_config[11])
 
-        tk.Label(self.popBask, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popBask, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.popBask, text="Start").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popBask, text="Duration").grid(row=1, column=0, padx=(20,0))
 
         tk.Entry(self.popBask, width=9, bg="white", textvariable=self.startBask).grid(row=0, column=1, pady=(20,0), padx=(0,20))
         tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,20))
@@ -1015,10 +1015,10 @@ class SensorArray(tk.Frame):
         positionDown = int(self.popPh.winfo_screenheight()/2 - popup_height/2 )
         self.popPh.geometry("+{}+{}".format(positionRight, positionDown))
 
-        tk.Label(self.popPh, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popPh, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
-        tk.Label(self.popPh, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
-        tk.Label(self.popPh, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+        tk.Label(self.popPh, text="Sample").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popPh, text="Sample").grid(row=2, column=0, padx=(20,0))
+        tk.Label(self.popPh, text="Sample").grid(row=3, column=0, padx=(20,0))
+        tk.Label(self.popPh, text="Sample").grid(row=4, column=0, padx=(20,0), pady=(0,20))
 
         tk.Entry(self.popPh, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
         tk.Entry(self.popPh, width=9, bg="white").grid(row=2, column=1)
@@ -1040,10 +1040,10 @@ class SensorArray(tk.Frame):
         positionDown = int(self.popTds.winfo_screenheight()/2 - popup_height/2 )
         self.popTds.geometry("+{}+{}".format(positionRight, positionDown))
 
-        tk.Label(self.popTds, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popTds, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
-        tk.Label(self.popTds, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
-        tk.Label(self.popTds, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+        tk.Label(self.popTds, text="Sample").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popTds, text="Sample").grid(row=2, column=0, padx=(20,0))
+        tk.Label(self.popTds, text="Sample").grid(row=3, column=0, padx=(20,0))
+        tk.Label(self.popTds, text="Sample").grid(row=4, column=0, padx=(20,0), pady=(0,20))
 
         tk.Entry(self.popTds, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
         tk.Entry(self.popTds, width=9, bg="white").grid(row=2, column=1)
@@ -1065,10 +1065,10 @@ class SensorArray(tk.Frame):
         positionDown = int(self.popNit.winfo_screenheight()/2 - popup_height/2 )
         self.popNit.geometry("+{}+{}".format(positionRight, positionDown))
 
-        tk.Label(self.popNit, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popNit, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
-        tk.Label(self.popNit, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
-        tk.Label(self.popNit, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+        tk.Label(self.popNit, text="Sample").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popNit, text="Sample").grid(row=2, column=0, padx=(20,0))
+        tk.Label(self.popNit, text="Sample").grid(row=3, column=0, padx=(20,0))
+        tk.Label(self.popNit, text="Sample").grid(row=4, column=0, padx=(20,0), pady=(0,20))
 
         tk.Entry(self.popNit, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
         tk.Entry(self.popNit, width=9, bg="white").grid(row=2, column=1)
@@ -1090,10 +1090,10 @@ class SensorArray(tk.Frame):
         positionDown = int(self.popAm.winfo_screenheight()/2 - popup_height/2 )
         self.popAm.geometry("+{}+{}".format(positionRight, positionDown))
 
-        tk.Label(self.popAm, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popAm, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
-        tk.Label(self.popAm, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
-        tk.Label(self.popAm, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+        tk.Label(self.popAm, text="Sample").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popAm, text="Sample").grid(row=2, column=0, padx=(20,0))
+        tk.Label(self.popAm, text="Sample").grid(row=3, column=0, padx=(20,0))
+        tk.Label(self.popAm, text="Sample").grid(row=4, column=0, padx=(20,0), pady=(0,20))
 
         tk.Entry(self.popAm, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
         tk.Entry(self.popAm, width=9, bg="white").grid(row=2, column=1)
