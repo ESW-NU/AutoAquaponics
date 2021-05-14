@@ -317,7 +317,7 @@ class HomePage(tk.Frame):
         tk.Frame.__init__(self,parent)
         #bring up vertical scroll frame and place it
         scframe = VerticalScrolledFrame(self)
-        scframe.place(x=225, y=40)
+        scframe.place(x=225, y=100)
         #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
         #background = canvas.copy_from_bbox(f.bbox)
@@ -333,18 +333,18 @@ class HomePage(tk.Frame):
         #color variables
         #data table labels
         table_title = tk.Label(self, text="Data Summary", bg="white", font = LARGE_FONT)
-        table_title.place(x=28, y=40)
+        table_title.place(x=28, y=100)
         for i, param in enumerate(param_list): #tk.Label self refers to Homepage
             param_label = tk.Label(self, text=param, fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=16, height=1, anchor=W, justify=LEFT)
-            param_label.place(x=5, y=65+22*i)
+            param_label.place(x=5, y=125+22*i)
 
         for i, param in enumerate(param_list):
             loading_text = tk.Label(self, text="Loading", fg="black", bg="white",
                     font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                     width=7, height=1)
-            loading_text.place(x=140, y=65+22*i)
+            loading_text.place(x=140, y=125+22*i)
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
 
