@@ -100,7 +100,7 @@ enable_text = config_settings[config_dict['enable_text']]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
-f = figure.Figure(figsize=(10.2,10), dpi=100, facecolor='white')
+f = figure.Figure(figsize=(16.6,15), dpi=100, facecolor='white')
 #f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 f.subplots_adjust(top=0.993, bottom=0.015, left=0.04, right = 0.96, hspace=0.65)
 
@@ -324,7 +324,7 @@ class HomePage(tk.Frame):
         canvas.draw()
         #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
-        label.place(x=600, y=10)
+        label.place(x=900, y=10)
         #embed graph into canvas
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
         #add navigation bar
@@ -1163,7 +1163,8 @@ class Backwashing(tk.Frame):
 
 app = AllWindow()
 #app.geometry('1025x672')
-app.geometry('1280x623')
+#app.geometry('1280x623')
+app.geometry('1917x970')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first

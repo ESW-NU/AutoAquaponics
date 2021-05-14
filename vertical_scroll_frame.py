@@ -51,14 +51,14 @@ class VerticalScrolledFrame(tk.Frame):
         self.canvas = tk.Canvas(self, bd=5, highlightthickness=0,bg="white",
                         yscrollcommand=vscrollbar.set)
         #self.canvas.config(width=100, height=580)
-        self.canvas.config(width=50, height=520)
+        self.canvas.config(width=50, height=750)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.TRUE)
         vscrollbar.config(command=self.canvas.yview)
 
         # reset the view
         self.canvas.xview_moveto(0)
         self.canvas.yview_moveto(0)
-        self.canvas.canvasheight = 520
+        self.canvas.canvasheight = 750
 
         # create a frame inside the canvas which will be scrolled with it
         self.interior = interior = tk.Frame(self.canvas)
