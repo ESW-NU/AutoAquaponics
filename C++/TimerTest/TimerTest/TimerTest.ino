@@ -29,29 +29,54 @@ volatile uint32_t lastIsrAt = 0;
 void IRAM_ATTR onTimer(){
   // Increment the counter and set the time of ISR
   portENTER_CRITICAL_ISR(&timerMux);
-  isrCounter++;
-  lastIsrAt = millis();
+  Serial.print(millis());
+  Serial.println(" ms");
+  al_pop();
   portEXIT_CRITICAL_ISR(&timerMux);
   // Give a semaphore that we can check in the loop
-  xSemaphoreGiveFromISR(timerSemaphore, NULL);
-  if (current_list < MAX_ALARMS) {
-    current_list++;
-    timerAlarmWrite(timer, al_list[current_list].time_hit, false);
+  //xSemaphoreGiveFromISR(timerSemaphore, NULL);
+  if (current_list > 0) {
+    timerAlarmWrite(timer, al_list[0].time_hit, false);
     timerAlarmEnable(timer);
   }
   // It is safe to use digitalRead/Write here if you want to toggle an output
 }
 
+void al_insert(uint32_t count, uint16_t state) {
+  uint8_t pos = 0;
+  virt_alarm inserted = virt_alarm {count, state};
+  if (current_list == 0) {
+    al_list[0] = inserted;
+    current_list++;
+    return;
+  }
+  for (size_t i = 0; i < current_list && al_list[i].time_hit < count; i++) {
+    pos++;
+  }
+  for (size_t i = current_list; i > pos; i--) {
+    al_list[i] = al_list[i - 1];
+  }
+  al_list[pos] = inserted;
+  current_list++;
+}
+
+void al_pop(void) {
+  for (size_t i = 0; i < current_list; i++) {
+    al_list[i] = al_list[i + 1];
+  }
+  current_list --;
+}
+
 void setup() {
   Serial.begin(115200);
-  al_list[0] = virt_alarm {10000, 10};
-  al_list[1] = virt_alarm {30000, 10};
-  al_list[2] = virt_alarm {40000, 10};
-  al_list[3] = virt_alarm {50000, 10};
-
-  // Set BTN_STOP_ALARM to input mode
-  pinMode(BTN_STOP_ALARM, INPUT);
-
+  al_insert(15000, 10);
+  al_insert(50000, 10);
+  al_insert(100000, 10);
+  al_insert(40000, 10);
+  al_insert(30000, 10);
+  al_insert(20000, 10);
+  al_insert(10000, 10);
+  
   // Create semaphore to inform us when the timer has fired
   timerSemaphore = xSemaphoreCreateBinary();
 
@@ -62,6 +87,7 @@ void setup() {
 
   // Attach onTimer function to our timer.
   timerAttachInterrupt(timer, &onTimer, true);
+  Serial.println("huh?");
 
   // Set alarm to call onTimer function every second (value in microseconds).
   // Repeat the alarm (third parameter)
@@ -73,27 +99,18 @@ void setup() {
 
 void loop() {
   // If Timer has fired
-  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
-    uint32_t isrCount = 0, isrTime = 0;
-    // Read the interrupt count and time
-    portENTER_CRITICAL(&timerMux);
-    isrCount = isrCounter;
-    isrTime = lastIsrAt;
-    portEXIT_CRITICAL(&timerMux);
-    // Print it
-    Serial.print("onTimer no. ");
-    Serial.print(isrCount);
-    Serial.print(" at ");
-    Serial.print(isrTime);
-    Serial.println(" ms");
-  }
-  // If button is pressed
-  if (digitalRead(BTN_STOP_ALARM) == LOW) {
-    // If timer is still running
-    if (timer) {
-      // Stop and free timer
-      timerEnd(timer);
-      timer = NULL;
-    }
-  }
+//  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
+//    uint32_t isrCount = 0, isrTime = 0;
+//    // Read the interrupt count and time
+//    portENTER_CRITICAL(&timerMux);
+//    isrCount = isrCounter;
+//    isrTime = lastIsrAt;
+//    portEXIT_CRITICAL(&timerMux);
+//    // Print it
+//    Serial.print("onTimer no. ");
+//    Serial.print(current_list);
+//    Serial.print(" at ");
+//    Serial.print(isrTime);
+//    Serial.println(" ms");
+//  }
 }
