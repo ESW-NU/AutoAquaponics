@@ -1,5 +1,5 @@
 from main import user_settings
-from getData import getData
+#from getData import getData
 
 config_path, db_path, img_path = user_settings()
 db_name = 'sensor_db.db'
@@ -12,7 +12,13 @@ end_GOAL = ["pH", "TDS (ppm)", "DO (ppm)", "Phosphate (ppm)", "Nitrate (ppm)", "
 def data_fxn(last_distance, last_wtemp):
     import numpy as np
     N = len(all_we_got_now)
-    return tuple(np.random.randint(0,10,size=(N-1))) #N-tuple of random ints from 0 to 10.
+    pH = 1
+    TDS = 2
+    hum = 3
+    atemp = 4
+    wtemp = 5
+    distance = 6
+    return pH, TDS, hum, atemp, wtemp, distance #N-tuple of random ints from 0 to 10.
 
 def DataLogger():
     from data import Reader, Logger
@@ -26,8 +32,8 @@ def DataLogger():
     last_hum = np.nan
     last_atemp = np.nan
     while True:
-        #change getData(last_distance, last_wtemp) to data_fxn if you are testing on your computer
-        last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", getData(last_distance, last_wtemp, last_hum, last_atemp), last_distance, last_wtemp, last_hum, last_atemp, tsamp=1, nsamp=5),2) #change tsamp and nsamp for logging time/frequency
+        #change getData(last_distance, last_wtemp) to data_fxn(last_distance, last_wtemp) if you are testing on your computer
+        last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", data_fxn(last_distance, last_wtemp), last_distance, last_wtemp, last_hum, last_atemp, tsamp=1, nsamp=5),2) #change tsamp and nsamp for logging time/frequency
         logger.log_data()
         logger.commit()
         
