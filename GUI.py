@@ -6,9 +6,12 @@ import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
 from PIL import Image, ImageTk
+
+#uncomment later
 import cv2   #open source computer vision library
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
@@ -100,7 +103,7 @@ enable_text = config_settings[config_dict['enable_text']]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
-f = figure.Figure(figsize=(10.2,10), dpi=100, facecolor='white')
+f = figure.Figure(figsize=(16.6,15), dpi=100, facecolor='white')
 #f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
 f.subplots_adjust(top=0.993, bottom=0.015, left=0.04, right = 0.96, hspace=0.65)
 
@@ -317,14 +320,14 @@ class HomePage(tk.Frame):
         tk.Frame.__init__(self,parent)
         #bring up vertical scroll frame and place it
         scframe = VerticalScrolledFrame(self)
-        scframe.place(x=225, y=40)
+        scframe.place(x=225, y=100)
         #bring up canvas with plot in the frame with vertical scroll bar
         canvas = FigureCanvasTkAgg(f, scframe.interior)
         #background = canvas.copy_from_bbox(f.bbox)
         canvas.draw()
         #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
-        label.place(x=600, y=10)
+        label.place(x=900, y=10)
         #embed graph into canvas
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
         #add navigation bar
@@ -333,18 +336,18 @@ class HomePage(tk.Frame):
         #color variables
         #data table labels
         table_title = tk.Label(self, text="Data Summary", bg="white", font = LARGE_FONT)
-        table_title.place(x=28, y=40)
+        table_title.place(x=28, y=100)
         for i, param in enumerate(param_list): #tk.Label self refers to Homepage
             param_label = tk.Label(self, text=param, fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=16, height=1, anchor=W, justify=LEFT)
-            param_label.place(x=5, y=65+22*i)
+            param_label.place(x=5, y=125+22*i)
 
         for i, param in enumerate(param_list):
             loading_text = tk.Label(self, text="Loading", fg="black", bg="white",
                     font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                     width=7, height=1)
-            loading_text.place(x=140, y=65+22*i)
+            loading_text.place(x=140, y=125+22*i)
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
 
@@ -442,7 +445,7 @@ class Settings(tk.Frame):
         self.popup = tk.Tk()
         self.popup.wm_title("Alert")
         label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
-        label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
         
         # centers the popup window
         popup_width = self.popup.winfo_reqwidth()
@@ -452,9 +455,9 @@ class Settings(tk.Frame):
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
         
         YesB = ttk.Button(self.popup, text="YES", command = self.save)
-        YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
+        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
-        NoB.grid(row=1, column=2, pady = (0,10))
+        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
         self.popup.mainloop()
     #triggered if user press YES in popup window
     def save(self):
@@ -546,6 +549,7 @@ class VideoStream(tk.Frame):
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
+
         #initialize button with a picture
         frame = self.get_frame()
         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -714,11 +718,11 @@ class Lights(tk.Frame):
         self.start1.set(lights_config[4])
         self.dur1.set(lights_config[8])
 
-        tk.Label(self.pop1, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(100,0))
 
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,20))
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,20))
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,100))
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,100))
 
         tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
 
@@ -746,11 +750,11 @@ class Lights(tk.Frame):
         self.start2.set(lights_config[5])
         self.dur2.set(lights_config[9])
 
-        tk.Label(self.pop2, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.pop2, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.pop2, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.pop2, text="Duration").grid(row=1, column=0, padx=(100,0))
 
-        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.start2).grid(row=0, column=1, pady=(20,0), padx=(0,20))
-        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,20))
+        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.start2).grid(row=0, column=1, pady=(20,0), padx=(0,100))
+        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,100))
 
         tk.Button(self.pop2, text="SAVE", width=9, command=lambda: [self.save2(), self.pop2.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
 
@@ -778,11 +782,11 @@ class Lights(tk.Frame):
         self.startTank.set(lights_config[6])
         self.durTank.set(lights_config[10])
 
-        tk.Label(self.popTank, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popTank, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.popTank, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.popTank, text="Duration").grid(row=1, column=0, padx=(100,0))
 
-        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.startTank).grid(row=0, column=1, pady=(20,0), padx=(0,20))
-        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,20))
+        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.startTank).grid(row=0, column=1, pady=(20,0), padx=(0,100))
+        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,100))
 
         tk.Button(self.popTank, text="SAVE", width=9, command=lambda: [self.saveTank(), self.popTank.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
 
@@ -810,11 +814,11 @@ class Lights(tk.Frame):
         self.startBask.set(lights_config[7])
         self.durBask.set(lights_config[11])
 
-        tk.Label(self.popBask, text="Start", bg="white").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popBask, text="Duration", bg="white").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.popBask, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.popBask, text="Duration").grid(row=1, column=0, padx=(100,0))
 
-        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.startBask).grid(row=0, column=1, pady=(20,0), padx=(0,20))
-        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,20))
+        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.startBask).grid(row=0, column=1, pady=(20,0), padx=(0,100))
+        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,100))
 
         tk.Button(self.popBask, text="SAVE", width=9, command=lambda: [self.saveBask(), self.popBask.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
 
@@ -902,7 +906,7 @@ class WaterPump(tk.Frame):
         self.popup = tk.Tk()
         self.popup.wm_title("Alert")
         label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
-        label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
         
         # centers the popup window
         popup_width = self.popup.winfo_reqwidth()
@@ -912,9 +916,9 @@ class WaterPump(tk.Frame):
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
         
         YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
-        YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
+        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
-        NoB.grid(row=1, column=2, pady = (0,10))
+        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
         self.popup.mainloop()
     
     # saves data to the csv
@@ -1015,18 +1019,18 @@ class SensorArray(tk.Frame):
         positionDown = int(self.popPh.winfo_screenheight()/2 - popup_height/2 )
         self.popPh.geometry("+{}+{}".format(positionRight, positionDown))
 
-        tk.Label(self.popPh, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popPh, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
-        tk.Label(self.popPh, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
-        tk.Label(self.popPh, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+        tk.Label(self.popPh, text="Sample").grid(row=1, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.popPh, text="Sample").grid(row=2, column=0, padx=(100,0))
+        tk.Label(self.popPh, text="Sample").grid(row=3, column=0, padx=(100,0))
+        tk.Label(self.popPh, text="Sample").grid(row=4, column=0, padx=(100,0), pady=(0,20))
 
         tk.Entry(self.popPh, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
         tk.Entry(self.popPh, width=9, bg="white").grid(row=2, column=1)
         tk.Entry(self.popPh, width=9, bg="white").grid(row=3, column=1)
         tk.Entry(self.popPh, width=9, bg="white").grid(row=4, column=1, pady=(0,20))
 
-        tk.Button(self.popPh, text="SET", width=9).grid(row=2, column=3, padx=(20,20))
-        tk.Button(self.popPh, text="CLEAR", width=9).grid(row=3, column=3)
+        tk.Button(self.popPh, text="SET", width=9).grid(row=2, column=3, padx=(20,100))
+        tk.Button(self.popPh, text="CLEAR", width=9).grid(row=3, column=3, padx=(20,100))
 
         self.popPh.mainloop()
 
@@ -1040,18 +1044,18 @@ class SensorArray(tk.Frame):
         positionDown = int(self.popTds.winfo_screenheight()/2 - popup_height/2 )
         self.popTds.geometry("+{}+{}".format(positionRight, positionDown))
 
-        tk.Label(self.popTds, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popTds, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
-        tk.Label(self.popTds, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
-        tk.Label(self.popTds, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+        tk.Label(self.popTds, text="Sample").grid(row=1, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.popTds, text="Sample").grid(row=2, column=0, padx=(100,0))
+        tk.Label(self.popTds, text="Sample").grid(row=3, column=0, padx=(100,0))
+        tk.Label(self.popTds, text="Sample").grid(row=4, column=0, padx=(100,0), pady=(0,20))
 
         tk.Entry(self.popTds, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
         tk.Entry(self.popTds, width=9, bg="white").grid(row=2, column=1)
         tk.Entry(self.popTds, width=9, bg="white").grid(row=3, column=1)
         tk.Entry(self.popTds, width=9, bg="white").grid(row=4, column=1, pady=(0,20))
 
-        tk.Button(self.popTds, text="SET", width=9).grid(row=2, column=3, padx=(20,20))
-        tk.Button(self.popTds, text="CLEAR", width=9).grid(row=3, column=3)
+        tk.Button(self.popTds, text="SET", width=9).grid(row=2, column=3, padx=(20,100))
+        tk.Button(self.popTds, text="CLEAR", width=9).grid(row=3, column=3, padx=(20,100))
 
         self.popTds.mainloop()
     
@@ -1065,18 +1069,18 @@ class SensorArray(tk.Frame):
         positionDown = int(self.popNit.winfo_screenheight()/2 - popup_height/2 )
         self.popNit.geometry("+{}+{}".format(positionRight, positionDown))
 
-        tk.Label(self.popNit, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popNit, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
-        tk.Label(self.popNit, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
-        tk.Label(self.popNit, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+        tk.Label(self.popNit, text="Sample").grid(row=1, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.popNit, text="Sample").grid(row=2, column=0, padx=(100,0))
+        tk.Label(self.popNit, text="Sample").grid(row=3, column=0, padx=(100,0))
+        tk.Label(self.popNit, text="Sample").grid(row=4, column=0, padx=(100,0), pady=(0,20))
 
         tk.Entry(self.popNit, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
         tk.Entry(self.popNit, width=9, bg="white").grid(row=2, column=1)
         tk.Entry(self.popNit, width=9, bg="white").grid(row=3, column=1)
         tk.Entry(self.popNit, width=9, bg="white").grid(row=4, column=1, pady=(0,20))
 
-        tk.Button(self.popNit, text="SET", width=9).grid(row=2, column=3, padx=(20,20))
-        tk.Button(self.popNit, text="CLEAR", width=9).grid(row=3, column=3)
+        tk.Button(self.popNit, text="SET", width=9).grid(row=2, column=3, padx=(20,100))
+        tk.Button(self.popNit, text="CLEAR", width=9).grid(row=3, column=3, padx=(20,100))
 
         self.popNit.mainloop()
     
@@ -1090,18 +1094,18 @@ class SensorArray(tk.Frame):
         positionDown = int(self.popAm.winfo_screenheight()/2 - popup_height/2 )
         self.popAm.geometry("+{}+{}".format(positionRight, positionDown))
 
-        tk.Label(self.popAm, text="Sample", bg="white").grid(row=1, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popAm, text="Sample", bg="white").grid(row=2, column=0, padx=(20,0))
-        tk.Label(self.popAm, text="Sample", bg="white").grid(row=3, column=0, padx=(20,0))
-        tk.Label(self.popAm, text="Sample", bg="white").grid(row=4, column=0, padx=(20,0), pady=(0,20))
+        tk.Label(self.popAm, text="Sample").grid(row=1, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.popAm, text="Sample").grid(row=2, column=0, padx=(100,0))
+        tk.Label(self.popAm, text="Sample").grid(row=3, column=0, padx=(100,0))
+        tk.Label(self.popAm, text="Sample").grid(row=4, column=0, padx=(100,0), pady=(0,20))
 
         tk.Entry(self.popAm, width=9, bg="white").grid(row=1, column=1, pady=(20,0))
         tk.Entry(self.popAm, width=9, bg="white").grid(row=2, column=1)
         tk.Entry(self.popAm, width=9, bg="white").grid(row=3, column=1)
         tk.Entry(self.popAm, width=9, bg="white").grid(row=4, column=1, pady=(0,20))
 
-        tk.Button(self.popAm, text="SET", width=9).grid(row=2, column=3, padx=(20,20))
-        tk.Button(self.popAm, text="CLEAR", width=9).grid(row=3, column=3)
+        tk.Button(self.popAm, text="SET", width=9).grid(row=2, column=3, padx=(20,100))
+        tk.Button(self.popAm, text="CLEAR", width=9).grid(row=3, column=3, padx=(20,100))
 
         self.popAm.mainloop()
 
@@ -1131,7 +1135,7 @@ class Oxygenator(tk.Frame):
         self.popup = tk.Tk()
         self.popup.wm_title("Alert")
         label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
-        label.grid(row=0, columnspan=14, pady=(10,20), padx = (5,5))
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
         
         # centers the popup window
         popup_width = self.popup.winfo_reqwidth()
@@ -1141,9 +1145,9 @@ class Oxygenator(tk.Frame):
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
         
         YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
-        YesB.grid(row=1, column=1, padx =(23,10), pady = (0,10))
+        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
-        NoB.grid(row=1, column=2, pady = (0,10))
+        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
         self.popup.mainloop()
     
     # saves value to csv
@@ -1162,8 +1166,8 @@ class Backwashing(tk.Frame):
         navibutton1.pack()
 
 app = AllWindow()
-#app.geometry('1025x672')
-app.geometry('1280x623')
+#app.geometry('1280x623')
+app.geometry('1917x970')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
