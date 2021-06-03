@@ -108,6 +108,7 @@ class Logger:
         #data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_med
         data_log = (round(datetime.now().timestamp()),) + data_med
         print(data_log) #timestamp is logged as int
+        Reader.query_by_time(self) #test function, need to be changed
         
         #assign data to tables in data_dict
         if table not in self.data_dict:
@@ -166,10 +167,18 @@ class Reader:
         return self.c.fetchall()
         #print(self.c.fetchall())
     
-    def get_timeset(self,table,num = 1,timeval = None):
+    def query_by_num(self,table,num = 1,timeval = None): #this function lets you get the last num row of data from the table
         self.c.execute("SELECT * FROM {} ORDER BY time DESC LIMIT {}".format(table, num))
         return self.c.fetchall()
         #print(self.c.fetchall())
+
+    def query_by_time(self):
+        self.c.execute("SELECT * FROM SensorData WHERE time > 1622695119 and time < 1622695211")
+        for row in self.c.fetchall():
+            print(row)
+            #this function lets you get a slice of the data between the two unix times specified above in c.execute
+            #add inputs to this function to make table and time indices dynamic
+            #change this however you want, just an example to get you started
 
     def close(self):
         #close sqlite connection

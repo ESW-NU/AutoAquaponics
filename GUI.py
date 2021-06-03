@@ -164,7 +164,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=30) #initializes plot up to 20 if possible if possible
+        most_recent = reader.query_by_num(table="SensorData", num=30) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -202,7 +202,7 @@ def animate(ii):
 
     while True:
         most_recent_time_graphed = param_dict[param_list[0]] #first, pulls up first plot
-        most_recent = reader.get_timeset(table="SensorData", num=1)
+        most_recent = reader.query_by_num(table="SensorData", num=1)
         reader.commit()         #if identical, do not animate
         #then checks that plot's time list
         if  (len(most_recent) == 0):
