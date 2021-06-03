@@ -12,12 +12,12 @@ end_GOAL = ["pH", "TDS (ppm)", "DO (ppm)", "Phosphate (ppm)", "Nitrate (ppm)", "
 def data_fxn(last_distance, last_wtemp):
     import numpy as np
     N = len(all_we_got_now)
-    pH = 1
-    TDS = 2
-    hum = 3
-    atemp = 4
-    wtemp = 5
-    distance = 6
+    pH = 5
+    TDS = 50
+    hum = 30
+    atemp = 15
+    wtemp = 15
+    distance = 40
     return pH, TDS, hum, atemp, wtemp, distance #N-tuple of random ints from 0 to 10.
 
 def DataLogger():

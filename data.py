@@ -105,8 +105,9 @@ class Logger:
         data_med = tuple(np.round(med, 2))
 
         #adding the timestamp
-        data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_med
-        print(data_log)
+        #data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_med
+        data_log = (round(datetime.now().timestamp()),) + data_med
+        print(data_log) #timestamp is logged as int
         
         #assign data to tables in data_dict
         if table not in self.data_dict:

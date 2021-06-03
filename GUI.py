@@ -1,6 +1,5 @@
-from typing import Optional
 from data import Reader
-from datetime import datetime 
+import datetime 
 #import tkinter for GUI
 import tkinter as tk
 from tkinter import ttk, W, LEFT, END
@@ -170,7 +169,8 @@ def initialize_plots(): #intiailizes plots...
             tList = []
             most_recent_any_size = []
             for j in range(len(most_recent)):
-                time_f = datetime.strptime(most_recent[j][0], "%m/%d/%Y %H:%M:%S")
+                #time_f = datetime.strptime(most_recent[j][0], "%m/%d/%Y %H:%M:%S")
+                time_f = datetime.datetime.fromtimestamp(most_recent[j][0])
                 tList.append(time_f)
                 most_recent_any_size.append(most_recent[j][i])
 
@@ -208,7 +208,8 @@ def animate(ii):
         if  (len(most_recent) == 0):
             break
         
-        time_reader = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+        #time_reader = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+        time_reader = datetime.datetime.fromtimestamp(most_recent[0][0])
         if (len(most_recent_time_graphed.tList) != 0) and (time_reader == most_recent_time_graphed.tList[0]):
             for i, param in enumerate(param_list, 1):
                 current_text = live_dict[param]
@@ -260,7 +261,8 @@ def animate(ii):
                 data_stream = current_plot.incoming_data
                 time_stream = current_plot.tList
                 data_stream.insert(0, most_recent[0][i])
-                time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+                #time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+                time_f = datetime.datetime.fromtimestamp(most_recent[0][0])
                 time_stream.insert(0, time_f)
                 if len(data_stream) < 20: #graph updates, growing to show 20 points
                     current_plot.make_plot()
