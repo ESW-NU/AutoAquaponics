@@ -330,6 +330,10 @@ class HomePage(tk.Frame):
         #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
         label.place(x=900, y=10)
+        #export data button
+        exportButton = ttk.Button(self, text="Export Selected Data",
+                            command=self.popup)
+        exportButton.place(x=902, y=45)
         #embed graph into canvas
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
         #add navigation bar
@@ -352,6 +356,61 @@ class HomePage(tk.Frame):
             loading_text.place(x=140, y=125+22*i)
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
+    def popup(self):
+        # setup the popup here
+        self.popup = tk.Tk()
+        self.popup.wm_title("Export Data")
+        label = ttk.Label(self.popup, text="Select Data to Export", font=MEDIUM_FONT)
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        
+        # ENTRY WIDGETS
+        self.label_list= ["Start date for exported data:","End date for exported data:","Save to path:"]
+        self.instru_list = [tk.StringVar() for i in range(len(self.label_list))]
+
+        # for each widget, create its label and entry, store in temp var, then place in entries list
+        for i in range(len(self.label_list)):
+            label = tk.Label(self.popup, width = 25, anchor = 'e', text=self.label_list[i])
+            label.grid(row=i+4, column = 1, padx = (0,10), pady=(0,0))
+            entry = tk.Entry(self.popup, width = 20, highlightthickness = 0, textvariable = self.instru_list[i])
+            entry.grid(row=i+4, column = 2, padx = (0,50), pady=(0,0))
+            self.instru_list[i] = entry
+        self.instru_list[0].insert(0, 'Ex. 01/15/2021')
+        self.instru_list[1].insert(0, 'Ex. 02/15/2021')
+        self.instru_list[2].insert(0, '/home/pi/Desktop')
+
+        # CHECKBUTTON WIDGETS
+        self.state_list = [tk.IntVar() for i in range(len(param_list))] #variable to hold checkbutton state
+        
+        for i in range(len(self.state_list)):
+            checkButton = tk.Checkbutton(self.popup, text="Include " + param_list[i],
+                                    variable=self.state_list[i], onvalue = 1, offvalue = 0)
+            checkButton.grid(row = len(self.label_list)+5+i, columnspan = 14, pady=(0,0))
+        
+        self.graph_var = tk.IntVar()
+        graphButton = tk.Checkbutton(self.popup, text="Generate Plot",
+                                    variable=self.graph_var, onvalue = 1, offvalue = 0)
+        graphButton.grid(row=2*len(param_list)+6, column=1)
+
+        self.csv_var = tk.IntVar()
+        csvButton = tk.Checkbutton(self.popup, text="Export CSV",
+                                    variable=self.csv_var, onvalue = 1, offvalue = 0)
+        csvButton.grid(row=2*len(param_list)+6, column=2)
+
+        # BUTTON WIDGET
+        executeButton = ttk.Button(self.popup, text="Execute")
+        executeButton.grid(row=2*len(param_list)+7, columnspan=14, pady=(10,20), padx = (100,100))
+        
+        self.grid_columnconfigure(0, weight=2)
+        self.grid_columnconfigure(5, weight=2)
+
+        self.popup.mainloop()
 
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
