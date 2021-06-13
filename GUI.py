@@ -1,5 +1,6 @@
 from data import Reader
-import datetime 
+from DataLogger import all_we_got_now
+import datetime, time
 #import tkinter for GUI
 import tkinter as tk
 from tkinter import ttk, W, LEFT, END
@@ -356,9 +357,10 @@ class HomePage(tk.Frame):
             loading_text.place(x=140, y=125+22*i)
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
+    
     def popup(self):
         # setup the popup here
-        self.popup = tk.Tk()
+        self.popup = tk.Toplevel() #dark magic that makes the checkbutton variables change, use instead of = tk.Tk()
         self.popup.wm_title("Export Data")
         label = ttk.Label(self.popup, text="Select Data to Export", font=MEDIUM_FONT)
         label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
@@ -381,16 +383,18 @@ class HomePage(tk.Frame):
             entry = tk.Entry(self.popup, width = 20, highlightthickness = 0, textvariable = self.instru_list[i])
             entry.grid(row=i+4, column = 2, padx = (0,50), pady=(0,0))
             self.instru_list[i] = entry
-        self.instru_list[0].insert(0, 'Ex. 01/15/2021')
-        self.instru_list[1].insert(0, 'Ex. 02/15/2021')
-        self.instru_list[2].insert(0, '/home/pi/Desktop')
+        self.instru_list[0].insert(0, '01/15/2021')
+        self.instru_list[1].insert(0, '08/15/2021')
+        # self.instru_list[0].insert(0, 'Ex. 01/15/2021')
+        # self.instru_list[1].insert(0, 'Ex. 02/15/2021')
+        self.instru_list[2].insert(0, '/home/pi/Desktop/data.csv') #C:\Users\billm\Desktop\data.csv
 
         # CHECKBUTTON WIDGETS
         self.state_list = [tk.IntVar() for i in range(len(param_list))] #variable to hold checkbutton state
         
         for i in range(len(self.state_list)):
             checkButton = tk.Checkbutton(self.popup, text="Include " + param_list[i],
-                                    variable=self.state_list[i], onvalue = 1, offvalue = 0)
+                                    variable=self.state_list[i])
             checkButton.grid(row = len(self.label_list)+5+i, columnspan = 14, pady=(0,0))
         
         self.graph_var = tk.IntVar()
@@ -399,18 +403,55 @@ class HomePage(tk.Frame):
         graphButton.grid(row=2*len(param_list)+6, column=1)
 
         self.csv_var = tk.IntVar()
-        csvButton = tk.Checkbutton(self.popup, text="Export CSV",
+        self.csvButton = tk.Checkbutton(self.popup, text="Export CSV",
                                     variable=self.csv_var, onvalue = 1, offvalue = 0)
-        csvButton.grid(row=2*len(param_list)+6, column=2)
+        self.csvButton.grid(row=2*len(param_list)+6, column=2)
 
         # BUTTON WIDGET
-        executeButton = ttk.Button(self.popup, text="Execute")
-        executeButton.grid(row=2*len(param_list)+7, columnspan=14, pady=(10,20), padx = (100,100))
+        self.executeButton = ttk.Button(self.popup, text="Execute", command=self.execute)
+        self.executeButton.grid(row=2*len(param_list)+7, columnspan=14, pady=(10,20), padx = (100,100))
         
         self.grid_columnconfigure(0, weight=2)
         self.grid_columnconfigure(5, weight=2)
 
         self.popup.mainloop()
+
+    def execute(self): #this function export/graph specified data depending on user input in the popup
+        entry_text = [entry.get() for entry in self.instru_list]
+        checkButton_state = [state.get() for state in self.state_list]
+        graphButton_state = self.graph_var.get()
+        csvButton_state = self.csv_var.get()
+        start = time.mktime(datetime.datetime.strptime(entry_text[0], "%m/%d/%Y").timetuple())
+        end = time.mktime(datetime.datetime.strptime(entry_text[1], "%m/%d/%Y").timetuple())
+        columns = ["unix_time"]
+
+        for i in range(len(param_list)):
+            if checkButton_state[i] == 1:
+                columns.append(all_we_got_now[i+1]) #all_we_got_now is defined in DataLogger
+
+        if csvButton_state == 1: #this part of the code saves the specified data as a csv
+            data = reader.query_by_time(start, end, columns)
+            with open(entry_text[2], 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(columns)
+                writer.writerows(data)
+
+        if graphButton_state == 1: #this part of the code plots the specified data on same figure
+            x = reader.query_by_time(start, end, ["unix_time"])
+            for i in range(len(x)):
+                x[i] = datetime.datetime.fromtimestamp(x[i][0]).strftime('%I:%M:%S %p') #uses local time, could be wonky
+            fig, axes = matplotlib.pyplot.subplots(1,1)
+            for i in range(1, len(columns)):
+                y = reader.query_by_time(start, end, [columns[i]])
+                axes.plot(x, y, label = [columns[i]])
+                
+            matplotlib.pyplot.legend(labels=columns[1:], bbox_to_anchor=(1.05, 1.0), loc='upper left')
+            axes.set_title("Exported Data")
+            axes.set_xlabel("Time")
+            axes.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 10))
+            matplotlib.pyplot.xticks(rotation=45)
+            fig.tight_layout() #add margin around so xlabel doesn't pop out
+            matplotlib.pyplot.show()
 
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
