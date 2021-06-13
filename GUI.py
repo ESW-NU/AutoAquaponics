@@ -334,7 +334,7 @@ class HomePage(tk.Frame):
         #export data button
         exportButton = ttk.Button(self, text="Export Selected Data",
                             command=self.popup)
-        exportButton.place(x=902, y=45)
+        exportButton.place(x=884, y=45)
         #embed graph into canvas
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
         #add navigation bar
