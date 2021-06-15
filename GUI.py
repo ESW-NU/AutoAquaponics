@@ -150,7 +150,7 @@ class Sensor_Plot:
         self.plot.set_ylim(self.ylim)
 
         self.x_ax.xaxis_date()
-        self.x_ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))
+        self.x_ax.xaxis.set_major_formatter(mdates.DateFormatter('%a %I:%M:%S %p'))
         
         [tk.set_visible(True) for tk in self.x_ax.get_xticklabels()]
         [label.set_rotation(10) for label in self.x_ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
