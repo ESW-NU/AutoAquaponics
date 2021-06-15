@@ -439,7 +439,7 @@ class HomePage(tk.Frame):
         if graphButton_state == 1: #this part of the code plots the specified data on same figure
             x = reader.query_by_time(start, end, ["unix_time"])
             for i in range(len(x)):
-                x[i] = datetime.datetime.fromtimestamp(x[i][0]).strftime('%I:%M:%S %p') #uses local time, could be wonky
+                x[i] = datetime.datetime.fromtimestamp(x[i][0]).strftime('%Y-%m-%d %I:%M:%S %p') #uses local time, could be wonky
             fig, axes = matplotlib.pyplot.subplots(1,1)
             for i in range(1, len(columns)):
                 y = reader.query_by_time(start, end, [columns[i]])
