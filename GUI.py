@@ -165,7 +165,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.query_by_num(table="SensorData", num=30) #initializes plot up to 20 if possible if possible
+        most_recent = reader.query_by_num(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -804,6 +804,7 @@ class Lights(tk.Frame):
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
         csv_write('lights_config', lights_config)
+        #ble_write(lights_config)
 
     # shelf 1 popup window: for setting start and duration times
     def pop1(self):
