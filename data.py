@@ -176,8 +176,7 @@ class Reader:
         column_string = columns[0]
         for i in range(1, len(columns)):
             column_string = column_string + ", "+ columns[i]
-        command = "SELECT " + str(column_string) +" FROM SensorData WHERE unix_time > ? and unix_time < ?" #? represents a parameter here
-        print(command)
+        command = "SELECT " + column_string +" FROM SensorData WHERE unix_time > ? and unix_time < ?" #? represents a parameter here
         self.c.execute(command, (start, end)) #pass command into SQLite execute
         return self.c.fetchall()
 
