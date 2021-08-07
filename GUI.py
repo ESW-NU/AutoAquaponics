@@ -13,7 +13,7 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 
 #import BLE stuff
-from writeBLE import writeBLE
+from BLE import BLE_write
 
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
@@ -807,7 +807,7 @@ class Lights(tk.Frame):
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
         csv_write('lights_config', lights_config)
-        writeBLE(str(i), 50) #will this work?
+        BLE_write(str(i), 50) #will this work?
 
     # shelf 1 popup window: for setting start and duration times
     def pop1(self):
