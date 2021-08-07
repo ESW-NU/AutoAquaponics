@@ -1,4 +1,3 @@
-import random
 import sqlite3
 import numpy as np
 from datetime import datetime
@@ -105,8 +104,10 @@ class Logger:
         data_med = tuple(np.round(med, 2))
 
         #adding the timestamp
-        data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_med
-        print(data_log)
+        #data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_med
+        data_log = (int(round(datetime.now().timestamp())),) + data_med #log time in unix as int
+        print(data_log) #timestamp is logged as int
+        #print(Reader.query_by_time(self, 1622730196, 1622730226)) #test function, need to be changed
         
         #assign data to tables in data_dict
         if table not in self.data_dict:
@@ -165,10 +166,20 @@ class Reader:
         return self.c.fetchall()
         #print(self.c.fetchall())
     
-    def get_timeset(self,table,num = 1,timeval = None):
-        self.c.execute("SELECT * FROM {} ORDER BY time DESC LIMIT {}".format(table, num))
+    def query_by_num(self,table,num = 1,timeval = None): #this function lets you get the last num rows of data from the table
+        self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, num))
         return self.c.fetchall()
         #print(self.c.fetchall())
+
+    def query_by_time(self, start, end, columns): #this function lets you get a slice of the data between two unix times (start, end)
+        #columns is a list of column names, ex. columns = ["unix_time", "pH", "water_temp"]
+        column_string = columns[0]
+        for i in range(1, len(columns)):
+            column_string = column_string + ", "+ columns[i]
+        command = "SELECT " + str(column_string) +" FROM SensorData WHERE unix_time > ? and unix_time < ?" #? represents a parameter here
+        print(command)
+        self.c.execute(command, (start, end)) #pass command into SQLite execute
+        return self.c.fetchall()
 
     def close(self):
         #close sqlite connection

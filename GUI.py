@@ -1,14 +1,17 @@
-from typing import Optional
 from data import Reader
-from datetime import datetime 
+from DataLogger import all_we_got_now
+import datetime, time
 #import tkinter for GUI
 import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
 from PIL import Image, ImageTk
+
+#uncomment later
 import cv2   #open source computer vision library
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
 LARGE_FONT = ("Verdana", 12)
@@ -147,7 +150,7 @@ class Sensor_Plot:
         self.plot.set_ylim(self.ylim)
 
         self.x_ax.xaxis_date()
-        self.x_ax.xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S %p'))
+        self.x_ax.xaxis.set_major_formatter(mdates.DateFormatter('%a %I:%M:%S %p'))
         
         [tk.set_visible(True) for tk in self.x_ax.get_xticklabels()]
         [label.set_rotation(10) for label in self.x_ax.xaxis.get_ticklabels()] #slant the x axis tick labels for extra coolness
@@ -162,12 +165,13 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.get_timeset(table="SensorData", num=30) #initializes plot up to 20 if possible if possible
+        most_recent = reader.query_by_num(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
             for j in range(len(most_recent)):
-                time_f = datetime.strptime(most_recent[j][0], "%m/%d/%Y %H:%M:%S")
+                #time_f = datetime.strptime(most_recent[j][0], "%m/%d/%Y %H:%M:%S")
+                time_f = datetime.datetime.fromtimestamp(most_recent[j][0])
                 tList.append(time_f)
                 most_recent_any_size.append(most_recent[j][i])
 
@@ -199,13 +203,14 @@ def animate(ii):
 
     while True:
         most_recent_time_graphed = param_dict[param_list[0]] #first, pulls up first plot
-        most_recent = reader.get_timeset(table="SensorData", num=1)
+        most_recent = reader.query_by_num(table="SensorData", num=1)
         reader.commit()         #if identical, do not animate
         #then checks that plot's time list
         if  (len(most_recent) == 0):
             break
         
-        time_reader = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+        #time_reader = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+        time_reader = datetime.datetime.fromtimestamp(most_recent[0][0])
         if (len(most_recent_time_graphed.tList) != 0) and (time_reader == most_recent_time_graphed.tList[0]):
             for i, param in enumerate(param_list, 1):
                 current_text = live_dict[param]
@@ -257,7 +262,8 @@ def animate(ii):
                 data_stream = current_plot.incoming_data
                 time_stream = current_plot.tList
                 data_stream.insert(0, most_recent[0][i])
-                time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+                #time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
+                time_f = datetime.datetime.fromtimestamp(most_recent[0][0])
                 time_stream.insert(0, time_f)
                 if len(data_stream) < 20: #graph updates, growing to show 20 points
                     current_plot.make_plot()
@@ -325,6 +331,10 @@ class HomePage(tk.Frame):
         #create title label
         label = tk.Label(self, text="Dashboard", bg='white', font = TITLE_FONT)
         label.place(x=900, y=10)
+        #export data button
+        exportButton = ttk.Button(self, text="Export Selected Data",
+                            command=self.popup)
+        exportButton.place(x=884, y=45)
         #embed graph into canvas
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand = True)
         #add navigation bar
@@ -347,6 +357,101 @@ class HomePage(tk.Frame):
             loading_text.place(x=140, y=125+22*i)
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
+    
+    def popup(self):
+        # setup the popup here
+        self.popup = tk.Toplevel() #dark magic that makes the checkbutton variables change, use instead of = tk.Tk()
+        self.popup.wm_title("Export Data")
+        label = ttk.Label(self.popup, text="Select Data to Export", font=MEDIUM_FONT)
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        
+        # ENTRY WIDGETS
+        self.label_list= ["Start date for exported data:","End date for exported data:","Save to path:"]
+        self.instru_list = [tk.StringVar() for i in range(len(self.label_list))]
+
+        # for each widget, create its label and entry, store in temp var, then place in entries list
+        for i in range(len(self.label_list)):
+            label = tk.Label(self.popup, width = 25, anchor = 'e', text=self.label_list[i])
+            label.grid(row=i+4, column = 1, padx = (0,10), pady=(0,0))
+            entry = tk.Entry(self.popup, width = 20, highlightthickness = 0, textvariable = self.instru_list[i])
+            entry.grid(row=i+4, column = 2, padx = (0,50), pady=(0,0))
+            self.instru_list[i] = entry
+        self.instru_list[0].insert(0, '01/15/2021')
+        self.instru_list[1].insert(0, '08/15/2021')
+        # self.instru_list[0].insert(0, 'Ex. 01/15/2021')
+        # self.instru_list[1].insert(0, 'Ex. 02/15/2021')
+        self.instru_list[2].insert(0, '/home/pi/Desktop/data.csv') #C:\Users\billm\Desktop\data.csv
+
+        # CHECKBUTTON WIDGETS
+        self.state_list = [tk.IntVar() for i in range(len(param_list))] #variable to hold checkbutton state
+        
+        for i in range(len(self.state_list)):
+            checkButton = tk.Checkbutton(self.popup, text="Include " + param_list[i],
+                                    variable=self.state_list[i])
+            checkButton.grid(row = len(self.label_list)+5+i, columnspan = 14, pady=(0,0))
+        
+        self.graph_var = tk.IntVar()
+        graphButton = tk.Checkbutton(self.popup, text="Generate Plot",
+                                    variable=self.graph_var, onvalue = 1, offvalue = 0)
+        graphButton.grid(row=2*len(param_list)+6, column=1)
+
+        self.csv_var = tk.IntVar()
+        self.csvButton = tk.Checkbutton(self.popup, text="Export CSV",
+                                    variable=self.csv_var, onvalue = 1, offvalue = 0)
+        self.csvButton.grid(row=2*len(param_list)+6, column=2)
+
+        # BUTTON WIDGET
+        self.executeButton = ttk.Button(self.popup, text="Execute", command=self.execute)
+        self.executeButton.grid(row=2*len(param_list)+7, columnspan=14, pady=(10,20), padx = (100,100))
+        
+        self.grid_columnconfigure(0, weight=2)
+        self.grid_columnconfigure(5, weight=2)
+
+        self.popup.mainloop()
+
+    def execute(self): #this function export/graph specified data depending on user input in the popup
+        entry_text = [entry.get() for entry in self.instru_list]
+        checkButton_state = [state.get() for state in self.state_list]
+        graphButton_state = self.graph_var.get()
+        csvButton_state = self.csv_var.get()
+        start = time.mktime(datetime.datetime.strptime(entry_text[0], "%m/%d/%Y").timetuple())
+        end = time.mktime(datetime.datetime.strptime(entry_text[1], "%m/%d/%Y").timetuple())
+        columns = ["unix_time"]
+
+        for i in range(len(param_list)):
+            if checkButton_state[i] == 1:
+                columns.append(all_we_got_now[i+1]) #all_we_got_now is defined in DataLogger
+
+        if csvButton_state == 1: #this part of the code saves the specified data as a csv
+            data = reader.query_by_time(start, end, columns)
+            with open(entry_text[2], 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(columns)
+                writer.writerows(data)
+
+        if graphButton_state == 1: #this part of the code plots the specified data on same figure
+            x = reader.query_by_time(start, end, ["unix_time"])
+            for i in range(len(x)):
+                x[i] = datetime.datetime.fromtimestamp(x[i][0]).strftime('%Y-%m-%d %I:%M:%S %p') #uses local time, could be wonky
+            fig, axes = matplotlib.pyplot.subplots(1,1)
+            for i in range(1, len(columns)):
+                y = reader.query_by_time(start, end, [columns[i]])
+                axes.plot(x, y, label = [columns[i]])
+                
+            matplotlib.pyplot.legend(labels=columns[1:], bbox_to_anchor=(1.05, 1.0), loc='upper left')
+            axes.set_title("Exported Data")
+            axes.set_xlabel("Time")
+            axes.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 10))
+            matplotlib.pyplot.xticks(rotation=45)
+            fig.tight_layout() #add margin around so xlabel doesn't pop out
+            matplotlib.pyplot.show()
 
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
@@ -546,6 +651,7 @@ class VideoStream(tk.Frame):
         #main label for showing the feed 
         self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
+
         #initialize button with a picture
         frame = self.get_frame()
         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -698,6 +804,7 @@ class Lights(tk.Frame):
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
         csv_write('lights_config', lights_config)
+        #ble_write(lights_config)
 
     # shelf 1 popup window: for setting start and duration times
     def pop1(self):
@@ -1162,7 +1269,6 @@ class Backwashing(tk.Frame):
         navibutton1.pack()
 
 app = AllWindow()
-#app.geometry('1025x672')
 #app.geometry('1280x623')
 app.geometry('1917x970')
 #this makes app full screen, not sure if it's good for us or not

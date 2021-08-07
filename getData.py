@@ -112,7 +112,6 @@ def getDHT():
             # get temp and humidity
             temperature_c = dhtDevice.temperature
             humidity = dhtDevice.humidity
-
         except RuntimeError as error:
             # Errors happen fairly often, DHT's are hard to read, just keep going
             temperature_c = float('NaN')
