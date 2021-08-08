@@ -842,6 +842,7 @@ class Lights(tk.Frame):
         lights_config[4] = self.start1.get()
         lights_config[8] = self.dur1.get()
         csv_write('lights_config', lights_config)
+        ble.BLE_write('0', 37) #change 37 to some sort of encoding for the message
 
     # shelf 2 popup window: for setting start and duration times
     def pop2(self):
@@ -874,6 +875,7 @@ class Lights(tk.Frame):
         lights_config[5] = self.start2.get()
         lights_config[9] = self.dur2.get()
         csv_write('lights_config', lights_config)
+        ble.BLE_write('0', 38) #change 38 to some sort of encoding for the message
 
     # fish tank popup window: for setting start and duration times
     def popTank(self):
@@ -906,6 +908,7 @@ class Lights(tk.Frame):
         lights_config[6] = self.startTank.get()
         lights_config[10] = self.durTank.get()
         csv_write('lights_config', lights_config)
+        ble.BLE_write('0', 39) #change 39 to some sort of encoding for the message
 
     # basking popup window: for setting start and duration times
     def popBask(self):
@@ -938,6 +941,7 @@ class Lights(tk.Frame):
         lights_config[7] = self.startBask.get()
         lights_config[11] = self.durBask.get()
         csv_write('lights_config', lights_config)
+        ble.BLE_write('0', 40) #change 40 to some sort of encoding for the message
 
 
 class WaterPump(tk.Frame):
@@ -1008,6 +1012,7 @@ class WaterPump(tk.Frame):
         pump_config = [config_settings[config_dict['pump_config']][0], config_settings[config_dict['pump_config']][1], \
             config_settings[config_dict['pump_config']][2], self.mode]
         csv_write('pump_config', pump_config)
+        ble.BLE_write('0', 50) #change 50 to some sort of encoding for the message
 
     # save popup
     def popup(self):
@@ -1037,6 +1042,7 @@ class WaterPump(tk.Frame):
             real_time = None
         pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
         csv_write('pump_config', pump_config)
+        ble.BLE_write('0', 51) #change 51 to some sort of encoding for the message
         
 
 class FishFeeder(tk.Frame):

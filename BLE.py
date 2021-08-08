@@ -1,20 +1,19 @@
 from bluepy import btle
-from time import sleep
 
 class BLE:
     def __init__(self):
-        print("Connecting...")
-    #Device 1 (outlet box)
+        print("Connecting to BLE...")
+        #Device 1 (outlet box)
         self.p = btle.Peripheral("AC:67:B2:37:2A:22") #unique address of our ESP32 in office
         self.s = self.p.getServiceByUUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
         self.c = self.s.getCharacteristics()[0]
 
-    # Device 2 (name of device)
-    # p1 = btle.Peripheral("insert id here") #follow this format, so on and so forth
-    # s1 = p1.getServiceByUUID("enter id here")
-    # c1 = s1.getCharacteristics()[0]
+        # Device 2 (name of device)
+        # self.p1 = btle.Peripheral("insert id here") #follow this format, so on and so forth
+        # self.s1 = self.p1.getServiceByUUID("enter id here")
+        # self.c1 = self.s1.getCharacteristics()[0]
 
-        self.charact = {
+        self.charact = { #we are using dictionaries to map input keys to specific characteristics/peripherals defined above
             "0": self.c, #outlet box, characteristic code is 1, char is c
             "1": self.c, #change to a different characteristic later on
             "2": self.c,
@@ -30,25 +29,10 @@ class BLE:
             #'4':p1 #another peripheral
         }
 
-# char is the characteristic we are writing to, message is the number we are sending
+    # char is the characteristic we are writing to, message is the number we are sending
     def BLE_write(self, char, message):
         self.charact[char].write(bytes([message]))
 
-        # print("Services...")
-        # for svc in p.services:
-        #     print(str(svc))
-        
-            
-        
-
-        #c.write(bytes("5", "utf-8")) #change the number to change frequency, what is utf-8 in hex?
-        # print("write fast")
-        # c.write(bytes([50]))
-        # sleep(1)
-        # print("write slow")
-        # c.write(bytes([200]))
-        # sleep(2)
-        # print("done")
-
+    # peri is the code for the specific peripheral we are disconnecting
     def BLE_disconnect(peri):
         self.peripheral[peri].disconnect()
