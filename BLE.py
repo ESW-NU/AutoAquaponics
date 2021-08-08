@@ -14,7 +14,7 @@ class BLE:
         # self.c1 = self.s1.getCharacteristics()[0]
 
         self.charact = { #we are using dictionaries to map input keys to specific characteristics/peripherals defined above
-            "0": self.c, #outlet box, characteristic code is 1, char is c
+            "0": self.c, #outlet box, characteristic code is 0, char is c
             "1": self.c, #change to a different characteristic later on
             "2": self.c,
             "3": self.c
