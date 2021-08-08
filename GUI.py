@@ -13,7 +13,8 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 
 #import BLE stuff
-from BLE import BLE_write
+from BLE import BLE
+ble = BLE() #initalize BLE class
 
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
@@ -807,7 +808,8 @@ class Lights(tk.Frame):
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
         csv_write('lights_config', lights_config)
-        BLE_write(str(i), 50) #will this work?
+
+        ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
 
     # shelf 1 popup window: for setting start and duration times
     def pop1(self):
