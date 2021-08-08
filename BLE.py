@@ -34,5 +34,5 @@ class BLE:
         self.charact[char].write(bytes([message]))
 
     # peri is the code for the specific peripheral we are disconnecting
-    def BLE_disconnect(peri):
+    def BLE_disconnect(self, peri):
         self.peripheral[peri].disconnect()
