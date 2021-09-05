@@ -786,6 +786,12 @@ class Lights(tk.Frame):
                 lights_config[i] = "off"
                 csv_write('lights_config', lights_config)
                 self.switch(i)
+            if lights_config[i] == "timer":
+                lights_config[i] = "on"
+                csv_write('lights_config', lights_config)
+                self.switch(i)
+            if lights_config[i] == "off":
+                pass
         
     # given a param index, switches its csv value and button text (between 'on'/'off')
     def switch(self, i):
