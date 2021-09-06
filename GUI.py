@@ -169,7 +169,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.query_by_num(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
+        most_recent = reader.query_by_num(table="SensorData", num=100) #initializes plot up to 20 if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -1258,7 +1258,7 @@ class Oxygenator(tk.Frame):
         positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
         
-        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save()])
         YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
         NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
@@ -1267,6 +1267,7 @@ class Oxygenator(tk.Frame):
     # saves value to csv
     def save(self):
         csv_write('oxygen_config', [self.min.get()])
+        self.popup.destroy()
 
 class Backwashing(tk.Frame):
     

@@ -93,7 +93,7 @@ class Logger:
         while ct < nsamp:
             #print(dataget)
             getdata = dataget
-            print(getdata)
+            #print(getdata)
             tup_arr = np.asarray([getdata], dtype=np.float) #put the getdata() into array form, also replace None with np.nan if it appears
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
@@ -106,7 +106,7 @@ class Logger:
         #adding the timestamp
         #data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_med
         data_log = (int(round(datetime.now().timestamp())),) + data_med #log time in unix as int
-        print(data_log) #timestamp is logged as int
+        #print(data_log) #timestamp is logged as int
         #print(Reader.query_by_time(self, 1622730196, 1622730226)) #test function, need to be changed
         
         #assign data to tables in data_dict
