@@ -12,9 +12,12 @@ import cv2   #open source computer vision library
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 
-#import BLE stuff
-from BLE import BLE
-ble = BLE() #initalize BLE class
+#import BLE stuff (uncomment 2 lines below if on computer)
+#from BLE import BLE
+#ble = BLE() #initalize BLE class
+#import fake BLE stuff (comment 2 lines below if on RPi)
+from BLE import fakeBLE
+ble = fakeBLE()
 
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
@@ -767,10 +770,10 @@ class Lights(tk.Frame):
         self.togBask.grid(row=3, column=1, padx=5, pady=8)
 
         # initialize timer buttons
-        self.time1 = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.pop1)
-        self.time2 = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.pop2)
-        self.timeTank = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.popTank)
-        self.timeBask = tk.Button(self.buttonFrame, text="Timer", fg="purple", width=9, command=self.popBask)
+        self.time1 = tk.Button(self.buttonFrame, text="Schedule", fg="purple", width=9, command=self.pop1)
+        self.time2 = tk.Button(self.buttonFrame, text="Schedule", fg="purple", width=9, command=self.pop2)
+        self.timeTank = tk.Button(self.buttonFrame, text="Schedule", fg="purple", width=9, command=self.popTank)
+        self.timeBask = tk.Button(self.buttonFrame, text="Schedule", fg="purple", width=9, command=self.popBask)
         self.time1.grid(row=0, column=2, padx=5, pady=8)
         self.time2.grid(row=1, column=2, padx=5, pady=8)
         self.timeTank.grid(row=2, column=2, padx=5, pady=8)
@@ -783,6 +786,12 @@ class Lights(tk.Frame):
                 lights_config[i] = "off"
                 csv_write('lights_config', lights_config)
                 self.switch(i)
+            if lights_config[i] == "timer":
+                lights_config[i] = "on"
+                csv_write('lights_config', lights_config)
+                self.switch(i)
+            if lights_config[i] == "off":
+                pass
         
     # given a param index, switches its csv value and button text (between 'on'/'off')
     def switch(self, i):
@@ -797,7 +806,17 @@ class Lights(tk.Frame):
                 self.togTank.config(text="ON", fg="green")
             elif i == 3:
                 self.togBask.config(text="ON", fg="green")
-        else:
+        elif lights_config[i] == "on":
+            lights_config[i] = "timer"
+            if i == 0:
+                self.tog1.config(text="TIMER", fg="purple")
+            elif i == 1:
+                self.tog2.config(text="TIMER", fg="purple")
+            elif i == 2:
+                self.togTank.config(text="TIMER", fg="purple")
+            elif i == 3:
+                self.togBask.config(text="TIMER", fg="purple")
+        elif lights_config[i] == "timer":
             lights_config[i] = "off"
             if i == 0:
                 self.tog1.config(text="OFF", fg="red")
@@ -808,7 +827,12 @@ class Lights(tk.Frame):
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
         csv_write('lights_config', lights_config)
-
+        time_now = datetime.datetime.now().strftime("%w/%H/%M").split("/") #makes list ["day of week in int", "hour in 24 hr int", "min in int"]
+        # convert time_now to number of ticks passed since start of Monday in increments of 10 minutes
+        # shift it left by 21 bits to set as current time bit
+        time_now = round(int(time_now[0])*144 + int(time_now[1])*6 + int(time_now[2])/10) << 21
+        time_on = 0
+        print(time_now)
         ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
 
     # shelf 1 popup window: for setting start and duration times
@@ -1012,7 +1036,7 @@ class WaterPump(tk.Frame):
         pump_config = [config_settings[config_dict['pump_config']][0], config_settings[config_dict['pump_config']][1], \
             config_settings[config_dict['pump_config']][2], self.mode]
         csv_write('pump_config', pump_config)
-        ble.BLE_write('0', 50) #change 50 to some sort of encoding for the message
+        ble.BLE_write('0', 52) #change 52 to some sort of encoding for the message
 
     # save popup
     def popup(self):
