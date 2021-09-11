@@ -9,7 +9,6 @@
  */
 
 // Stop button is attached to PIN 0 (IO0)
-#define BTN_STOP_ALARM    0
 #define MAX_ALARMS 500
 
 typedef struct virt_alarm {
