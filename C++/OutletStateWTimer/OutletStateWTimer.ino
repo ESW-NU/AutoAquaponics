@@ -148,6 +148,7 @@ void al_insert(uint16_t count, uint16_t state) {
   current_list++;
 }
 
+<<<<<<< HEAD
 void schedule_insert(uint8_t time_hit, uint16_t state, char repeat) {
   uint8_t pos = 0;
   schedule inserted = schedule {time_hit, state, repeat};
@@ -245,7 +246,6 @@ void loop() {
   if (pServer->getConnectedCount() == 0) {
     pAdvertising->stop();
     pAdvertising->start();
-    al_insert(15000, 10);
     Serial.println("Restarting Advertising");
   }
   delay(10000);
