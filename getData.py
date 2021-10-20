@@ -1,3 +1,5 @@
+#Desmond
+
 #initialize GPIO pins for TDS sensor switch + distance sensor
 pin_num = 17
 pin_num2 = 27
