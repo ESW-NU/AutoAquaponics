@@ -754,7 +754,7 @@ class Lights(tk.Frame):
         self.toggle1 = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
                            height=1, command=self.toggle_a)
         self.toggle1.grid(row=1, column=1, pady=(0,10))
-        self.timer1 = tk.Button(self, text="timer", bg= "white",  width=10, 
+        self.timer1 = tk.Button(self, text="Configure Timer", bg= "white",  width=10, 
                            height=1, command=self.popup)
         self.timer1.grid(row=1, column=2, pady=(0,10))
         #shelf2
@@ -762,7 +762,7 @@ class Lights(tk.Frame):
         self.toggle2 = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
                            height=1, command=self.toggle_b)
         self.toggle2.grid(row=2, column=1, pady=(0,10))
-        self.timer2 = tk.Button(self, text="timer", bg= "white",  width=10, 
+        self.timer2 = tk.Button(self, text="Configure Timer", bg= "white",  width=10, 
                            height=1, command=self.popup)
         self.timer2.grid(row=2, column=2, pady=(0,10))
         #fish tank
@@ -770,7 +770,7 @@ class Lights(tk.Frame):
         self.toggle_tank = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
                            height=1, command=self.toggle_c)
         self.toggle_tank.grid(row=3, column=1, pady=(0,10))
-        self.timer_tank = tk.Button(self, text="timer", bg= "white",  width=10, 
+        self.timer_tank = tk.Button(self, text="Configure Timer", bg= "white",  width=10, 
                            height=1, command=self.popup)
         self.timer_tank.grid(row=3, column=2, pady=(0,10))
         #basking
@@ -778,7 +778,7 @@ class Lights(tk.Frame):
         self.toggle_basking = tk.Button(self, text="Light OFF", bg= "red",  width=10, 
                            height=1, command=self.toggle_d)
         self.toggle_basking.grid(row=4, column=1, pady=(0,10))
-        self.timer_basking = tk.Button(self, text="timer", bg= "white",  width=10, 
+        self.timer_basking = tk.Button(self, text="Configure Timer", bg= "white",  width=10, 
                            height=1, command=self.popup)
         self.timer_basking.grid(row=4, column=2, pady=(0,20))
         #back button to Alternate Control Panel
@@ -792,6 +792,8 @@ class Lights(tk.Frame):
             self.toggle1.config(bg='green',text='Lights ON')
             self.update()
         elif self.toggle1['bg']=='green':
+            self.toggle1.configure(bg='purple',text='Timer')
+        elif self.toggle1['bg']=='purple':
             self.toggle1.configure(bg='red',text='Lights OFF')
         self.update()
     def toggle_b(self):
@@ -799,6 +801,8 @@ class Lights(tk.Frame):
             self.toggle2.config(bg='green',text='Lights ON')
             self.update()
         elif self.toggle2['bg']=='green':
+            self.toggle2.configure(bg='purple',text='Timer')
+        elif self.toggle2['bg']=='purple':
             self.toggle2.configure(bg='red',text='Lights OFF')
         self.update()
     def toggle_c(self):
@@ -806,6 +810,8 @@ class Lights(tk.Frame):
             self.toggle_tank.config(bg='green',text='Lights ON')
             self.update()
         elif self.toggle_tank['bg']=='green':
+            self.toggle_tank.configure(bg='purple',text='Timer')
+        elif self.toggle_tank['bg']=='purple':
             self.toggle_tank.configure(bg='red',text='Lights OFF')
         self.update()
     def toggle_d(self):
@@ -813,6 +819,8 @@ class Lights(tk.Frame):
             self.toggle_basking.config(bg='green',text='Lights ON')
             self.update_basking()
         elif self.toggle_basking['bg']=='green':
+            self.toggle_basking.configure(bg='purple',text='Timer')
+        elif self.toggle_basking['bg']=='purple':
             self.toggle_basking.configure(bg='red',text='Lights OFF')
         self.update()
     
