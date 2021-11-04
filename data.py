@@ -40,6 +40,7 @@ class Logger:
         for table in self.c.fetchall():
             #print(table[0])
             #c.execute(f'PRAGMA table_info({table[0]})')
+            self.c.execute(f'PRAGMA journal_mode=WAL')
             self.table_dict[table[0]] = ((),()) #TO DO: READ EXISTING COLUMN NAMES AND TYPES
 
     def table(self,newtable):

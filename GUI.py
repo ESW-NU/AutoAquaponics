@@ -706,7 +706,8 @@ class ControlPanel(tk.Frame):
         self.ctrl_panel_image = []
         
         for image in self.icons:
-            self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
+            f = img_path + image
+            self.ctrl_panel_image.append(tk.PhotoImage(f)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
