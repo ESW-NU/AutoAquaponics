@@ -97,7 +97,7 @@ init_dict = {
     'pump_config': [0, 0, None, "off"],
     'oxygen_config': [0],
     'sensor_config': ['off']*4,
-    'lights_config': ['off']*4+[0]*8
+    'lights_config': ['off']*4+[0]*12
 }
 
 # initializes csv, if not properly initialized
@@ -706,7 +706,8 @@ class ControlPanel(tk.Frame):
         self.ctrl_panel_image = []
         
         for image in self.icons:
-            self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
+            f = img_path + image
+            self.ctrl_panel_image.append(tk.PhotoImage(f)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
@@ -742,7 +743,7 @@ class ControlPanel(tk.Frame):
                 if(i == 2):
                     j = 1
 
-class Lights(tk.Frame):
+class Lights(tk.Frame): 
     
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -778,6 +779,7 @@ class Lights(tk.Frame):
         self.time2.grid(row=1, column=2, padx=5, pady=8)
         self.timeTank.grid(row=2, column=2, padx=5, pady=8)
         self.timeBask.grid(row=3, column=2, padx=5, pady=8)
+
 
         # intialize param buttons to proper state based on current csv value
         for i in range(4):
@@ -834,7 +836,9 @@ class Lights(tk.Frame):
         time_on = 0
         print(time_now)
         ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
-
+        
+        # write a separate function in BLE.py: raw msg -> 32 bit binary msg -> send new msg to the write function
+        
     # shelf 1 popup window: for setting start and duration times
     def pop1(self):
         self.pop1 = tk.Tk()
@@ -846,17 +850,21 @@ class Lights(tk.Frame):
         self.pop1.geometry("+{}+{}".format(positionRight, positionDown))
 
         lights_config = csv_read()[config_dict['lights_config']]
-        self.start1, self.dur1 = tk.IntVar(self.pop1), tk.IntVar(self.pop1)
+        self.start1, self.dur1h, self.dur1m = tk.IntVar(self.pop1), tk.IntVar(self.pop1), tk.IntVar(self.pop1)
         self.start1.set(lights_config[4])
-        self.dur1.set(lights_config[8])
+        self.dur1h.set(lights_config[8])
+        self.dur1m.set(lights_config[12])
 
-        tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(100,0))
+        tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(30,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(30,0))
+        tk.Label(self.pop1, text="Hours").grid(row=1, column=2,padx=(0,0))
+        tk.Label(self.pop1, text="Minutes").grid(row=1, column=4,padx=(0,0))
+        
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,0))
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1h).grid(row=1, column=1, padx=(0,0))
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1m).grid(row=1, column=3, padx=(0,0))
 
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,100))
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,100))
-
-        tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+        tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=1, columnspan=3, padx=(20,20), pady=(20,20))
 
         self.pop1.mainloop()
 
@@ -864,9 +872,11 @@ class Lights(tk.Frame):
     def save1(self):
         lights_config = csv_read()[config_dict['lights_config']]
         lights_config[4] = self.start1.get()
-        lights_config[8] = self.dur1.get()
+        lights_config[8] = self.dur1h.get()
+        lights_config[12] = self.dur1m.get()
         csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 37) #change 37 to some sort of encoding for the message
+        num = lights_config[8]*6 + lights_config[12]%10
+        ble.BLE_write('0', num) #change 37 to some sort of encoding for the message
 
     # shelf 2 popup window: for setting start and duration times
     def pop2(self):
