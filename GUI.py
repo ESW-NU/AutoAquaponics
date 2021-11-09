@@ -829,16 +829,9 @@ class Lights(tk.Frame):
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
         csv_write('lights_config', lights_config)
-        time_now = datetime.datetime.now().strftime("%w/%H/%M").split("/") #makes list ["day of week in int", "hour in 24 hr int", "min in int"]
-        # convert time_now to number of ticks passed since start of Monday in increments of 10 minutes
-        # shift it left by 21 bits to set as current time bit
-        time_now = round(int(time_now[0])*144 + int(time_now[1])*6 + int(time_now[2])/10) << 21
-        time_on = 0
-        print(time_now)
-        ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
-        
-        # write a separate function in BLE.py: raw msg -> 32 bit binary msg -> send new msg to the write function
-        
+        #ble.BLE_message(0b10, )
+        #ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
+
     # shelf 1 popup window: for setting start and duration times
     def pop1(self):
         self.pop1 = tk.Tk()
@@ -850,10 +843,12 @@ class Lights(tk.Frame):
         self.pop1.geometry("+{}+{}".format(positionRight, positionDown))
 
         lights_config = csv_read()[config_dict['lights_config']]
-        self.start1, self.dur1h, self.dur1m = tk.IntVar(self.pop1), tk.IntVar(self.pop1), tk.IntVar(self.pop1)
+        self.start1, self.dur1 = tk.StringVar(self.pop1), tk.StringVar(self.pop1)
         self.start1.set(lights_config[4])
-        self.dur1h.set(lights_config[8])
-        self.dur1m.set(lights_config[12])
+        self.dur1.set(lights_config[8])
+
+        tk.Label(self.pop1, text="Start (HH:MM)").grid(row=0, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration (HH:MM)").grid(row=1, column=0, padx=(100,0))
 
         tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(30,0), pady=(20,0))
         tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(30,0))
