@@ -77,6 +77,37 @@ class fakeBLE:
         with open(config_path, "r") as file:
             config = list(csv.reader(file))
 
+    def BLE_messenger(self,mode,outlet):
+        brown = "0000000000" # 10 bit
+        red = "0000000000" # 10 bit
+        blue = "0000000000" # 10 bit
+        yellow = "00" # 2 bit 
+        # send start message
+        # start_msg() working on this right now
+        # message: turn on(1) or off(0)
+        if mode == 1 or mode == 0:
+            yellow = "11" # indicate permanant mode
+            red = list(red)
+            red[outlet-1]=str(mode)
+            red = "".join(red)
+            blue = list(blue)
+            blue[outlet-1]=str(mode)
+            blue = "".join(blue)
+        # message: timer
+        elif mode == 2:
+            pass
+        message = brown+red+blue+yellow
+        print(message + "\n")
+        #message = bin(int(message,2))
+        message = format(int(message,2),"032b")
+        print(message)
+        return message
+
+    # def start_msg(self):
+        # working on this right now
+        #now = datetime.now()
+        #current_time = now.strftime("%H:%M:%S")
+
     # this generates the individual 32 bit binary messages we are sending
     def BLE_message(self, mode, type, index_pump_outlets, time, state, interval=0b0):
         if mode == 0b00: #remove alarm mode

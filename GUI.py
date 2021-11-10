@@ -808,6 +808,8 @@ class Lights(tk.Frame):
                 self.togTank.config(text="ON", fg="green")
             elif i == 3:
                 self.togBask.config(text="ON", fg="green")
+            # send message
+            ble.BLE_messenger(1,1) # 1 is on, outlet 1
         elif lights_config[i] == "on":
             lights_config[i] = "timer"
             if i == 0:
@@ -818,6 +820,7 @@ class Lights(tk.Frame):
                 self.togTank.config(text="TIMER", fg="purple")
             elif i == 3:
                 self.togBask.config(text="TIMER", fg="purple")
+            ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
         elif lights_config[i] == "timer":
             lights_config[i] = "off"
             if i == 0:
@@ -828,6 +831,7 @@ class Lights(tk.Frame):
                 self.togTank.config(text="OFF", fg="red")
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
+            ble.BLE_messenger(0,1) # 0 is off, outlet 1
         csv_write('lights_config', lights_config)
         #ble.BLE_message(0b10, )
         #ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
@@ -852,12 +856,9 @@ class Lights(tk.Frame):
 
         tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(30,0), pady=(20,0))
         tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(30,0))
-        tk.Label(self.pop1, text="Hours").grid(row=1, column=2,padx=(0,0))
-        tk.Label(self.pop1, text="Minutes").grid(row=1, column=4,padx=(0,0))
         
         tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,0))
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1h).grid(row=1, column=1, padx=(0,0))
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1m).grid(row=1, column=3, padx=(0,0))
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,0))
 
         tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=1, columnspan=3, padx=(20,20), pady=(20,20))
 
@@ -867,11 +868,9 @@ class Lights(tk.Frame):
     def save1(self):
         lights_config = csv_read()[config_dict['lights_config']]
         lights_config[4] = self.start1.get()
-        lights_config[8] = self.dur1h.get()
-        lights_config[12] = self.dur1m.get()
+        lights_config[8] = self.dur1.get()
         csv_write('lights_config', lights_config)
-        num = lights_config[8]*6 + lights_config[12]%10
-        ble.BLE_write('0', num) #change 37 to some sort of encoding for the message
+        ble.BLE_write('0', 37) #change 37 to some sort of encoding for the message
 
     # shelf 2 popup window: for setting start and duration times
     def pop2(self):
