@@ -44,6 +44,7 @@ BLECharacteristic *pCharacteristic = NULL;
 BLEAdvertising *pAdvertising = NULL;
 uint32_t message;
 const int outputs[10] = {15, 2, 4, 16, 17, 5, 18, 19, 21, 20};
+//const int outputs[10] = {23, 22, 14, 32, 15, 33, 27, 12, 13, 21};
 
 void IRAM_ATTR onTimer(){
   // Increment the counter and set the time of ISR
@@ -55,7 +56,7 @@ void IRAM_ATTR onTimer(){
   if (curr_alarm.pump) {
     al_insert(curr_alarm.time_hit + curr_alarm.pump_repeat, outlet, curr_alarm.pump_repeat, curr_alarm.end_post, true);
   } else {
-    al_insert(curr_alarm.time_hit + 10, outlet, 0, curr_alarm.end_post, false);
+    al_insert(curr_alarm.time_hit + 20, outlet, 0, curr_alarm.end_post, false);
   }
   portEXIT_CRITICAL_ISR(&timerMux);
   // Give a semaphore that we can check in the loop
@@ -96,7 +97,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         message = 0;
         for (int i = 0; i < value.length(); i++) {
           message <<= 8;
-          message |= value[value.length() - 1 - i]; 
+          message |= value[i]; 
         }
 
         uint16_t blue_part = (message >> 2) & 0x3FF;
@@ -123,15 +124,17 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           start_post.time_hit = red_part;
           end_post.time_hit = red_part + brown_part;
         } else if (message & 3 == 3) {
-          //set_reset(blue_part, (permanence_toggle >> blue_part & 1) ^ (permanent_state >> blue_part & 1), &permanent_state);
-          //set_reset(blue_part, !((permanence_toggle >> blue_part & 1) ^ (permanent_state >> blue_part & 1)), &permanence_toggle);
-          permanent_state = red_part;
-          permanence_toggle = blue_part;
+          set_reset(blue_part, brown_part, &permanent_state);
+          set_reset(blue_part, red_part, &permanence_toggle);
+          //permanent_state = red_part;
+          //permanence_toggle = blue_part;
           if ((permanence_toggle >> blue_part) & 1) {
             set_outlet_to_state(brown_part, permanent_state);
           } else {
             set_outlet_to_state(brown_part, state);
           }
+          Serial.println(permanent_state, BIN);
+          Serial.println(permanence_toggle, BIN);
           return;
         }
         al_insert(start_post);
