@@ -97,7 +97,7 @@ init_dict = {
     'pump_config': [0, 0, None, "off"],
     'oxygen_config': [0],
     'sensor_config': ['off']*4,
-    'lights_config': ['off']*4+[0]*8
+    'lights_config': ['off']*4+[0]*12
 }
 
 # initializes csv, if not properly initialized
@@ -706,7 +706,8 @@ class ControlPanel(tk.Frame):
         self.ctrl_panel_image = []
         
         for image in self.icons:
-            self.ctrl_panel_image.append(tk.PhotoImage(file = img_path + image)) #create array of images using image path
+            f = img_path + image
+            self.ctrl_panel_image.append(tk.PhotoImage(f)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
@@ -742,7 +743,7 @@ class ControlPanel(tk.Frame):
                 if(i == 2):
                     j = 1
 
-class Lights(tk.Frame):
+class Lights(tk.Frame): 
     
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -779,6 +780,7 @@ class Lights(tk.Frame):
         self.timeTank.grid(row=2, column=2, padx=5, pady=8)
         self.timeBask.grid(row=3, column=2, padx=5, pady=8)
 
+
         # intialize param buttons to proper state based on current csv value
         for i in range(4):
             lights_config = csv_read()[config_dict['lights_config']]
@@ -806,6 +808,8 @@ class Lights(tk.Frame):
                 self.togTank.config(text="ON", fg="green")
             elif i == 3:
                 self.togBask.config(text="ON", fg="green")
+            # send message
+            ble.BLE_messenger(1,1) # 1 is on, outlet 1
         elif lights_config[i] == "on":
             lights_config[i] = "timer"
             if i == 0:
@@ -816,6 +820,7 @@ class Lights(tk.Frame):
                 self.togTank.config(text="TIMER", fg="purple")
             elif i == 3:
                 self.togBask.config(text="TIMER", fg="purple")
+            ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
         elif lights_config[i] == "timer":
             lights_config[i] = "off"
             if i == 0:
@@ -826,14 +831,10 @@ class Lights(tk.Frame):
                 self.togTank.config(text="OFF", fg="red")
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
+            ble.BLE_messenger(0,1) # 0 is off, outlet 1
         csv_write('lights_config', lights_config)
-        time_now = datetime.datetime.now().strftime("%w/%H/%M").split("/") #makes list ["day of week in int", "hour in 24 hr int", "min in int"]
-        # convert time_now to number of ticks passed since start of Monday in increments of 10 minutes
-        # shift it left by 21 bits to set as current time bit
-        time_now = round(int(time_now[0])*144 + int(time_now[1])*6 + int(time_now[2])/10) << 21
-        time_on = 0
-        print(time_now)
-        ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
+        #ble.BLE_message(0b10, )
+        #ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
 
     # shelf 1 popup window: for setting start and duration times
     def pop1(self):
@@ -846,17 +847,20 @@ class Lights(tk.Frame):
         self.pop1.geometry("+{}+{}".format(positionRight, positionDown))
 
         lights_config = csv_read()[config_dict['lights_config']]
-        self.start1, self.dur1 = tk.IntVar(self.pop1), tk.IntVar(self.pop1)
+        self.start1, self.dur1 = tk.StringVar(self.pop1), tk.StringVar(self.pop1)
         self.start1.set(lights_config[4])
         self.dur1.set(lights_config[8])
 
-        tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(100,0))
+        tk.Label(self.pop1, text="Start (HH:MM)").grid(row=0, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration (HH:MM)").grid(row=1, column=0, padx=(100,0))
 
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,100))
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,100))
+        tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(30,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(30,0))
+        
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,0))
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,0))
 
-        tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+        tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=1, columnspan=3, padx=(20,20), pady=(20,20))
 
         self.pop1.mainloop()
 
