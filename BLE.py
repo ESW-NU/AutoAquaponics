@@ -31,7 +31,7 @@ class BLE:
             #'4':p1 #another peripheral
         }
 
-    # char is the characteristic we are writing to, message is the number we are sending
+    # char is the characteristic we are writing to, message is the number (int) we are sending
     def BLE_write(self, char, message):
         self.charact[char].write(bytes([message]))
 
