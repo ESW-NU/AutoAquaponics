@@ -697,6 +697,9 @@ class ControlPanel(tk.Frame):
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 10)
+        
+        # send init message
+        ble.BLE_init()
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
@@ -742,6 +745,7 @@ class ControlPanel(tk.Frame):
                 j = 0
                 if(i == 2):
                     j = 1
+         
 
 class Lights(tk.Frame): 
     

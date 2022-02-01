@@ -82,8 +82,7 @@ class fakeBLE:
         red = "0000000000" # 10 bit
         blue = "0000000000" # 10 bit
         yellow = "00" # 2 bit 
-        # send start message
-        # self.start_msg()
+
         # message: permanent turn on(1) or off(0)
         if mode == 1 or mode == 0:
             yellow = "11" # indicate permanant mode
@@ -101,14 +100,22 @@ class fakeBLE:
         #message = format(int(message,2),"032b")
         message = int(message,2)
         return message
+        
 
     def start_msg(self):
         now = datetime.datetime.now()
         current_time = now.strftime("%H:%M").split(":")
         current_time = round(int(current_time[0])*6 + int(current_time[1])/10) 
-        # print(str(current_time))
+        message = bin(current_time)[2:] + '00'
+        message = int(message,2)
+        return message
+    
+    def BLE_init(self):
+        # send start message
+        self.BLE_write('0', self.start_msg())
+        # TODO: send settings saved in CSV
         
-
+    # REFERENCE CODE BELOW - NOT ACTUALLY USED ANYWHERE
     # this generates the individual 32 bit binary messages we are sending
     def BLE_message(self, mode, type, index_pump_outlets, time, state, interval=0b0):
         if mode == 0b00: #remove alarm mode
