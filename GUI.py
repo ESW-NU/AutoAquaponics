@@ -28,7 +28,7 @@ SMALL_FONT = ("Verdana", 8)
 import csv
 import matplotlib
 from matplotlib import ticker as mticker
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 matplotlib.use('TkAgg')
 from matplotlib import figure
 from matplotlib import dates as mdates
@@ -1024,15 +1024,25 @@ class WaterPump(tk.Frame):
         elif self.mode == "on":
             self.mode = "timer"
             self.control.config(text="Timer ON", fg="purple")
-            self.mins = tk.Label(master=self.buttonFrame, text="(min):", bg = 'white')
-            self.mins.grid(row=0, column=3)
+            self.mins = tk.Label(master=self.buttonFrame, text="Time Pumping (min):", bg = 'white')
+            self.mins.grid(row=1, column=3)
             self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
-            self.timer.grid(row=0, column=4, padx=(0,5), pady=5, columnspan=1)
+            self.timer.grid(row=1, column=4, padx=(0,5), pady=5, columnspan=1)
+            
+            #edits
+            self.mins1 = tk.Label(master=self.buttonFrame, text="Time Pumping (min):", bg = 'white')
+            self.mins1.grid(row=2, column=3)
+            self.timer1 = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
+            self.timer1.grid(row=2, column=4, padx=(0,5), pady=5, columnspan=1)
+
         elif self.mode == "timer":
             self.mode = "off"
             self.control.config(text="OFF", fg="red")
             self.mins.destroy()
             self.timer.destroy()
+            self.mins1.destroy()
+            self.timer1.destroy()            
+            
         elif self.mode == "go to off":
             self.mode = "off"
             self.control.config(text="OFF", fg="red")
@@ -1313,6 +1323,6 @@ app.geometry('1917x970')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
-ani = animation.FuncAnimation(f, animate, interval=5000)
+ani = animation.FuncAnimation(f, animate, interval=5000)#, blit=True)
 #mainloop
 app.mainloop()
