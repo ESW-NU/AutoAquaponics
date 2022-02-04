@@ -697,6 +697,9 @@ class ControlPanel(tk.Frame):
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 10)
+        
+        # send init message
+        ble.BLE_init()
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
@@ -742,6 +745,7 @@ class ControlPanel(tk.Frame):
                 j = 0
                 if(i == 2):
                     j = 1
+         
 
 class Lights(tk.Frame): 
     
@@ -809,7 +813,9 @@ class Lights(tk.Frame):
             elif i == 3:
                 self.togBask.config(text="ON", fg="green")
             # send message
-            ble.BLE_messenger(1,1) # 1 is on, outlet 1
+            msg = ble.BLE_messenger(1,1) # 1 is on, outlet 1
+            # prints message
+            ble.BLE_write('1',msg)
         elif lights_config[i] == "on":
             lights_config[i] = "timer"
             if i == 0:
@@ -820,7 +826,10 @@ class Lights(tk.Frame):
                 self.togTank.config(text="TIMER", fg="purple")
             elif i == 3:
                 self.togBask.config(text="TIMER", fg="purple")
-            ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
+            # send message
+            msg = ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
+            # prints message
+            ble.BLE_write('1',msg)
         elif lights_config[i] == "timer":
             lights_config[i] = "off"
             if i == 0:
@@ -831,7 +840,10 @@ class Lights(tk.Frame):
                 self.togTank.config(text="OFF", fg="red")
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
-            ble.BLE_messenger(0,1) # 0 is off, outlet 1
+            # send message
+            msg = ble.BLE_messenger(0,1) # 0 is off, outlet 1
+            # prints message
+            ble.BLE_write('1',msg)
         csv_write('lights_config', lights_config)
         #ble.BLE_message(0b10, )
         #ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
