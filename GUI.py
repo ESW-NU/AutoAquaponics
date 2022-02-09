@@ -28,7 +28,7 @@ SMALL_FONT = ("Verdana", 8)
 import csv
 import matplotlib
 from matplotlib import ticker as mticker
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 matplotlib.use('TkAgg')
 from matplotlib import figure
 from matplotlib import dates as mdates
@@ -697,6 +697,9 @@ class ControlPanel(tk.Frame):
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 10)
+        
+        # send init message
+        ble.BLE_init()
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
@@ -742,6 +745,7 @@ class ControlPanel(tk.Frame):
                 j = 0
                 if(i == 2):
                     j = 1
+         
 
 class Lights(tk.Frame): 
     
@@ -809,7 +813,9 @@ class Lights(tk.Frame):
             elif i == 3:
                 self.togBask.config(text="ON", fg="green")
             # send message
-            ble.BLE_messenger(1,1) # 1 is on, outlet 1
+            msg = ble.BLE_messenger(1,1) # 1 is on, outlet 1
+            # prints message
+            ble.BLE_write('1',msg)
         elif lights_config[i] == "on":
             lights_config[i] = "timer"
             if i == 0:
@@ -820,7 +826,10 @@ class Lights(tk.Frame):
                 self.togTank.config(text="TIMER", fg="purple")
             elif i == 3:
                 self.togBask.config(text="TIMER", fg="purple")
-            ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
+            # send message
+            msg = ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
+            # prints message
+            ble.BLE_write('1',msg)
         elif lights_config[i] == "timer":
             lights_config[i] = "off"
             if i == 0:
@@ -831,7 +840,10 @@ class Lights(tk.Frame):
                 self.togTank.config(text="OFF", fg="red")
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
-            ble.BLE_messenger(0,1) # 0 is off, outlet 1
+            # send message
+            msg = ble.BLE_messenger(0,1) # 0 is off, outlet 1
+            # prints message
+            ble.BLE_write('1',msg)
         csv_write('lights_config', lights_config)
         #ble.BLE_message(0b10, )
         #ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
@@ -1024,15 +1036,25 @@ class WaterPump(tk.Frame):
         elif self.mode == "on":
             self.mode = "timer"
             self.control.config(text="Timer ON", fg="purple")
-            self.mins = tk.Label(master=self.buttonFrame, text="(min):", bg = 'white')
-            self.mins.grid(row=0, column=3)
+            self.mins = tk.Label(master=self.buttonFrame, text="Time Pumping (min):", bg = 'white')
+            self.mins.grid(row=1, column=3)
             self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
-            self.timer.grid(row=0, column=4, padx=(0,5), pady=5, columnspan=1)
+            self.timer.grid(row=1, column=4, padx=(0,5), pady=5, columnspan=1)
+            
+            #edits
+            self.mins1 = tk.Label(master=self.buttonFrame, text="Time Pumping (min):", bg = 'white')
+            self.mins1.grid(row=2, column=3)
+            self.timer1 = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
+            self.timer1.grid(row=2, column=4, padx=(0,5), pady=5, columnspan=1)
+
         elif self.mode == "timer":
             self.mode = "off"
             self.control.config(text="OFF", fg="red")
             self.mins.destroy()
             self.timer.destroy()
+            self.mins1.destroy()
+            self.timer1.destroy()            
+            
         elif self.mode == "go to off":
             self.mode = "off"
             self.control.config(text="OFF", fg="red")

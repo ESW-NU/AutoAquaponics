@@ -63,7 +63,7 @@ class fakeBLE:
     # char is the characteristic we are writing to, message is the number we are sending
     def BLE_write(self, char, message):
         print("Fake message here: " + 
-            str(self.charact[char]) + ", " + bin(message) + ", " + str(message))
+            str(self.charact[char]) + ", " + format(message,"032b") + ", " + str(message))
 
     # peri is the code for the specific peripheral we are disconnecting
     def BLE_disconnect(self, peri):
@@ -82,32 +82,40 @@ class fakeBLE:
         red = "0000000000" # 10 bit
         blue = "0000000000" # 10 bit
         yellow = "00" # 2 bit 
-        # send start message
-        # start_msg() working on this right now
-        # message: turn on(1) or off(0)
+
+        # message: permanent turn on(1) or off(0)
         if mode == 1 or mode == 0:
             yellow = "11" # indicate permanant mode
-            red = list(red)
-            red[outlet-1]=str(mode)
-            red = "".join(red)
-            blue = list(blue)
-            blue[outlet-1]=str(mode)
-            blue = "".join(blue)
-        # message: timer
+            brown = "000000000" + str(mode)
+            red = "0000000001"
+            blue = format(outlet-1,"010b")
+        # message: timer toggle button
         elif mode == 2:
-            pass
+            yellow = "11"
+        # message: timer save button
+        elif mode == 3:
+            yellow = "10"
+
         message = brown+red+blue+yellow
-        print(message + "\n")
-        #message = bin(int(message,2))
-        message = format(int(message,2),"032b")
-        print(message)
+        #message = format(int(message,2),"032b")
+        message = int(message,2)
         return message
+        
 
-    # def start_msg(self):
-        # working on this right now
-        #now = datetime.now()
-        #current_time = now.strftime("%H:%M:%S")
-
+    def start_msg(self):
+        now = datetime.datetime.now()
+        current_time = now.strftime("%H:%M").split(":")
+        current_time = round(int(current_time[0])*6 + int(current_time[1])/10) 
+        message = bin(current_time)[2:] + '00'
+        message = int(message,2)
+        return message
+    
+    def BLE_init(self):
+        # send start message
+        self.BLE_write('0', self.start_msg())
+        # TODO: send settings saved in CSV
+        
+    # REFERENCE CODE BELOW - NOT ACTUALLY USED ANYWHERE
     # this generates the individual 32 bit binary messages we are sending
     def BLE_message(self, mode, type, index_pump_outlets, time, state, interval=0b0):
         if mode == 0b00: #remove alarm mode
