@@ -31,7 +31,7 @@ class Logger:
         self.c.execute("SELECT name FROM sqlite_master WHERE type='table';")
         for n in self.c.fetchall():
             self.dbtables.append(n[0])
-
+        
         #Create an alert for when a new database is being made
         if newdb:
             print('ALERT: No prior database named ' + self.dbname + '. Created a new database in the target directory')

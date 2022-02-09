@@ -172,7 +172,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.query_by_num(table="SensorData", num=288) #initializes plot up to 20 if possible
+        most_recent = reader.query_by_num(table="SensorData", num=17280) #initializes plot up to 20 if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -272,7 +272,7 @@ def animate(ii):
                 #time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
                 time_f = datetime.datetime.fromtimestamp(most_recent[0][0])
                 time_stream.insert(0, time_f)
-                if len(data_stream) < 288: #graph updates, growing to show 20 points
+                if len(data_stream) < 17280: #graph updates, growing to show 20 points
                     current_plot.make_plot()
                 else:                      #there are 20 points and more available, so animation occurs
                     data_stream.pop()
@@ -700,7 +700,7 @@ class ControlPanel(tk.Frame):
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
-                                  "Backwashing", "Back"] 
+                                  "Backwashing", "Back"]
         self.icons = ["light.png", "water.png", "food.png",  "sensor.png", "oxygen.png", 
                                  "backwash.png", "back.png"]
         self.ctrl_panel_image = []
@@ -1314,6 +1314,6 @@ app.geometry('1917x970')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
-ani = animation.FuncAnimation(f, animate, interval=5000)
+ani = animation.FuncAnimation(f, animate, interval=10000)
 #mainloop
 app.mainloop()
