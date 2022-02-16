@@ -988,7 +988,7 @@ class WaterPump(tk.Frame):
         self.rateA.set(pump_config[0])
         self.rateB.set(pump_config[1])
         self.time.set(pump_config[2])
-        self.mode = pump_config[3]
+        self.mode = pump_config[4]
 
         # initialize param text and padding text
         self.buttonFrame = tk.Frame(master=self, bg='white')
@@ -1048,7 +1048,7 @@ class WaterPump(tk.Frame):
             self.control.config(text="OFF", fg="red")
         config_settings = csv_read()
         pump_config = [config_settings[config_dict['pump_config']][0], config_settings[config_dict['pump_config']][1], \
-            config_settings[config_dict['pump_config']][2], self.mode]
+            config_settings[config_dict['pump_config']][2], config_settings[config_dict['pump_config']][3], self.mode]
         csv_write('pump_config', pump_config)
         # send message for timer mode (on/off/timer)
         ble.BLE_pump_mode(pump_config)
@@ -1080,7 +1080,7 @@ class WaterPump(tk.Frame):
             real_time = self.timer.get()
         else:
             real_time = None
-        pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
+        pump_config = [self.rateA.get(), self.rateB.get(), real_time, 0, self.mode]
         csv_write('pump_config', pump_config)
         # send messages for timer durations (A and B)
         ble.BLE_pump_duration(pump_config)
