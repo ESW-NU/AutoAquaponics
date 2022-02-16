@@ -8,7 +8,7 @@ from tkinter import ttk, W, LEFT, END
 from PIL import Image, ImageTk
 
 #uncomment later
-#import cv2   #open source computer vision library
+import cv2   #open source computer vision library
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 
