@@ -101,17 +101,14 @@ class fakeBLE:
         # send settings saved in CSV
         pump, oxygen, sensor, lights = config_settings
         self.BLE_pump_mode(pump)
-        self.BLE_pump_duration(pump)
-        for i, mode in enumerate(sensor):
-            self.BLE_sensor(i, mode)
+        self.BLE_solenoid_interval(pump)
         for i, mode in enumerate(lights[:4]):
             self.BLE_lights_mode(i, mode)
             self.BLE_lights_duration(i, lights[i+4], lights[i+8])
 
     def BLE_pump_mode(self, data):
         mode = data[4]
-        blueA = self.blue(15) # outlets: timerA=15, timerB=16
-        blueB = self.blue(16)
+        blueA = self.blue(1) # outlet number?
         yellow = 3
         if mode == 'on':
             brown = self.brown(1)
@@ -122,12 +119,10 @@ class fakeBLE:
         else:
             brown = 0
             red = 0
-        messageA = brown | red | blueA | yellow
-        messageB = brown | red | blueB | yellow
-        self.BLE_write('0', messageA)
-        self.BLE_write('0', messageB)
+        message = brown | red | blueA | yellow
+        self.BLE_write('0', message)
 
-    def BLE_pump_duration(self, data):
+    def BLE_solenoid_interval(self, data):
         if data[4] != 'timer':
             return
         timerA = data[2]
@@ -147,17 +142,6 @@ class fakeBLE:
         # [current DO]
         pass
 
-    def BLE_sensor(self, index, mode):
-        if mode == 'on':
-            brown = self.brown(1)
-        else:
-            brown = self.brown(0)
-        red = self.red(1)
-        blue = self.blue(index) # outlets: ph=0, tds=1, nitrate=2, ammonia=3
-        yellow = 3
-        message = brown | red | blue | yellow
-        self.BLE_write('0', message)
-
     def BLE_lights_mode(self, index, mode):
         if mode == 'on':
             brown = self.brown(1)
@@ -168,7 +152,7 @@ class fakeBLE:
         else:
             brown = 0
             red = 0
-        blue = self.blue(index) # outlets: shelf1=0, shelf2=1, fish=2, basking=3
+        blue = self.blue(index+1) # outlets: shelf1=1, shelf2=2, fish=3, basking=4
         yellow = 3
         message = brown | red | blue | yellow
         self.BLE_write('0', message)

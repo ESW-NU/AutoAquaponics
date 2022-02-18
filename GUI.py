@@ -1083,7 +1083,7 @@ class WaterPump(tk.Frame):
         pump_config = [self.rateA.get(), self.rateB.get(), real_time, 0, self.mode]
         csv_write('pump_config', pump_config)
         # send messages for timer durations (A and B)
-        ble.BLE_pump_duration(pump_config)
+        ble.BLE_solenoid_interval(pump_config)
         #ble.BLE_write('0', 51) #change 51 to some sort of encoding for the message
         
 
@@ -1164,7 +1164,6 @@ class SensorArray(tk.Frame):
             elif i == 3:
                 self.amTog.config(text="OFF", fg="red")
         csv_write('sensor_config', sensor_config)
-        ble.BLE_sensor(i, sensor_config[i])
     
     # ph popup window: for sample calibration values
     def popPh(self):
