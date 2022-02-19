@@ -35,7 +35,7 @@ def DataLogger():
     while True:
         #change tsamp and nsamp for logging time/frequency
         #use this for RPi with real sensors (comment line below if on computer, also comment line 2)
-        #last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", getData(last_distance, last_wtemp, last_hum, last_atemp), last_distance, last_wtemp, last_hum, last_atemp, tsamp=1, nsamp=5),2)
+        #last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", getData(last_distance, last_wtemp, last_hum, last_atemp), last_distance, last_wtemp, last_hum, last_atemp, tsamp=1, nsamp=10),2)
         #use this to simulate sensor logging data on computer (comment line below if on RPi)
         last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", data_fxn(last_distance, last_wtemp), last_distance, last_wtemp, last_hum, last_atemp, tsamp=1, nsamp=5),2)
         logger.log_data()

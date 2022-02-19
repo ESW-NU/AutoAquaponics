@@ -1,6 +1,9 @@
 #from bluepy import btle
 import datetime
+from distutils.command.config import config
 from tkinter import Message
+
+from pyparsing import ParseExpression
 
 class BLE:
     def __init__(self):
@@ -62,8 +65,7 @@ class fakeBLE:
 
     # char is the characteristic we are writing to, message is the number we are sending
     def BLE_write(self, char, message):
-        print("Fake message here: " + 
-            str(self.charact[char]) + ", " + format(message,"032b") + ", " + str(message))
+        print("Fake message here: ", str(self.charact[char]), ", " + bin(message), ", ", message)
 
     # peri is the code for the specific peripheral we are disconnecting
     def BLE_disconnect(self, peri):
@@ -76,44 +78,97 @@ class fakeBLE:
         config_path, db_path, img_path = user_settings()
         with open(config_path, "r") as file:
             config = list(csv.reader(file))
-
-    def BLE_messenger(self,mode,outlet):
-        brown = "0000000000" # 10 bit
-        red = "0000000000" # 10 bit
-        blue = "0000000000" # 10 bit
-        yellow = "00" # 2 bit 
-
-        # message: permanent turn on(1) or off(0)
-        if mode == 1 or mode == 0:
-            yellow = "11" # indicate permanant mode
-            brown = "000000000" + str(mode)
-            red = "0000000001"
-            blue = format(outlet-1,"010b")
-        # message: timer toggle button
-        elif mode == 2:
-            yellow = "11"
-        # message: timer save button
-        elif mode == 3:
-            yellow = "10"
-
-        message = brown+red+blue+yellow
-        #message = format(int(message,2),"032b")
-        message = int(message,2)
-        return message
-        
-
-    def start_msg(self):
-        now = datetime.datetime.now()
-        current_time = now.strftime("%H:%M").split(":")
-        current_time = round(int(current_time[0])*6 + int(current_time[1])/10) 
-        message = bin(current_time)[2:] + '00'
-        message = int(message,2)
-        return message
     
-    def BLE_init(self):
-        # send start message
-        self.BLE_write('0', self.start_msg())
-        # TODO: send settings saved in CSV
+
+    def brown(self, n):
+        return n << 22
+    
+    def red(self, n):
+        return n << 12
+
+    def blue(self, n):
+        return n << 2
+
+    def BLE_init(self, config_settings):
+        now = datetime.datetime.now()
+        time = [int(x) for x in now.strftime("%H:%M").split(":")]
+        time = 6 * time[0] + time[1]//10
+        blue = self.blue(time)
+        yellow = 0
+        message = blue | yellow
+        self.BLE_write('0', message)
+        
+        # send settings saved in CSV
+        pump, oxygen, sensor, lights = config_settings
+        self.BLE_pump_mode(pump)
+        self.BLE_solenoid_interval(pump)
+        for i, mode in enumerate(lights[:4]):
+            self.BLE_lights_mode(i, mode)
+            self.BLE_lights_duration(i, lights[i+4], lights[i+8])
+
+    def BLE_pump_mode(self, data):
+        mode = data[4]
+        blueA = self.blue(1) # outlet number?
+        yellow = 3
+        if mode == 'on':
+            brown = self.brown(1)
+            red = self.red(1)
+        elif mode == 'off':
+            brown = 0
+            red = self.red(1)
+        else:
+            brown = 0
+            red = 0
+        message = brown | red | blueA | yellow
+        self.BLE_write('0', message)
+
+    def BLE_solenoid_interval(self, data):
+        if data[4] != 'timer':
+            return
+        timerA = data[2]
+        timerB = data[3]
+        redA = self.red(timerA)
+        redB = self.red(timerB)
+        blueA = self.blue(15)
+        blueB = self.blue(16)
+        yellow = 1
+        messageA = redA | blueA | yellow
+        messageB = redB | blueB | yellow
+        self.BLE_write('0', messageA)
+        self.BLE_write('0', messageB)
+
+    def BLE_oxygen(self, data):
+        # [0]
+        # [current DO]
+        pass
+
+    def BLE_lights_mode(self, index, mode):
+        if mode == 'on':
+            brown = self.brown(1)
+            red = self.red(1)
+        elif mode == 'off':
+            brown = 0
+            red = self.red(1)
+        else:
+            brown = 0
+            red = 0
+        blue = self.blue(index+1) # outlets: shelf1=1, shelf2=2, fish=3, basking=4
+        yellow = 3
+        message = brown | red | blue | yellow
+        self.BLE_write('0', message)
+
+    def BLE_lights_duration(self, index, start, duration):
+        start = [int(start[:2]), int(start[3:])]
+        start = 6 * start[0] + start[1]//10
+        duration = [int(duration[:2]), int(duration[3:])]
+        duration = 6 * duration[0] + duration[1]//10
+        brown = self.brown(duration)
+        red = self.red(start)
+        blue = self.blue(index)
+        yellow = 2
+        message = brown | red | blue | yellow
+        self.BLE_write('0', message)
+    
         
     # REFERENCE CODE BELOW - NOT ACTUALLY USED ANYWHERE
     # this generates the individual 32 bit binary messages we are sending

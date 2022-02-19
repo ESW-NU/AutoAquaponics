@@ -95,11 +95,11 @@ init_dict = {
     'email_config': ['Email']*num_contacts,
     'upper_config': [1000]*11,
     'lower_config': [0]*11,
-    'pump_config': [0, 0, None, "off"],
+    'pump_config': [0, 0, None, None, "off"],
     'oxygen_config': [0],
     'sensor_config': ['off']*4,
-    'lights_config': ['off']*4+[0]*12,
-    'backwash_config': [0, 0]
+    'lights_config': ['off']*4+['00:00']*8,
+    'backwash_config': [0, "off"]
 }
 
 # initializes csv, if not properly initialized
@@ -174,7 +174,7 @@ class Sensor_Plot:
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
     try:
-        most_recent = reader.query_by_num(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
+        most_recent = reader.query_by_num(table="SensorData", num=17280) #initializes plot up to 20 if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -274,7 +274,7 @@ def animate(ii):
                 #time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
                 time_f = datetime.datetime.fromtimestamp(most_recent[0][0])
                 time_stream.insert(0, time_f)
-                if len(data_stream) < 20: #graph updates, growing to show 20 points
+                if len(data_stream) < 17280: #graph updates, growing to show 20 points
                     current_plot.make_plot()
                 else:                      #there are 20 points and more available, so animation occurs
                     data_stream.pop()
@@ -701,11 +701,12 @@ class ControlPanel(tk.Frame):
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 10)
         
         # send init message
-        ble.BLE_init()
+        config_settings = csv_read()[6:10]
+        ble.BLE_init(config_settings)
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
-                                  "Backwashing", "Back"] 
+                                  "Backwashing", "Back"]
         self.icons = ["light.png", "water.png", "food.png",  "sensor.png", "oxygen.png", 
                                  "backwash.png", "back.png"]
         self.ctrl_panel_image = []
@@ -814,10 +815,6 @@ class Lights(tk.Frame):
                 self.togTank.config(text="ON", fg="green")
             elif i == 3:
                 self.togBask.config(text="ON", fg="green")
-            # send message
-            msg = ble.BLE_messenger(1,1) # 1 is on, outlet 1
-            # prints message
-            ble.BLE_write('1',msg)
         elif lights_config[i] == "on":
             lights_config[i] = "timer"
             if i == 0:
@@ -828,10 +825,6 @@ class Lights(tk.Frame):
                 self.togTank.config(text="TIMER", fg="purple")
             elif i == 3:
                 self.togBask.config(text="TIMER", fg="purple")
-            # send message
-            msg = ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
-            # prints message
-            ble.BLE_write('1',msg)
         elif lights_config[i] == "timer":
             lights_config[i] = "off"
             if i == 0:
@@ -842,13 +835,8 @@ class Lights(tk.Frame):
                 self.togTank.config(text="OFF", fg="red")
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
-            # send message
-            msg = ble.BLE_messenger(0,1) # 0 is off, outlet 1
-            # prints message
-            ble.BLE_write('1',msg)
+        ble.BLE_lights_mode(i, lights_config[i])
         csv_write('lights_config', lights_config)
-        #ble.BLE_message(0b10, )
-        #ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
 
     # shelf 1 popup window: for setting start and duration times
     def pop1(self):
@@ -884,7 +872,7 @@ class Lights(tk.Frame):
         lights_config[4] = self.start1.get()
         lights_config[8] = self.dur1.get()
         csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 37) #change 37 to some sort of encoding for the message
+        ble.BLE_lights_duration(0, lights_config[4], lights_config[8])
 
     # shelf 2 popup window: for setting start and duration times
     def pop2(self):
@@ -917,7 +905,7 @@ class Lights(tk.Frame):
         lights_config[5] = self.start2.get()
         lights_config[9] = self.dur2.get()
         csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 38) #change 38 to some sort of encoding for the message
+        ble.BLE_lights_duration(1, lights_config[5], lights_config[9])
 
     # fish tank popup window: for setting start and duration times
     def popTank(self):
@@ -950,7 +938,7 @@ class Lights(tk.Frame):
         lights_config[6] = self.startTank.get()
         lights_config[10] = self.durTank.get()
         csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 39) #change 39 to some sort of encoding for the message
+        ble.BLE_lights_duration(2, lights_config[6], lights_config[10])
 
     # basking popup window: for setting start and duration times
     def popBask(self):
@@ -983,7 +971,7 @@ class Lights(tk.Frame):
         lights_config[7] = self.startBask.get()
         lights_config[11] = self.durBask.get()
         csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 40) #change 40 to some sort of encoding for the message
+        ble.BLE_lights_duration(3, lights_config[7], lights_config[11])
 
 
 class WaterPump(tk.Frame):
@@ -1002,7 +990,7 @@ class WaterPump(tk.Frame):
         self.rateA.set(pump_config[0])
         self.rateB.set(pump_config[1])
         self.time.set(pump_config[2])
-        self.mode = pump_config[3]
+        self.mode = pump_config[4]
 
         # initialize param text and padding text
         self.buttonFrame = tk.Frame(master=self, bg='white')
@@ -1062,9 +1050,11 @@ class WaterPump(tk.Frame):
             self.control.config(text="OFF", fg="red")
         config_settings = csv_read()
         pump_config = [config_settings[config_dict['pump_config']][0], config_settings[config_dict['pump_config']][1], \
-            config_settings[config_dict['pump_config']][2], self.mode]
+            config_settings[config_dict['pump_config']][2], config_settings[config_dict['pump_config']][3], self.mode]
         csv_write('pump_config', pump_config)
-        ble.BLE_write('0', 52) #change 52 to some sort of encoding for the message
+        # send message for timer mode (on/off/timer)
+        ble.BLE_pump_mode(pump_config)
+        #ble.BLE_write('0', 52) #change 52 to some sort of encoding for the message
 
     # save popup
     def popup(self):
@@ -1092,9 +1082,11 @@ class WaterPump(tk.Frame):
             real_time = self.timer.get()
         else:
             real_time = None
-        pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
+        pump_config = [self.rateA.get(), self.rateB.get(), real_time, 0, self.mode]
         csv_write('pump_config', pump_config)
-        ble.BLE_write('0', 51) #change 51 to some sort of encoding for the message
+        # send messages for timer durations (A and B)
+        ble.BLE_solenoid_interval(pump_config)
+        #ble.BLE_write('0', 51) #change 51 to some sort of encoding for the message
         
 
 class FishFeeder(tk.Frame):
@@ -1310,7 +1302,7 @@ class Oxygenator(tk.Frame):
         positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
         
-        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save()])
         YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
         NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
@@ -1319,6 +1311,7 @@ class Oxygenator(tk.Frame):
     # saves value to csv
     def save(self):
         csv_write('oxygen_config', [self.min.get()])
+        self.popup.destroy()
 
 class Backwashing(tk.Frame):
 
@@ -1422,6 +1415,6 @@ app.geometry('1917x970')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
-ani = animation.FuncAnimation(f, animate, interval=5000)#, blit=True)
+ani = animation.FuncAnimation(f, animate, interval=10000)
 #mainloop
 app.mainloop()
