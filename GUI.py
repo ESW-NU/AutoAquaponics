@@ -985,7 +985,7 @@ class WaterPump(tk.Frame):
         navibutton1.pack(pady = (0,10))
         
         # initialize tkinter variables for rate and time values
-        self.rateA, self.rateB, self.time = tk.IntVar(), tk.IntVar(), tk.IntVar()
+        self.rateA, self.rateB, self.timeA, self.timeB = tk.IntVar(), tk.IntVar(), tk.IntVar(), tk.IntVar()
         pump_config = csv_read()[config_dict['pump_config']]
         self.rateA.set(pump_config[0])
         self.rateB.set(pump_config[1])
