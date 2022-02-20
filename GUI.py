@@ -987,7 +987,8 @@ class WaterPump(tk.Frame):
         pump_config = csv_read()[config_dict['pump_config']]
         self.rateA.set(pump_config[0])
         self.rateB.set(pump_config[1])
-        self.time.set(pump_config[2])
+        self.timeA.set(pump_config[2])
+        self.timeB.set(pump_config[3])
         self.mode = pump_config[4]
 
         # initialize param text and padding text
@@ -1026,13 +1027,13 @@ class WaterPump(tk.Frame):
             self.control.config(text="Timer ON", fg="purple")
             self.mins = tk.Label(master=self.buttonFrame, text="Time Pumping (min):", bg = 'white')
             self.mins.grid(row=1, column=3)
-            self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
+            self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.timeA)
             self.timer.grid(row=1, column=4, padx=(0,5), pady=5, columnspan=1)
             
             #edits
             self.mins1 = tk.Label(master=self.buttonFrame, text="Time Pumping (min):", bg = 'white')
             self.mins1.grid(row=2, column=3)
-            self.timer1 = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
+            self.timer1 = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.timeB)
             self.timer1.grid(row=2, column=4, padx=(0,5), pady=5, columnspan=1)
 
         elif self.mode == "timer":
@@ -1080,7 +1081,7 @@ class WaterPump(tk.Frame):
             real_time = self.timer.get()
         else:
             real_time = None
-        pump_config = [self.rateA.get(), self.rateB.get(), real_time, 0, self.mode]
+        pump_config = [self.rateA.get(), self.rateB.get(), self.timeA.get(), self.timeB.get(), self.mode] # need to fix csv with new data
         csv_write('pump_config', pump_config)
         # send messages for timer durations (A and B)
         ble.BLE_solenoid_interval(pump_config)

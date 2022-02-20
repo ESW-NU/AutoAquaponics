@@ -108,7 +108,7 @@ class fakeBLE:
 
     def BLE_pump_mode(self, data):
         mode = data[4]
-        blueA = self.blue(1) # outlet number?
+        blue = self.blue(0) # water pump outlet 0 (will be 2 pumps)
         yellow = 3
         if mode == 'on':
             brown = self.brown(1)
@@ -119,7 +119,7 @@ class fakeBLE:
         else:
             brown = 0
             red = 0
-        message = brown | red | blueA | yellow
+        message = brown | red | blue | yellow
         self.BLE_write('0', message)
 
     def BLE_solenoid_interval(self, data):
@@ -129,8 +129,8 @@ class fakeBLE:
         timerB = data[3]
         redA = self.red(timerA)
         redB = self.red(timerB)
-        blueA = self.blue(15)
-        blueB = self.blue(16)
+        blueA = self.blue(15) # solenoid A outlet 15
+        blueB = self.blue(16) # solenoid B outlet 16
         yellow = 1
         messageA = redA | blueA | yellow
         messageB = redB | blueB | yellow
