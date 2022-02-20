@@ -81,7 +81,8 @@ config_dict = {
     'pump_config':6,
     'oxygen_config':7,
     'sensor_config':8,
-    'lights_config':9
+    'lights_config':9,
+    'backwash_config':10
     }
 
 # Enter row title here when adding a new row to the csv:
@@ -97,7 +98,8 @@ init_dict = {
     'pump_config': [0, 0, None, None, "off"],
     'oxygen_config': [0],
     'sensor_config': ['off']*4,
-    'lights_config': ['off']*4+['00:00']*8
+    'lights_config': ['off']*4+['00:00']*8,
+    'backwash_config': [0, "off"]
 }
 
 # initializes csv, if not properly initialized
@@ -1313,7 +1315,7 @@ class Oxygenator(tk.Frame):
         self.popup.destroy()
 
 class Backwashing(tk.Frame):
-    
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
@@ -1322,6 +1324,91 @@ class Backwashing(tk.Frame):
         navibutton1 = ttk.Button(self, text="Back",
                             command=lambda: controller.show_frame(ControlPanel))
         navibutton1.pack()
+
+        # init tkinter var: rate and mode
+        self.rate = tk.IntVar()
+        backwash_config = csv_read()[config_dict['backwash_config']]
+        self.rate.set(backwash_config[0])
+        self.mode = backwash_config[1]
+
+        # init frame
+        self.buttonFrame = tk.Frame(master=self, bg='white')
+        self.buttonFrame.pack()
+
+        # init labels
+        tk.Label(master=self.buttonFrame, text="Backwash Status:", bg="white").grid(row=4, column=0, padx=1, pady=5)
+        tk.Label(master=self.buttonFrame, text="Backwash When Flow Rate Less Than (GPH):", bg="white").grid(row=1, column=0, padx=3, pady=5)
+        # init entry spaces
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rate, bg="white").grid(row=1, column=1, padx=5, pady=5)
+        # init buttons
+        ttk.Button(self, text="Backwash Now", width=15, command=self.popupNow).pack(pady = (11,0))
+        ttk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
+       
+        # init on/off button
+        self.control = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=self.switch)
+        self.control.grid(row=4, column=1, padx=1, pady=8)
+
+        # initialize correct button state (on vs. off)
+        if self.mode == "on":
+            self.initialize()
+    
+    def initialize(self):
+        if self.mode == "on":
+            self.control.config(text="ON", fg="green")
+        else:
+            self.control.config(text="OFF", fg="red")
+
+    def switch(self):
+        if self.mode == "off":
+            self.mode = "on"
+            self.control.config(text="ON", fg="green")
+        else:
+            self.mode = "off"
+            self.control.config(text="OFF", fg="red")
+
+    # Backwash Now popup
+    def popupNow(self):
+        self.popupNow = tk.Tk()
+        self.popupNow.wm_title("Alert")
+        label = ttk.Label(self.popupNow, text="Are you sure you want to backwash now?", font=MEDIUM_FONT)
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+        
+        # centers the popup window
+        popup_width = self.popupNow.winfo_reqwidth()
+        popup_height = self.popupNow.winfo_reqheight()
+        positionRight = int(self.popupNow.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popupNow.winfo_screenheight()/2 - popup_height/2 )
+        self.popupNow.geometry("+{}+{}".format(positionRight, positionDown))
+        
+        YesB = ttk.Button(self.popupNow, text="YES", command = lambda:[self.save(), self.popupNow.destroy()])
+        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
+        NoB = ttk.Button(self.popupNow, text="NO", command = self.popupNow.destroy)
+        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
+        self.popupNow.mainloop()
+
+    # save popup
+    def popup(self):
+        self.popup = tk.Tk()
+        self.popup.wm_title("Alert")
+        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+        
+        # centers the popup window
+        popup_width = self.popup.winfo_reqwidth()
+        popup_height = self.popup.winfo_reqheight()
+        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+        
+        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
+        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
+        self.popup.mainloop()
+
+    # saves value to csv
+    def save(self):
+        csv_write('backwash_config', [self.rate.get(), self.mode])
 
 app = AllWindow()
 #app.geometry('1280x623')
