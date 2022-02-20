@@ -1080,10 +1080,12 @@ class WaterPump(tk.Frame):
     # saves data to the csv
     def save(self):
         if self.mode == "timer":
-            real_time = self.timer.get()
+            real_timeA = int(self.timerA.get())
+            real_timeA = int(self.timerB.get())
         else:
-            real_time = None
-        pump_config = [self.rateA.get(), self.rateB.get(), self.timeA.get(), self.timeB.get(), self.mode] # need to fix csv with new data
+            real_timeA = None
+            real_timeB = None
+        pump_config = [self.rateA.get(), self.rateB.get(), real_timeA, real_timeB, self.mode] # need to fix csv with new data
         csv_write('pump_config', pump_config)
         # send messages for timer durations (A and B)
         ble.BLE_solenoid_interval(pump_config)
