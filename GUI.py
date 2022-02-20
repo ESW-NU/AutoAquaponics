@@ -1081,7 +1081,7 @@ class WaterPump(tk.Frame):
     def save(self):
         if self.mode == "timer":
             real_timeA = int(self.timeA.get())
-            real_timeA = int(self.timeB.get())
+            real_timeB = int(self.timeB.get())
         else:
             real_timeA = None
             real_timeB = None
