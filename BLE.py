@@ -125,8 +125,8 @@ class fakeBLE:
     def BLE_solenoid_interval(self, data):
         if data[4] != 'timer':
             return
-        timerA = data[2]
-        timerB = data[3]
+        timerA = int(data[2])
+        timerB = int(data[3])
         redA = self.red(timerA)
         redB = self.red(timerB)
         blueA = self.blue(15) # solenoid A outlet 15
