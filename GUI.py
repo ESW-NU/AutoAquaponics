@@ -1080,8 +1080,8 @@ class WaterPump(tk.Frame):
     # saves data to the csv
     def save(self):
         if self.mode == "timer":
-            real_timeA = int(self.timerA.get())
-            real_timeA = int(self.timerB.get())
+            real_timeA = int(self.timeA.get())
+            real_timeA = int(self.timeB.get())
         else:
             real_timeA = None
             real_timeB = None
