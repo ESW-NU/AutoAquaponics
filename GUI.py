@@ -850,8 +850,10 @@ class Lights(tk.Frame):
 
         lights_config = csv_read()[config_dict['lights_config']]
         self.start1, self.dur1 = tk.StringVar(self.pop1), tk.StringVar(self.pop1)
-        self.start1.set(lights_config[4])
-        self.dur1.set(lights_config[8])
+        self.start1.set(lights_config[4][:2])
+        self.dur1.set(lights_config[8][:2])
+        self.drop_start1_val.set(lights_config[4][3:])
+        self.drop_dur1_val.set(lights_config[4][3:])
 
         tk.Label(self.pop1, text="Start HH:").grid(row=0, column=0, padx=(100,0), pady=(20,0))
         tk.Label(self.pop1, text="Duration HH:").grid(row=1, column=0, padx=(100,0))
@@ -865,8 +867,6 @@ class Lights(tk.Frame):
         self.options = ['00', '10', '20', '30', '40', '50']
         self.drop_start1_val = tk.StringVar(self.pop1)
         self.drop_dur1_val = tk.StringVar(self.pop1)
-        self.drop_start1_val.set('00')
-        self.drop_dur1_val.set('00')
         tk.OptionMenu(self.pop1, self.drop_start1_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,0))
         tk.OptionMenu(self.pop1, self.drop_dur1_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,0))
 
