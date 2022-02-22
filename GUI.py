@@ -853,14 +853,22 @@ class Lights(tk.Frame):
         self.start1.set(lights_config[4])
         self.dur1.set(lights_config[8])
 
-        tk.Label(self.pop1, text="Start (HH:MM)").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration (HH:MM)").grid(row=1, column=0, padx=(100,0))
-
-        tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(30,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(30,0))
+        tk.Label(self.pop1, text="Start HH:").grid(row=0, column=0, padx=(100,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration HH:").grid(row=1, column=0, padx=(100,0))
         
         tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,0))
         tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,0))
+
+        tk.Label(self.pop1, text="MM:").grid(row=0, column=2, padx=(100,0), pady=(20,0))
+        tk.Label(self.pop1, text="MM:").grid(row=1, column=2, padx=(100,0))
+        
+        self.options = ['00', '10', '20', '30', '40', '50']
+        self.drop_start1_val = tk.StringVar(self.pop1)
+        self.drop_dur1_val = tk.StringVar(self.pop1)
+        self.drop_start1_val.set('00')
+        self.drop_dur1_val.set('00')
+        tk.OptionMenu(self.pop1, self.drop_start1_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,0))
+        tk.OptionMenu(self.pop1, self.drop_dur1_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,0))
 
         tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=1, columnspan=3, padx=(20,20), pady=(20,20))
 
@@ -869,8 +877,8 @@ class Lights(tk.Frame):
     # saves shelf 1 start/duration values
     def save1(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[4] = self.start1.get()
-        lights_config[8] = self.dur1.get()
+        lights_config[4] = self.start1.get()+':'+self.drop_start1_val.get()
+        lights_config[8] = self.dur1.get()+':'+self.drop_dur1_val.get()
         csv_write('lights_config', lights_config)
         ble.BLE_lights_duration(0, lights_config[4], lights_config[8])
 
