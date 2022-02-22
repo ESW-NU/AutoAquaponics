@@ -856,10 +856,10 @@ class Lights(tk.Frame):
         self.start1.set(lights_config[4][:2])
         self.dur1.set(lights_config[8][:2])
         self.drop_start1_val.set(lights_config[4][3:])
-        self.drop_dur1_val.set(lights_config[4][3:])
+        self.drop_dur1_val.set(lights_config[8][3:])
 
-        tk.Label(self.pop1, text="Start HH:").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration HH:").grid(row=1, column=0, padx=(100,0))
+        tk.Label(self.pop1, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration HH:").grid(row=1, column=0, padx=(20,0))
         
         tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,0))
         tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,0))
