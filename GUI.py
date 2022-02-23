@@ -850,11 +850,10 @@ class Lights(tk.Frame):
 
         lights_config = csv_read()[config_dict['lights_config']]
         self.start1, self.dur1 = tk.StringVar(self.pop1), tk.StringVar(self.pop1)
-        self.drop_start1_val = tk.StringVar(self.pop1)
-        self.drop_dur1_val = tk.StringVar(self.pop1)
-
         self.start1.set(lights_config[4][:2])
         self.dur1.set(lights_config[8][:2])
+
+        self.drop_start1_val, self.drop_dur1_val = tk.StringVar(self.pop1), tk.StringVar(self.pop1)
         self.drop_start1_val.set(lights_config[4][3:])
         self.drop_dur1_val.set(lights_config[8][3:])
 
@@ -868,8 +867,8 @@ class Lights(tk.Frame):
         tk.Label(self.pop1, text="MM:").grid(row=1, column=2, padx=(20,0))
         
         self.options = ['00', '10', '20', '30', '40', '50']
-        tk.OptionMenu(self.pop1, self.drop_start1_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,0))
-        tk.OptionMenu(self.pop1, self.drop_dur1_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,0))
+        tk.OptionMenu(self.pop1, self.drop_start1_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
+        tk.OptionMenu(self.pop1, self.drop_dur1_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
 
         tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=1, columnspan=3, padx=(20,20), pady=(20,20))
 
@@ -895,14 +894,25 @@ class Lights(tk.Frame):
 
         lights_config = csv_read()[config_dict['lights_config']]
         self.start2, self.dur2 = tk.IntVar(self.pop2), tk.IntVar(self.pop2)
-        self.start2.set(lights_config[5])
-        self.dur2.set(lights_config[9])
+        self.start2.set(lights_config[5][:2])
+        self.dur2.set(lights_config[9][:2])
 
-        tk.Label(self.pop2, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.pop2, text="Duration").grid(row=1, column=0, padx=(100,0))
+        self.drop_start2_val, self.drop_dur2_val = tk.StringVar(self.pop2), tk.StringVar(self.pop2)
+        self.drop_start2_val.set(lights_config[5][3:])
+        self.drop_dur2_val.set(lights_config[9][3:])
 
-        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.start2).grid(row=0, column=1, pady=(20,0), padx=(0,100))
-        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,100))
+        tk.Label(self.pop2, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop2, text="Duration HH:").grid(row=1, column=0, padx=(20,0))
+        
+        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.start2).grid(row=0, column=1, pady=(20,0), padx=(0,0))
+        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,0))
+
+        tk.Label(self.pop2, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop2, text="MM:").grid(row=1, column=2, padx=(20,0))
+        
+        self.options = ['00', '10', '20', '30', '40', '50']
+        tk.OptionMenu(self.pop2, self.drop_start2_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
+        tk.OptionMenu(self.pop2, self.drop_dur2_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
 
         tk.Button(self.pop2, text="SAVE", width=9, command=lambda: [self.save2(), self.pop2.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
 
@@ -911,8 +921,8 @@ class Lights(tk.Frame):
     # saves shelf 2 start/duration values
     def save2(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[5] = self.start2.get()
-        lights_config[9] = self.dur2.get()
+        lights_config[5] = self.start2.get()+':'+self.drop_start2_val.get()
+        lights_config[9] = self.dur2.get()+':'+self.drop_dur2_val.get()
         csv_write('lights_config', lights_config)
         ble.BLE_lights_duration(1, lights_config[5], lights_config[9])
 
@@ -928,14 +938,25 @@ class Lights(tk.Frame):
 
         lights_config = csv_read()[config_dict['lights_config']]
         self.startTank, self.durTank = tk.IntVar(self.popTank), tk.IntVar(self.popTank)
-        self.startTank.set(lights_config[6])
-        self.durTank.set(lights_config[10])
+        self.startTank.set(lights_config[6][:2])
+        self.durTank.set(lights_config[10][:2])
 
-        tk.Label(self.popTank, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.popTank, text="Duration").grid(row=1, column=0, padx=(100,0))
+        self.drop_startTank_val, self.drop_durTank_val = tk.StringVar(self.popTank), tk.StringVar(self.popTank)
+        self.drop_startTank_val.set(lights_config[6][3:])
+        self.drop_durTank_val.set(lights_config[10][3:])
 
-        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.startTank).grid(row=0, column=1, pady=(20,0), padx=(0,100))
-        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,100))
+        tk.Label(self.popTank, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popTank, text="Duration HH:").grid(row=1, column=0, padx=(20,0))
+        
+        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.startTank).grid(row=0, column=1, pady=(20,0), padx=(0,0))
+        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,0))
+
+        tk.Label(self.popTank, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
+        tk.Label(self.popTank, text="MM:").grid(row=1, column=2, padx=(20,0))
+        
+        self.options = ['00', '10', '20', '30', '40', '50']
+        tk.OptionMenu(self.popTank, self.drop_startTank_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
+        tk.OptionMenu(self.popTank, self.drop_durTank_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
 
         tk.Button(self.popTank, text="SAVE", width=9, command=lambda: [self.saveTank(), self.popTank.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
 
@@ -944,8 +965,8 @@ class Lights(tk.Frame):
     # saves fish tank start/duration values
     def saveTank(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[6] = self.startTank.get()
-        lights_config[10] = self.durTank.get()
+        lights_config[6] = self.startTank.get()+':'+self.drop_startTank_val.get()
+        lights_config[10] = self.durTank.get()+':'+self.drop_durTank_val.get()
         csv_write('lights_config', lights_config)
         ble.BLE_lights_duration(2, lights_config[6], lights_config[10])
 
@@ -961,14 +982,25 @@ class Lights(tk.Frame):
 
         lights_config = csv_read()[config_dict['lights_config']]
         self.startBask, self.durBask = tk.IntVar(self.popBask), tk.IntVar(self.popBask)
-        self.startBask.set(lights_config[7])
-        self.durBask.set(lights_config[11])
+        self.startBask.set(lights_config[7][:2])
+        self.durBask.set(lights_config[11][:2])
 
-        tk.Label(self.popBask, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.popBask, text="Duration").grid(row=1, column=0, padx=(100,0))
+        self.drop_startBask_val, self.drop_durBask_val = tk.StringVar(self.popBask), tk.StringVar(self.popBask)
+        self.drop_startBask_val.set(lights_config[7][3:])
+        self.drop_durBask_val.set(lights_config[11][3:])
 
-        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.startBask).grid(row=0, column=1, pady=(20,0), padx=(0,100))
-        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,100))
+        tk.Label(self.popBask, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popBask, text="Duration HH:").grid(row=1, column=0, padx=(20,0))
+        
+        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.startBask).grid(row=0, column=1, pady=(20,0), padx=(0,0))
+        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,0))
+
+        tk.Label(self.popBask, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
+        tk.Label(self.popBask, text="MM:").grid(row=1, column=2, padx=(20,0))
+        
+        self.options = ['00', '10', '20', '30', '40', '50']
+        tk.OptionMenu(self.popBask, self.drop_startBask_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
+        tk.OptionMenu(self.popBask, self.drop_durBask_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
 
         tk.Button(self.popBask, text="SAVE", width=9, command=lambda: [self.saveBask(), self.popBask.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
 
@@ -977,8 +1009,8 @@ class Lights(tk.Frame):
     # saves basking start/duration values
     def saveBask(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[7] = self.startBask.get()
-        lights_config[11] = self.durBask.get()
+        lights_config[7] = self.startBask.get()+':'+self.drop_startBask_val.get()
+        lights_config[11] = self.durBask.get()+':'+self.drop_durBask_val.get()
         csv_write('lights_config', lights_config)
         ble.BLE_lights_duration(3, lights_config[7], lights_config[11])
 
