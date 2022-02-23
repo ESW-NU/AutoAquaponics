@@ -713,7 +713,7 @@ class ControlPanel(tk.Frame):
         
         for image in self.icons:
             f = img_path + image
-            self.ctrl_panel_image.append(tk.PhotoImage(f)) #create array of images using image path
+            self.ctrl_panel_image.append(tk.PhotoImage(file = f)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
@@ -728,7 +728,7 @@ class ControlPanel(tk.Frame):
             frame.grid(row=i, column=j, padx=2, pady=2, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 0):
-                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Lights))
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image= self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Lights))
             if(counter == 1):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(WaterPump))
             if(counter == 2):
@@ -741,6 +741,7 @@ class ControlPanel(tk.Frame):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Backwashing))
             if(counter == 6):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
+
             button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
             j += 1
             if(j == 3):
