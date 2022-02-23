@@ -893,7 +893,7 @@ class Lights(tk.Frame):
         self.pop2.geometry("+{}+{}".format(positionRight, positionDown))
 
         lights_config = csv_read()[config_dict['lights_config']]
-        self.start2, self.dur2 = tk.IntVar(self.pop2), tk.IntVar(self.pop2)
+        self.start2, self.dur2 = tk.StringVar(self.pop2), tk.StringVar(self.pop2)
         self.start2.set(lights_config[5][:2])
         self.dur2.set(lights_config[9][:2])
 
@@ -937,7 +937,7 @@ class Lights(tk.Frame):
         self.popTank.geometry("+{}+{}".format(positionRight, positionDown))
 
         lights_config = csv_read()[config_dict['lights_config']]
-        self.startTank, self.durTank = tk.IntVar(self.popTank), tk.IntVar(self.popTank)
+        self.startTank, self.durTank = tk.StringVar(self.popTank), tk.StringVar(self.popTank)
         self.startTank.set(lights_config[6][:2])
         self.durTank.set(lights_config[10][:2])
 
@@ -981,7 +981,7 @@ class Lights(tk.Frame):
         self.popBask.geometry("+{}+{}".format(positionRight, positionDown))
 
         lights_config = csv_read()[config_dict['lights_config']]
-        self.startBask, self.durBask = tk.IntVar(self.popBask), tk.IntVar(self.popBask)
+        self.startBask, self.durBask = tk.StringVar(self.popBask), tk.StringVar(self.popBask)
         self.startBask.set(lights_config[7][:2])
         self.durBask.set(lights_config[11][:2])
 
