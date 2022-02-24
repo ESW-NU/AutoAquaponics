@@ -1425,9 +1425,9 @@ class Backwashing(tk.Frame):
         self.popupNow.geometry("+{}+{}".format(positionRight, positionDown))
         
         YesB = ttk.Button(self.popupNow, text="YES", command = lambda:[self.save(), self.popupNow.destroy()])
-        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
+        YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
         NoB = ttk.Button(self.popupNow, text="NO", command = self.popupNow.destroy)
-        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
+        NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
         self.popupNow.mainloop()
 
     # save popup
@@ -1445,9 +1445,9 @@ class Backwashing(tk.Frame):
         self.popup.geometry("+{}+{}".format(positionRight, positionDown))
         
         YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
-        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
+        YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
         NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
-        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
+        NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
         self.popup.mainloop()
 
     # saves value to csv
