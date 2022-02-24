@@ -1390,7 +1390,7 @@ class Backwashing(tk.Frame):
        
         # init on/off button
         self.control = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=self.switch)
-        self.control.grid(row=4, column=1, padx=1, pady=8)
+        self.control.place(x=210, y=47, anchor="center")
 
         # initialize correct button state (on vs. off)
         if self.mode == "on":
