@@ -136,7 +136,7 @@ def sendEmail(user_settings):
                         h3 {
                             font-size: 20px;
                         }
-                        header h1, header h3 {
+                        header * {
                             padding: 0px;
                             margin: 0px;
                         }
@@ -146,7 +146,7 @@ def sendEmail(user_settings):
                             text-align: center;
                         }
                         .griddy {
-                            max-width: 60%;
+                            max-width: 40%;
                             margin: 0 auto;
                         }
                         .item {
