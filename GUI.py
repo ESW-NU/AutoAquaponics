@@ -859,19 +859,19 @@ class Lights(tk.Frame):
         self.drop_dur1_val.set(lights_config[8][3:])
 
         tk.Label(self.pop1, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration HH:").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.pop1, text="Duration HH:").grid(row=1, column=0, padx=(20,0), pady=(20,0))
         
         tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,0))
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,0))
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,0), pady=(20,0))
 
         tk.Label(self.pop1, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
-        tk.Label(self.pop1, text="MM:").grid(row=1, column=2, padx=(20,0))
+        tk.Label(self.pop1, text="MM:").grid(row=1, column=2, padx=(20,0), pady=(20,0))
         
         self.options = ['00', '10', '20', '30', '40', '50']
         tk.OptionMenu(self.pop1, self.drop_start1_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
         tk.OptionMenu(self.pop1, self.drop_dur1_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
 
-        tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=1, columnspan=3, padx=(20,20), pady=(20,20))
+        tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=1, columnspan=4, padx=(20,20), pady=(20,20))
 
         self.pop1.mainloop()
 
@@ -903,19 +903,19 @@ class Lights(tk.Frame):
         self.drop_dur2_val.set(lights_config[9][3:])
 
         tk.Label(self.pop2, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.pop2, text="Duration HH:").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.pop2, text="Duration HH:").grid(row=1, column=0, padx=(20,0), pady=(20,0))
         
         tk.Entry(self.pop2, width=9, bg="white", textvariable=self.start2).grid(row=0, column=1, pady=(20,0), padx=(0,0))
-        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,0))
+        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,0), pady=(20,0))
 
         tk.Label(self.pop2, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
-        tk.Label(self.pop2, text="MM:").grid(row=1, column=2, padx=(20,0))
+        tk.Label(self.pop2, text="MM:").grid(row=1, column=2, padx=(20,0), pady=(20,0))
         
         self.options = ['00', '10', '20', '30', '40', '50']
         tk.OptionMenu(self.pop2, self.drop_start2_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
         tk.OptionMenu(self.pop2, self.drop_dur2_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
 
-        tk.Button(self.pop2, text="SAVE", width=9, command=lambda: [self.save2(), self.pop2.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+        tk.Button(self.pop2, text="SAVE", width=9, command=lambda: [self.save2(), self.pop2.destroy()]).grid(row=2, column=0, columnspan=4, padx=(20,20), pady=(20,20))
 
         self.pop2.mainloop()
 
@@ -947,19 +947,19 @@ class Lights(tk.Frame):
         self.drop_durTank_val.set(lights_config[10][3:])
 
         tk.Label(self.popTank, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popTank, text="Duration HH:").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.popTank, text="Duration HH:").grid(row=1, column=0, padx=(20,0), pady=(20,0))
         
         tk.Entry(self.popTank, width=9, bg="white", textvariable=self.startTank).grid(row=0, column=1, pady=(20,0), padx=(0,0))
-        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,0))
+        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,0), pady=(20,0))
 
         tk.Label(self.popTank, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
-        tk.Label(self.popTank, text="MM:").grid(row=1, column=2, padx=(20,0))
+        tk.Label(self.popTank, text="MM:").grid(row=1, column=2, padx=(20,0), pady=(20,0))
         
         self.options = ['00', '10', '20', '30', '40', '50']
         tk.OptionMenu(self.popTank, self.drop_startTank_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
         tk.OptionMenu(self.popTank, self.drop_durTank_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
 
-        tk.Button(self.popTank, text="SAVE", width=9, command=lambda: [self.saveTank(), self.popTank.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+        tk.Button(self.popTank, text="SAVE", width=9, command=lambda: [self.saveTank(), self.popTank.destroy()]).grid(row=2, column=0, columnspan=4, padx=(20,20), pady=(20,20))
 
         self.popTank.mainloop()
 
@@ -991,19 +991,19 @@ class Lights(tk.Frame):
         self.drop_durBask_val.set(lights_config[11][3:])
 
         tk.Label(self.popBask, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
-        tk.Label(self.popBask, text="Duration HH:").grid(row=1, column=0, padx=(20,0))
+        tk.Label(self.popBask, text="Duration HH:").grid(row=1, column=0, padx=(20,0), pady=(20,0))
         
         tk.Entry(self.popBask, width=9, bg="white", textvariable=self.startBask).grid(row=0, column=1, pady=(20,0), padx=(0,0))
-        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,0))
+        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,0), pady=(20,0))
 
         tk.Label(self.popBask, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
-        tk.Label(self.popBask, text="MM:").grid(row=1, column=2, padx=(20,0))
+        tk.Label(self.popBask, text="MM:").grid(row=1, column=2, padx=(20,0), pady=(20,0))
         
         self.options = ['00', '10', '20', '30', '40', '50']
         tk.OptionMenu(self.popBask, self.drop_startBask_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
         tk.OptionMenu(self.popBask, self.drop_durBask_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
 
-        tk.Button(self.popBask, text="SAVE", width=9, command=lambda: [self.saveBask(), self.popBask.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+        tk.Button(self.popBask, text="SAVE", width=9, command=lambda: [self.saveBask(), self.popBask.destroy()]).grid(row=2, column=0, columnspan=4, padx=(20,20), pady=(20,20))
 
         self.popBask.mainloop()
 
