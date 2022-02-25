@@ -930,8 +930,16 @@ class Lights(tk.Frame):
     # saves shelf 2 start/duration values
     def save2(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[5] = self.start2.get()+':'+self.drop_start2_val.get()
-        lights_config[9] = self.dur2.get()+':'+self.drop_dur2_val.get()
+        start = self.start2.get()
+        if len(start) == 1:
+            start = '0'+start
+            self.start2.set(start)
+        dur = self.dur2.get()
+        if len(dur) == 1:
+            dur = '0'+dur
+            self.dur2.set(dur)
+        lights_config[5] = start+':'+self.drop_start2_val.get()
+        lights_config[9] = dur+':'+self.drop_dur2_val.get()
         csv_write('lights_config', lights_config)
         ble.BLE_lights_duration(1, lights_config[5], lights_config[9])
 
@@ -974,8 +982,16 @@ class Lights(tk.Frame):
     # saves fish tank start/duration values
     def saveTank(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[6] = self.startTank.get()+':'+self.drop_startTank_val.get()
-        lights_config[10] = self.durTank.get()+':'+self.drop_durTank_val.get()
+        start = self.startTank.get()
+        if len(start) == 1:
+            start = '0'+start
+            self.startTank.set(start)
+        dur = self.durTank.get()
+        if len(dur) == 1:
+            dur = '0'+dur
+            self.durTank.set(dur)
+        lights_config[6] = start+':'+self.drop_startTank_val.get()
+        lights_config[10] = dur+':'+self.drop_durTank_val.get()
         csv_write('lights_config', lights_config)
         ble.BLE_lights_duration(2, lights_config[6], lights_config[10])
 
@@ -1018,8 +1034,16 @@ class Lights(tk.Frame):
     # saves basking start/duration values
     def saveBask(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[7] = self.startBask.get()+':'+self.drop_startBask_val.get()
-        lights_config[11] = self.durBask.get()+':'+self.drop_durBask_val.get()
+        start = self.startBask.get()
+        if len(start) == 1:
+            start = '0'+start
+            self.startBask.set(start)
+        dur = self.durBask.get()
+        if len(dur) == 1:
+            dur = '0'+dur
+            self.durBask.set(dur)
+        lights_config[7] = start+':'+self.drop_startBask_val.get()
+        lights_config[11] = dur+':'+self.drop_durBask_val.get()
         csv_write('lights_config', lights_config)
         ble.BLE_lights_duration(3, lights_config[7], lights_config[11])
 
