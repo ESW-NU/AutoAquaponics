@@ -878,8 +878,16 @@ class Lights(tk.Frame):
     # saves shelf 1 start/duration values
     def save1(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[4] = self.start1.get()+':'+self.drop_start1_val.get()
-        lights_config[8] = self.dur1.get()+':'+self.drop_dur1_val.get()
+        start = self.start1.get()
+        if len(start) == 1:
+            start = '0'+start
+            self.start1.set(start)
+        dur = self.dur1.get()
+        if len(dur) == 1:
+            dur = '0'+dur
+            self.dur1.set(dur)
+        lights_config[4] = start+':'+self.drop_start1_val.get()
+        lights_config[8] = dur+':'+self.drop_dur1_val.get()
         csv_write('lights_config', lights_config)
         ble.BLE_lights_duration(0, lights_config[4], lights_config[8])
 
