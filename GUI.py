@@ -1380,17 +1380,16 @@ class Backwashing(tk.Frame):
         self.buttonFrame.pack()
 
         # init labels
-        tk.Label(master=self.buttonFrame, text="Backwash Status:", bg="white").grid(row=4, column=0, padx=1, pady=5)
+        tk.Label(self, text="Backwash Status:", bg="white").pack()
+                # init on/off button
+        self.control = tk.Button(self, text="OFF", fg="red", width=9, command=self.switch)
+        self.control.pack()
         tk.Label(master=self.buttonFrame, text="Backwash When Flow Rate Less Than (GPH):", bg="white").grid(row=1, column=0, padx=3, pady=5)
         # init entry spaces
         tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rate, bg="white").grid(row=1, column=1, padx=5, pady=5)
         # init buttons
         ttk.Button(self, text="Backwash Now", width=15, command=self.popupNow).pack(pady = (11,0))
         ttk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
-       
-        # init on/off button
-        self.control = tk.Button(master=self.buttonFrame, text="OFF", fg="red", width=9, command=self.switch)
-        self.control.place(x=210, y=47, anchor="center")
 
         # initialize correct button state (on vs. off)
         if self.mode == "on":
