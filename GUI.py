@@ -1367,28 +1367,46 @@ class Oxygenator(tk.Frame):
 
     # save popup
     def popup(self):
-        self.popup = tk.Tk()
-        self.popup.wm_title("Alert")
-        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
-        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
-        
-        # centers the popup window
-        popup_width = self.popup.winfo_reqwidth()
-        popup_height = self.popup.winfo_reqheight()
-        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
-        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
-        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
-        
-        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save()])
-        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
-        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
-        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
-        self.popup.mainloop()
+        if self.min.get() < 0:
+            # popup error
+            self.popupError = tk.Tk()
+            self.popupError.wm_title("Alert")
+            label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popupError.winfo_reqwidth()
+            popup_height = self.popupError.winfo_reqheight()
+            positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+            self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy(), self.popup.destroy()])
+            OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+            self.popupError.mainloop()
+        else:
+            # save popup
+            self.popup = tk.Tk()
+            self.popup.wm_title("Alert")
+            label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popup.winfo_reqwidth()
+            popup_height = self.popup.winfo_reqheight()
+            positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+            self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+            YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
+            NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+            NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
+            self.popup.mainloop()
     
     # saves value to csv
     def save(self):
         csv_write('oxygen_config', [self.min.get()])
-        self.popup.destroy()
 
 class Backwashing(tk.Frame):
 
@@ -1461,29 +1479,48 @@ class Backwashing(tk.Frame):
         NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
         self.popupNow.mainloop()
 
-    # save popup
+        # save popup
     def popup(self):
-        self.popup = tk.Tk()
-        self.popup.wm_title("Alert")
-        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
-        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
-        
-        # centers the popup window
-        popup_width = self.popup.winfo_reqwidth()
-        popup_height = self.popup.winfo_reqheight()
-        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
-        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
-        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
-        
-        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
-        YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
-        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
-        NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
-        self.popup.mainloop()
+        if self.rate.get() < 0:
+            # popup error
+            self.popupError = tk.Tk()
+            self.popupError.wm_title("Alert")
+            label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popupError.winfo_reqwidth()
+            popup_height = self.popupError.winfo_reqheight()
+            positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+            self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy(), self.popup.destroy()])
+            OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+            self.popupError.mainloop()
+        else:
+            # save popup
+            self.popup = tk.Tk()
+            self.popup.wm_title("Alert")
+            label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popup.winfo_reqwidth()
+            popup_height = self.popup.winfo_reqheight()
+            positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+            self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+            YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
+            NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+            NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
+            self.popup.mainloop()
 
     # saves value to csv
     def save(self):
-        csv_write('backwash_config', [self.rate.get(), self.mode])
+            csv_write('backwash_config', [self.rate.get(), self.mode])
 
 app = AllWindow()
 #app.geometry('1280x623')
