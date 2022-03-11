@@ -13,6 +13,7 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 
 
+
 def sendEmail(user_settings):
     while True:
         #if not sunday - return
@@ -121,7 +122,6 @@ def sendEmail(user_settings):
                 <head>
                     <style>
                         header {
-                            position: fixed;
                             top: 0;
                             left: 0;
                             width: 100%;
@@ -145,8 +145,13 @@ def sendEmail(user_settings):
                             font-size: 30px;
                             text-align: center;
                         }
+                        .container {
+                            height: 250px;
+                            width: 100%;
+                            margin: 0 auto;
+                        }
                         .griddy {
-                            max-width: 40%;
+                            max-width: 60%;
                             margin: 0 auto;
                         }
                         .item {
@@ -157,11 +162,9 @@ def sendEmail(user_settings):
                             border: solid 1px black;
                             padding: 1%;
                         }
-                        .blank {
+                        .gap {
                             width: 100%;
-                        }
-                        br {
-                            margin: auto;
+                            height: 10px;
                         }
                     </style>
                 </head>
@@ -201,7 +204,9 @@ def sendEmail(user_settings):
                         <div class="item">'''+str(mins[5])+'''</div>
                         <div class="item">'''+str(maxs[5])+'''</div>
                     </div>
-                    <br><img src="cid:image1"><br>
+                    <section class="container"></section>
+                    <div class="gap"></div>
+                    <img src="cid:image1">
                 </body>
                 
             '''
