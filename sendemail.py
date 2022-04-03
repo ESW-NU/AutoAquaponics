@@ -11,7 +11,8 @@ import matplotlib.pyplot as plt
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
-
+from html2image import Html2Image
+hti = Html2Image()
 
 def sendEmail(user_settings):
     while True:
@@ -75,6 +76,7 @@ def sendEmail(user_settings):
             ax.axes.xaxis.set_visible(False)
         
         title = 'thisweek.png'
+        table = 'table.png'
 
         plt.tight_layout()
         plt.savefig(title)
@@ -108,8 +110,70 @@ def sendEmail(user_settings):
             msgText = MIMEText('This is the alternative plain text message.')
             msgAlternative.attach(msgText)
 
+            tableHtml = '''
+                <h2>Weekly Statistics</h2>
+                <div class="griddy">
+                    <div class="item"><b>Metric</b></div>
+                    <div class="item"><b>Average</b></div>
+                    <div class="item"><b>Minimum</b></div>
+                    <div class="item"><b>Maximum</b></div>
+                    <div class="item">pH</div>
+                    <div class="item">'''+str(avgs[0])+'''</div>
+                    <div class="item">'''+str(mins[0])+'''</div>
+                    <div class="item">'''+str(maxs[0])+'''</div>
+                    <div class="item">TDS (ppm)</div>
+                    <div class="item">'''+str(avgs[1])+'''</div>
+                    <div class="item">'''+str(mins[1])+'''</div>
+                    <div class="item">'''+str(maxs[1])+'''</div>
+                    <div class="item">Humidity (%)</div>
+                    <div class="item">'''+str(avgs[2])+'''</div>
+                    <div class="item">'''+str(mins[2])+'''</div>
+                    <div class="item">'''+str(maxs[2])+'''</div>
+                    <div class="item">Air Temp</div>
+                    <div class="item">'''+str(avgs[3])+'''</div>
+                    <div class="item">'''+str(mins[3])+'''</div>
+                    <div class="item">'''+str(maxs[3])+'''</div>
+                    <div class="item">Water Temp</div>
+                    <div class="item">'''+str(avgs[4])+'''</div>
+                    <div class="item">'''+str(mins[4])+'''</div>
+                    <div class="item">'''+str(maxs[4])+'''</div>
+                    <div class="item">Water Level</div>
+                    <div class="item">'''+str(avgs[5])+'''</div>
+                    <div class="item">'''+str(mins[5])+'''</div>
+                    <div class="item">'''+str(maxs[5])+'''</div>
+                </div>
+            '''
 
+            tableCss = '''
+                h2 {
+                    color: #4e2a84;
+                    font-size: 30px;
+                    text-align: center;
+                }
+                .container {
+                    height: 250px;
+                    width: 100%;
+                    margin: 0 auto;
+                }
+                .griddy {
+                    max-width: 60%;
+                    margin: 0 auto;
+                }
+                .item {
+                    font-size: 15px;
+                    color: black;
+                    width: 22%;
+                    float: left;
+                    border: solid 1px black;
+                    padding: 1%;
+                }
+                .gap {
+                    width: 100%;
+                    height: 10px;
+                }
+            '''
 
+            hti.screenshot(html_str=tableHtml, css_str=tableCss, save_as=table)
 
             
             #num needs to be changed accordingly
@@ -121,7 +185,6 @@ def sendEmail(user_settings):
                 <head>
                     <style>
                         header {
-                            position: fixed;
                             top: 0;
                             left: 0;
                             width: 100%;
@@ -140,29 +203,6 @@ def sendEmail(user_settings):
                             padding: 0px;
                             margin: 0px;
                         }
-                        h2 {
-                            color: #4e2a84;
-                            font-size: 30px;
-                            text-align: center;
-                        }
-                        .griddy {
-                            max-width: 40%;
-                            margin: 0 auto;
-                        }
-                        .item {
-                            font-size: 15px;
-                            color: black;
-                            width: 22%;
-                            float: left;
-                            border: solid 1px black;
-                            padding: 1%;
-                        }
-                        .blank {
-                            width: 100%;
-                        }
-                        br {
-                            margin: auto;
-                        }
                     </style>
                 </head>
                 <body>
@@ -170,38 +210,10 @@ def sendEmail(user_settings):
                         <h1>AutoAquaponics</h1>
                         <h3>Weekly Report</h3>
                     </header>
-                    <h2>Weekly Statistics</h2>
-                    <div class="griddy">
-                        <div class="item"><b>Metric</b></div>
-                        <div class="item"><b>Average</b></div>
-                        <div class="item"><b>Minimum</b></div>
-                        <div class="item"><b>Maximum</b></div>
-                        <div class="item">pH</div>
-                        <div class="item">'''+str(avgs[0])+'''</div>
-                        <div class="item">'''+str(mins[0])+'''</div>
-                        <div class="item">'''+str(maxs[0])+'''</div>
-                        <div class="item">TDS (ppm)</div>
-                        <div class="item">'''+str(avgs[1])+'''</div>
-                        <div class="item">'''+str(mins[1])+'''</div>
-                        <div class="item">'''+str(maxs[1])+'''</div>
-                        <div class="item">Humidity (%)</div>
-                        <div class="item">'''+str(avgs[2])+'''</div>
-                        <div class="item">'''+str(mins[2])+'''</div>
-                        <div class="item">'''+str(maxs[2])+'''</div>
-                        <div class="item">Air Temp</div>
-                        <div class="item">'''+str(avgs[3])+'''</div>
-                        <div class="item">'''+str(mins[3])+'''</div>
-                        <div class="item">'''+str(maxs[3])+'''</div>
-                        <div class="item">Water Temp</div>
-                        <div class="item">'''+str(avgs[4])+'''</div>
-                        <div class="item">'''+str(mins[4])+'''</div>
-                        <div class="item">'''+str(maxs[4])+'''</div>
-                        <div class="item">Water Level</div>
-                        <div class="item">'''+str(avgs[5])+'''</div>
-                        <div class="item">'''+str(mins[5])+'''</div>
-                        <div class="item">'''+str(maxs[5])+'''</div>
-                    </div>
-                    <br><img src="cid:image1"><br>
+                    <img src="cid:image2">
+                    <section class="container"></section>
+                    <div class="gap"></div>
+                    <img src="cid:image1">
                 </body>
                 
             '''
@@ -217,7 +229,11 @@ def sendEmail(user_settings):
             # Define the image's ID as referenced above
             msgImage.add_header('Content-ID', '<image1>')
             msgRoot.attach(msgImage)
-            
+
+            fp = open(table, 'rb')
+            tableImage = MIMEImage(fp.read)
+            tableImage.add_header('Content-ID', '<image2>')
+            msgRoot.attach(tableImage)
             
             #otherwise it goes here
             
@@ -250,4 +266,3 @@ def sendEmail(user_settings):
 
         os.remove(title)
         #return
-

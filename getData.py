@@ -63,6 +63,7 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function tha
         hum, atemp = last_hum, last_atemp
     distance = getDistance(last_distance)
     #make sure distance is the last value on this list
+    #order should be pH, TDS, hum, atemp, wtemp, distance
     return pH, TDS, 15, 20, wtemp, distance
 
 #DS18B20 functions

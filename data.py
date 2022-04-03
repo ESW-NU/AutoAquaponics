@@ -168,7 +168,17 @@ class Reader:
         #print(self.c.fetchall())
     
     def query_by_num(self,table,num = 1,timeval = None): #this function lets you get the last num rows of data from the table
-        self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, num))
+        self.c.execute("SELECT COUNT(*) FROM {}".format(table))
+        n = self.c.fetchall()[0][0]
+        if n < num:
+            self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, n))
+        else:
+            self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, num))
+        #self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, num))
+        #result = self.c.fetchall()
+        #print('res:', result)
+        #print('len', len(result))
+        #return(result)
         return self.c.fetchall()
         #print(self.c.fetchall())
 
