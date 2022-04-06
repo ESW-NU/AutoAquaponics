@@ -12,7 +12,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from html2image import Html2Image
-hti = Html2Image()
 
 def sendEmail(user_settings):
     while True:
@@ -129,15 +128,15 @@ def sendEmail(user_settings):
                     <div class="item">'''+str(avgs[2])+'''</div>
                     <div class="item">'''+str(mins[2])+'''</div>
                     <div class="item">'''+str(maxs[2])+'''</div>
-                    <div class="item">Air Temp</div>
+                    <div class="item">Air Temp (C)</div>
                     <div class="item">'''+str(avgs[3])+'''</div>
                     <div class="item">'''+str(mins[3])+'''</div>
                     <div class="item">'''+str(maxs[3])+'''</div>
-                    <div class="item">Water Temp</div>
+                    <div class="item">Water Temp (C)</div>
                     <div class="item">'''+str(avgs[4])+'''</div>
                     <div class="item">'''+str(mins[4])+'''</div>
                     <div class="item">'''+str(maxs[4])+'''</div>
-                    <div class="item">Water Level</div>
+                    <div class="item">Water Level (cm)</div>
                     <div class="item">'''+str(avgs[5])+'''</div>
                     <div class="item">'''+str(mins[5])+'''</div>
                     <div class="item">'''+str(maxs[5])+'''</div>
@@ -172,8 +171,9 @@ def sendEmail(user_settings):
                     height: 10px;
                 }
             '''
-
-            hti.screenshot(html_str=tableHtml, css_str=tableCss, save_as=table)
+            
+            hti = Html2Image(output_path=db_path)
+            hti.screenshot(html_str=tableHtml, css_str=tableCss, save_as=table, size=(1100,350))
 
             
             #num needs to be changed accordingly
@@ -231,7 +231,8 @@ def sendEmail(user_settings):
             msgRoot.attach(msgImage)
 
             fp = open(table, 'rb')
-            tableImage = MIMEImage(fp.read)
+            tableImage = MIMEImage(fp.read())
+            fp.close()
             tableImage.add_header('Content-ID', '<image2>')
             msgRoot.attach(tableImage)
             
@@ -265,4 +266,5 @@ def sendEmail(user_settings):
             
 
         os.remove(title)
+        os.remove(table)
         #return
