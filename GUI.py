@@ -443,7 +443,6 @@ class HomePage(tk.Frame):
         
         if csvButton_state == 1: #this part of the code saves the specified data as a csv
             print('Exporting data to CSV...')
-            print(data[:5])
             with open(entry_text[2], 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(columns)
@@ -459,11 +458,9 @@ class HomePage(tk.Frame):
             width = len(old_data[0])
             height = len(old_data)
             data = [[0 for _ in range(height)] for _ in range(width)]
-            print(data)
             for i in range(height):
                 for j in range(width):
                     data[j][i] = old_data[i][j]
-            print('data', data[:5])
             for row in data[1:]:
                 matplotlib.pyplot.plot(row)
             matplotlib.pyplot.legend(labels=columns[1:], bbox_to_anchor=(1.05, 1.0), loc='upper left')
