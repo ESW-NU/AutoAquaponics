@@ -462,14 +462,13 @@ class HomePage(tk.Frame):
                 for j in range(width):
                     data[j][i] = old_data[i][j]
             for row in data[1:]:
-                matplotlib.pyplot.plot(row)
+                matplotlib.pyplot.plot(x, row)
             matplotlib.pyplot.legend(labels=columns[1:], bbox_to_anchor=(1.05, 1.0), loc='upper left')
             axes.set_title("Exported Data")
             axes.set_xlabel("Time")
             axes.xaxis.set_major_locator(mticker.MaxNLocator(nbins = 10))
             matplotlib.pyplot.xticks(rotation=45)
             fig.tight_layout() #add margin around so xlabel doesn't pop out
-            #matplotlib.pyplot.legend()
             matplotlib.pyplot.show()
         print('Done!')
 
