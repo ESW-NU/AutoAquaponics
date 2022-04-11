@@ -12,6 +12,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from html2image import Html2Image
+import time
 
 def sendEmail(user_settings):
     while True:
@@ -46,7 +47,10 @@ def sendEmail(user_settings):
         sec_per_week = 7 * 24 * 60 * 60
         tsamp = 1
         nsamp = 10
-        information = Reader(db_path,'sensor_db.db').query_by_num(table="SensorData", num= sec_per_week / (tsamp * nsamp)) #num is the number of data points. We need to figure out what num is for a whole week
+        current_time = int(time.time())
+        information = Reader(db_path,'sensor_db.db').query_by_time(current_time-604800, current_time, '*')
+        #information = Reader(db_path,'sensor_db.db').query_by_num(table="SensorData", num=60480) #num is the number of data points. We need to figure out what num is for a whole week
+        #information = Reader(db_path,'sensor_db.db').query_by_num(table="SensorData", num= sec_per_week / (tsamp * nsamp)) #num is the number of data points. We need to figure out what num is for a whole week
         #Daniel will apply SQL lite later
     
         def func1(x):
