@@ -64,6 +64,13 @@ def csv_write(row_name, to_write):
                 writer.writerows(config_settings)
                 file.flush()
 
+# List of parameters (try to link this with the list in DataLogger?)
+param_dict = {}
+param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
+param_ylim = [(5, 9), (0, 1500), (20, 80), (15, 35), (15, 35), (0, 61)]
+#param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
+live_dict = {}
+
 #initialize entry configs, email_config, num_config, provider_config, and SQLite reader
 db_name = 'sensor_db.db'
 reader = Reader(db_path, db_name)
@@ -112,16 +119,9 @@ enable_text = config_settings[config_dict['enable_text']]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
-f = figure.Figure(figsize=(16.6,15), dpi=100, facecolor='white')
+f = figure.Figure(figsize=(16.6,1.25*len(param_list)), dpi=100, facecolor='white') #edit figsize when adding new data rows
 #f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
-f.subplots_adjust(top=0.993, bottom=0.015, left=0.04, right = 0.96, hspace=0.65)
-
-param_dict = {}
-param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
-param_ylim = [(5, 9), (0, 1500), (20, 80), (15, 35), (15, 35), (0, 61)]
-#param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
-live_dict = {}
-
+f.subplots_adjust(top=0.992, bottom=0.05, left=0.04, right = 0.96, hspace=0.5) #might have to adjust this too if we add new data rows
 
 ########################
 #this is for texting
@@ -173,6 +173,7 @@ class Sensor_Plot:
 
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
+    num_row = len(param_list)//2 + (len(param_list) % 2 > 0) #calc how many rows of 2 graphs we need, round up
     try:
         most_recent = reader.query_by_num(table="SensorData", num=17280) #initializes plot up to 20 if possible
         for i, param in enumerate(param_list, 1):
@@ -184,7 +185,7 @@ def initialize_plots(): #intiailizes plots...
                 tList.append(time_f)
                 most_recent_any_size.append(most_recent[j][i])
 
-            subplot = f.add_subplot(6, 2, i)  # sharex?
+            subplot = f.add_subplot(num_row, 2, i)  # sharex?
             x_ax = f.get_axes()
             
             current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param_ylim[i-1], param, most_recent_any_size, 'b')
@@ -193,7 +194,7 @@ def initialize_plots(): #intiailizes plots...
                     
     except: #if there is no data points available to plot, initialize the subplots
         for i, param in enumerate(param_list, 1):
-            subplot = f.add_subplot(6, 2, i)
+            subplot = f.add_subplot(num_row, 2, i)
             x_ax = f.get_axes()
             current_plot = Sensor_Plot(subplot, [], x_ax[i-1], param_ylim[i-1], param, [], 'b')
             param_dict[param] = current_plot
@@ -274,9 +275,9 @@ def animate(ii):
                 #time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
                 time_f = datetime.datetime.fromtimestamp(most_recent[0][0])
                 time_stream.insert(0, time_f)
-                if len(data_stream) < 17280: #graph updates, growing to show 20 points
+                if len(data_stream) < 17280: #graph updates, growing to show 17280 points
                     current_plot.make_plot()
-                else:                      #there are 20 points and more available, so animation occurs
+                else:                      #there are 17280 points and more available, so animation occurs
                     data_stream.pop()
                     time_stream.pop()
                     current_plot.make_plot()
@@ -392,8 +393,8 @@ class HomePage(tk.Frame):
             entry = tk.Entry(self.popup, width = 20, highlightthickness = 0, textvariable = self.instru_list[i])
             entry.grid(row=i+4, column = 2, padx = (0,50), pady=(0,0))
             self.instru_list[i] = entry
-        self.instru_list[0].insert(0, '01/15/2021')
-        self.instru_list[1].insert(0, '08/15/2021')
+        self.instru_list[0].insert(0, '01/15/2022')
+        self.instru_list[1].insert(0, '08/15/2022')
         # self.instru_list[0].insert(0, 'Ex. 01/15/2021')
         # self.instru_list[1].insert(0, 'Ex. 02/15/2021')
         self.instru_list[2].insert(0, '/home/pi/Desktop/data.csv') #C:\Users\billm\Desktop\data.csv
@@ -437,23 +438,31 @@ class HomePage(tk.Frame):
         for i in range(len(param_list)):
             if checkButton_state[i] == 1:
                 columns.append(all_we_got_now[i+1]) #all_we_got_now is defined in DataLogger
-
+        
+        data = reader.query_by_time(start, end, columns)
+        
         if csvButton_state == 1: #this part of the code saves the specified data as a csv
-            data = reader.query_by_time(start, end, columns)
+            print('Exporting data to CSV...')
             with open(entry_text[2], 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(columns)
                 writer.writerows(data)
 
         if graphButton_state == 1: #this part of the code plots the specified data on same figure
-            x = reader.query_by_time(start, end, ["unix_time"])
+            print('Generating graph...')
+            x = [row[0] for row in data]#reader.query_by_time(start, end, ["unix_time"])
             for i in range(len(x)):
-                x[i] = datetime.datetime.fromtimestamp(x[i][0]).strftime('%Y-%m-%d %I:%M:%S %p') #uses local time, could be wonky
+                x[i] = datetime.datetime.fromtimestamp(x[i]).strftime('%Y-%m-%d %I:%M:%S %p') #uses local time, could be wonky
             fig, axes = matplotlib.pyplot.subplots(1,1)
-            for i in range(1, len(columns)):
-                y = reader.query_by_time(start, end, [columns[i]])
-                axes.plot(x, y, label = [columns[i]])
-                
+            old_data = data
+            width = len(old_data[0])
+            height = len(old_data)
+            data = [[0 for _ in range(height)] for _ in range(width)]
+            for i in range(height):
+                for j in range(width):
+                    data[j][i] = old_data[i][j]
+            for row in data[1:]:
+                matplotlib.pyplot.plot(x, row)
             matplotlib.pyplot.legend(labels=columns[1:], bbox_to_anchor=(1.05, 1.0), loc='upper left')
             axes.set_title("Exported Data")
             axes.set_xlabel("Time")
@@ -461,6 +470,7 @@ class HomePage(tk.Frame):
             matplotlib.pyplot.xticks(rotation=45)
             fig.tight_layout() #add margin around so xlabel doesn't pop out
             matplotlib.pyplot.show()
+        print('Done!')
 
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
