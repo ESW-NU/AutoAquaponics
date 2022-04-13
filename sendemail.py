@@ -8,6 +8,7 @@ from data import Reader
 from datetime import datetime
 import os
 import matplotlib.pyplot as plt
+from matplotlib import dates as mdates
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -51,6 +52,12 @@ def sendEmail(user_settings):
         #information = Reader(db_path,'sensor_db.db').query_by_num(table="SensorData", num=60480) #num is the number of data points. We need to figure out what num is for a whole week
         #information = Reader(db_path,'sensor_db.db').query_by_num(table="SensorData", num= sec_per_week / (tsamp * nsamp)) #num is the number of data points. We need to figure out what num is for a whole week
         #Daniel will apply SQL lite later
+
+        def funcTime(x):
+            return x[0]
+
+        timeInfo = list(map(funcTime, information))
+        timeInfo = mdates.epoch2num(timeInfo)
     
         def func1(x):
             return x[1:]
@@ -72,10 +79,11 @@ def sendEmail(user_settings):
             #print(partOfInfo)
             #allOfData[param_list[i]] = partOfInfo
             plt.subplot(3,2,1+i)
-            plt.plot(partOfInfo, color='#4e2a84')
+            plt.plot(timeInfo, partOfInfo, color='#4e2a84')
             plt.title(param_list[i])
             ax = plt.gca()
-            ax.axes.xaxis.set_visible(False)
+            ax.axes.xaxis_date()
+            ax.axes.xaxis.set_major_formatter(mdates.DateFormatter('%a'))
         
         title = 'thisweek.png'
         table = 'table.png'
@@ -86,14 +94,15 @@ def sendEmail(user_settings):
         avgs = []
         mins = []
         maxs = []
+        rounding = [2,2,1,1,2,2]
         for i in range(len(param_list)):
             def func2(x):
                 return x[i]
             partOfInfo = list(map(func2,information))
             partOfInfo = [x for x in partOfInfo if x]
-            avgs.append(round(sum(partOfInfo)/len(partOfInfo), 3))
-            mins.append(round(min(partOfInfo), 3))
-            maxs.append(round(max(partOfInfo), 3))
+            avgs.append(round(sum(partOfInfo)/len(partOfInfo), rounding[i]))
+            mins.append(round(min(partOfInfo), rounding[i]))
+            maxs.append(round(max(partOfInfo), rounding[i]))
 
 
         for strTo in strTos:
