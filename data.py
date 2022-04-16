@@ -135,7 +135,7 @@ class Logger:
             for rdg in data:
                 cnt = len(rdg) - 1
                 params = '?' + ',?'*cnt
-                data_tuple = self.data_dict[0]
+                data_tuple = self.data_dict['sensorData'][0]
                 data_dict = {}
                 for i in range(len(data_tuple)):
                     data_dict[all_we_got_now[i]] = data_tuple[i]
