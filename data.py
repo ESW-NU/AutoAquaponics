@@ -135,11 +135,10 @@ class Logger:
             for rdg in data:
                 cnt = len(rdg) - 1
                 params = '?' + ',?'*cnt
-                data_tuple = self.data_dict['sensorData'][0]
+                data_tuple = self.data_dict['SensorData'][0]
                 data_dict = {}
                 for i in range(len(data_tuple)):
                     data_dict[all_we_got_now[i]] = data_tuple[i]
-                print(data_dict)
                 db.collection(u'stats').add(data_dict)
                 self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
