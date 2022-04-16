@@ -3,6 +3,14 @@ import numpy as np
 from datetime import datetime
 from time import sleep
 import os
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+cred = credentials.Certificate("./serviceAccountKey.json")
+app = firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 class Logger:
     def __init__(self,tgt_path,database):
@@ -126,6 +134,8 @@ class Logger:
             for rdg in data:
                 cnt = len(rdg) - 1
                 params = '?' + ',?'*cnt
+
+                db.collection(u'stats').add(self.data_dict)
                 self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
         
