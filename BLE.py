@@ -105,6 +105,10 @@ class fakeBLE:
         for i, mode in enumerate(lights[:4]):
             self.BLE_lights_mode(i, mode)
             self.BLE_lights_duration(i, lights[i+4], lights[i+8])
+        
+        # end message
+        red = self.red(1)
+        self.BLE_write('0', red)
 
     def BLE_pump_mode(self, data):
         mode = data[4]
