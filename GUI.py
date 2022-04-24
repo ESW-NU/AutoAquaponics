@@ -1181,10 +1181,10 @@ class WaterPump(tk.Frame):
             self.mode = "off"
         else:
             self.mode = "on"
-        self.switch()
+        self.switch(first=True)
 
     # switches the button state betwee 'off'/'on'/'timer'
-    def switch(self):
+    def switch(self, first=False):
         if self.mode == "off":
             self.mode = "on"
             self.control.config(text="ON", fg="green")
@@ -1217,8 +1217,9 @@ class WaterPump(tk.Frame):
         pump_config = [config_settings[config_dict['pump_config']][0], config_settings[config_dict['pump_config']][1], \
             config_settings[config_dict['pump_config']][2], config_settings[config_dict['pump_config']][3], self.mode]
         csv_write('pump_config', pump_config)
-        # send message for timer mode (on/off/timer)
-        ble.BLE_pump_mode(pump_config)
+        # send message for timer mode (on/off/timer) if not initialization step
+        if not first:
+            ble.BLE_pump_mode(pump_config)
         #ble.BLE_write('0', 52) #change 52 to some sort of encoding for the message
 
     # save popup
