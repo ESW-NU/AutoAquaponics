@@ -82,7 +82,7 @@ void IRAM_ATTR onTimer(){
     for (int i = 0; i < max_index; i++){
       al_list[simul[i]].state = !al_list[simul[i]].state; 
     }
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
       if (al_list[i].permanence == 1){
         digitalWrite(outputs[i], al_list[i].permanent);
       }
@@ -123,7 +123,7 @@ void IRAM_ATTR onTimer(){
   }
   Serial.println();
   Serial.print("Permanence: ");
-  for (int i = 0; i < 10; i++){
+  for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
     Serial.print(al_list[i].permanence);
     Serial.print(" ");
   }
@@ -316,7 +316,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Beginning!");
 
-  for (int i = 0; i < 10; i++){
+  for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
     pinMode(outputs[i], OUTPUT);
   } 
 
