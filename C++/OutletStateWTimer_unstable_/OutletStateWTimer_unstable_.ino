@@ -14,10 +14,10 @@
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
 typedef struct virt_alarm {
-  uint16_t time_hit; //When the alarm activates its callback
+  uint16_t time_hit; //When the alarm activates its callback (unit defined in onTimer)
   uint8_t outlet; //Which outlet the alarm refers to
   uint32_t repeat_period; //How oftern the timer repeats
-  bool end_post; //Whether the alarm turns on or turns off the outlet
+  virt_alarm* end_post; //Either the ending timer or void
 } virt_alarm;
 
 const uint16_t TIMER_SCALAR = 40000; //Timer ticks every half a millisecond
@@ -30,8 +30,7 @@ volatile SemaphoreHandle_t timerSemaphore;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 virt_alarm al_list[500];
 uint32_t current_list = 0;
-uint64_t ref_time = 0; //Offset for day_time
-uint8_t day_time = 0; //Changes every time a message is sent, used to place alarms
+uint8_t day_offset = 0; //Changes every time a message is sent, used to place alarms
 uint16_t state = 0; //Outlet state (MSB is outlet[9])
 uint16_t permanence_toggle = 0; //Whether a pin is in a permanent state (MSB is outlet[9])
 uint16_t permanent_state = 0; //What permanent state a pin should be at (MSB is outlet[9])
@@ -48,10 +47,10 @@ const int outputs[10] = {15, 2, 0, 4, 16, 17, 5, 18, 19, 21};
 void IRAM_ATTR onTimer(){
   // Increment the counter and set the time of ISR
   portENTER_CRITICAL_ISR(&timerMux);
-  Serial.print(millis());
-  Serial.println(" ms");
+  Serial.print(millis()/1000);
+  Serial.println(" Seconds");
   virt_alarm curr_alarm = al_pop();
-  al_insert(curr_alarm.time_hit + curr_alarm.repeat_period, curr_alarm.outlet, curr_alarm.repeat_period, curr_alarm.end_post);
+  al_insert(curr_alarm.time_hit + curr_alarm.repeat_period, curr_alarm.outlet, curr_alarm.repeat_period, curr_alarm.end_post); 
   portEXIT_CRITICAL_ISR(&timerMux);
   // Give a semaphore that we can check in the loop
   //xSemaphoreGiveFromISR(timerSemaphore, NULL);
@@ -64,17 +63,19 @@ void IRAM_ATTR onTimer(){
   }
   */
 
-  set_reset(curr_alarm.outlet, !curr_alarm.end_post, &state);
+  set_reset(curr_alarm.outlet, !(curr_alarm.end_post == NULL), &state);
   
   if (((permanence_toggle >> curr_alarm.outlet) & 1) == 0) {
     set_outlet_to_state(curr_alarm.outlet, state);
   }
-  
+
+  Serial.print("Outlets: ");
   for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
     Serial.print(digitalRead(outputs[i]));
   } 
   Serial.println();
   Serial.println(curr_alarm.outlet);
+  Serial.println();
   if (current_list > 0) {
     timerAlarmWrite(timer, al_list[0].time_hit * SECOND, false);
     timerAlarmEnable(timer);
@@ -107,26 +108,28 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         Serial.print("Brown: ");
         Serial.println(brown_part);
         Serial.println("*********");
-        
-        virt_alarm start_post{0, 0, 10, false};
-        virt_alarm end_post{0, 0, 10, true};
 
-        uint32_t day_time = ((SECOND/1000) * millis()) % DAY;
+        virt_alarm end_post{0, 0, 10, NULL};
+        virt_alarm start_post{0, 0, 10, &end_post};
 
         if ((message & 3) == 0) {
           reset_virt();
-          ref_time = red_part;
+          day_offset = red_part;
         } else if ((message & 3) == 1) {
-          start_post.repeat_period = red_part;
-          start_post.outlet = blue_part;
+            start_post.repeat_period = red_part;
+            start_post.outlet = blue_part;
         } else if ((message & 3) == 2) {
-          start_post.outlet = blue_part;
-          end_post.outlet = blue_part;
-          start_post.time_hit = red_part;
-          end_post.time_hit = red_part + brown_part;
+            start_post.outlet = blue_part;
+            end_post.outlet = blue_part;
+            if (red_part + day_time() + brown_part > 143) {
+              
+            } else {
+              start_post.time_hit = red_part;
+              end_post.time_hit = red_part + brown_part;
+          }
         } else if ((message & 3) == 3) {
-          set_reset(blue_part, brown_part, &permanent_state);
-          set_reset(blue_part, red_part, &permanence_toggle);
+            set_reset(blue_part, brown_part, &permanent_state);
+            set_reset(blue_part, red_part, &permanence_toggle);
           //permanent_state = red_part;
           //permanence_toggle = blue_part;
           if ((permanence_toggle >> blue_part) & 1) {
@@ -161,13 +164,13 @@ void set_outlet_to_state(uint16_t outlet, uint16_t state){
   digitalWrite(outputs[outlet], ((state >> outlet) & 1));
 }
 
-void al_insert(uint32_t count, uint16_t outlet, uint32_t repeat_period, bool end_post) {
+virt_alarm* al_insert(uint32_t count, uint16_t outlet, uint32_t repeat_period, virt_alarm* end_post) {
   uint8_t pos = 0;
-  virt_alarm inserted = virt_alarm{count, outlet, repeat_period, end_post};
+  virt_alarm* inserted = new virt_alarm{count, outlet, repeat_period, end_post};
   if (current_list == 0) {
-    al_list[0] = inserted;
+    al_list[0] = *inserted;
     current_list++;
-    return;
+    return inserted;
   }
   for (size_t i = 0; i < current_list && al_list[i].time_hit < count; i++) {
     pos++;
@@ -175,8 +178,9 @@ void al_insert(uint32_t count, uint16_t outlet, uint32_t repeat_period, bool end
   for (size_t i = current_list; i > pos; i--) {
     al_list[i] = al_list[i - 1];
   }
-  al_list[pos] = inserted;
+  al_list[pos] = *inserted;
   current_list++;
+  return inserted;
 }
 
 void al_insert(virt_alarm alarm) {
@@ -192,8 +196,11 @@ virt_alarm al_pop(void) {
   return ret;
 }
 
+uint8_t day_time() {
+  return (millis() * 2 / SECOND + day_offset) % 144;
+}
+
 void reset_virt() {
-  ref_time = millis();
   current_list = 0;
   return;
 }
@@ -206,14 +213,16 @@ void setup() {
 
   delay(10000);
 
-  al_insert(0, 8, 5, false);
-  al_insert(0, 7, 5, false);
-  al_insert(0, 6, 5, false);
-  al_insert(0, 5, 5, false);
-  al_insert(1, 8, 5, true);
-  al_insert(2, 7, 5, true);
-  al_insert(3, 6, 5, true);
-  al_insert(4, 5, 5, true);
+  Serial.println("dies bruh");
+
+  virt_alarm* end1 = al_insert(1, 8, 5, NULL);
+  virt_alarm* end2 = al_insert(2, 7, 5, NULL);
+  virt_alarm* end3 = al_insert(3, 6, 5, NULL);
+  virt_alarm* end4 = al_insert(4, 5, 5, NULL);
+  virt_alarm* start1 = al_insert(0, 8, 5, end1);
+  virt_alarm* start2 = al_insert(0, 7, 5, end2);
+  virt_alarm* start3 = al_insert(0, 6, 5, end3);
+  virt_alarm* start4 = al_insert(0, 5, 5, end4);
 
   timerSemaphore = xSemaphoreCreateBinary();
 
