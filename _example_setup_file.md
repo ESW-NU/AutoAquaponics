@@ -10,13 +10,13 @@ WINDOWS EXAMPLE
 MAC EXAMPLE
 {
     "config_file":"/Users/larinachen/Desktop/AutoAquaponics/config.csv",
-    "db_dir":"/Users/larinachen/Desktop/AutoAquaponics/"
+    "db_dir":"/Users/larinachen/Desktop/AutoAquaponics/",
     "img_path": "/Users/larinachen/Documents/GitHub/AutoAquaponics/Images/"  
 }
 
 LINUX EXAMPLE
 { 
     "db_dir":"/home/christian-ctrl/Desktop/NU Urban Ag/",
-    "config_file":"/home/christian-ctrl/Desktop/NU Urban Ag/config.csv"
+    "config_file":"/home/christian-ctrl/Desktop/NU Urban Ag/config.csv",
     "img_path":"/home/christian-ctrl/Documents/GitHub/AutoAquaponics/Images/"
 }

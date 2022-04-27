@@ -1,13 +1,13 @@
-#Desmond
-
 #initialize GPIO pins for TDS sensor switch + distance sensor
 pin_num = 17
 pin_num2 = 27
+import time, sys
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(pin_num,GPIO.OUT)
 GPIO.setup(pin_num2,GPIO.OUT)
+import sys
 import time #need this for sleep and distance sensor
 from time import sleep
 #import necessary modules and initialize I2C bus
@@ -18,14 +18,9 @@ i2c = busio.I2C(board.SCL, board.SDA)
 import adafruit_ads1x15.ads1115 as ADS
 #import ADS1x15 library's version of AnalogIn
 from adafruit_ads1x15.analog_in import AnalogIn
-#import Adafruit DHT22 stuff (humidty)
-#import Adafruit_DHT as dht
 import adafruit_dht
-#DHT = 14 #set DHT's GPIO pin number
 dhtDevice = adafruit_dht.DHT22(board.D14, use_pulseio=False)
 #import the w1 water temp sensor module
-#from w1thermsensor import W1ThermSensor
-#wt_sensor = W1ThermSensor()
 import glob
 import time
 
@@ -64,8 +59,13 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function tha
     if hum == np.nan or atemp == np.nan:
         hum, atemp = last_hum, last_atemp
     distance = getDistance(last_distance)
+    
+#read flow rate
+    #flow1 = getFlowRate(12, 4.8)
+    #flow2 = getFlowRate(13, 0.273)
     #make sure distance is the last value on this list
-    return pH, TDS, hum, atemp, wtemp, distance
+    #order should be pH, TDS, hum, atemp, wtemp, distance
+    return pH, TDS, hum, atemp, wtemp, distance#, flow1, flow2
 
 #DS18B20 functions
 def read_temp_raw():
@@ -163,6 +163,34 @@ def getDistance(last_distance): #output distance in cm
         return last_distance
     else:
         return (TimeElapsed * 34300)/2
+
+def getFlowRate(FLOW_SENSOR_GPIO, k):
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(FLOW_SENSOR_GPIO, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+    global count
+    count = 0
+    start_counter = 0
+    def countPulse(channel):
+       global count
+       if start_counter == 1:
+          count = count+1
+    
+    GPIO.add_event_detect(FLOW_SENSOR_GPIO, GPIO.FALLING, callback=countPulse)
+
+    
+    try:
+        start_counter = 1
+        time.sleep(1)
+        start_counter = 0
+        flow = (count / k)*15.850323141489 # Pulse frequency (Hz) = 0.2Q, Q is flow rate in GPH.
+        print("The flow is: %.3f GPH" % (flow))
+        print("The count is: " + str(count))
+        count = 0
+        time.sleep(0.1)
+    except KeyboardInterrupt:
+        print('\nkeyboard interrupt!')
+        GPIO.cleanup()
+        sys.exit()
 '''
 from time import sleep
 from datetime import datetime
@@ -170,4 +198,4 @@ while True:
      print('updating...')
      print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1, 1, 1))
      sleep(1)
-'''
+    '''

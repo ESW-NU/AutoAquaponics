@@ -1,5 +1,5 @@
 from data import Reader
-from DataLogger import all_we_got_now
+#from DataLogger import all_we_got_now
 import datetime, time
 #import tkinter for GUI
 import tkinter as tk
@@ -28,7 +28,7 @@ SMALL_FONT = ("Verdana", 8)
 import csv
 import matplotlib
 from matplotlib import ticker as mticker
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 matplotlib.use('TkAgg')
 from matplotlib import figure
 from matplotlib import dates as mdates
@@ -64,6 +64,13 @@ def csv_write(row_name, to_write):
                 writer.writerows(config_settings)
                 file.flush()
 
+# List of parameters (try to link this with the list in DataLogger?)
+param_dict = {}
+param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
+param_ylim = [(5, 9), (0, 1500), (20, 80), (15, 35), (15, 35), (0, 61)]
+#param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
+live_dict = {}
+
 #initialize entry configs, email_config, num_config, provider_config, and SQLite reader
 db_name = 'sensor_db.db'
 reader = Reader(db_path, db_name)
@@ -81,7 +88,8 @@ config_dict = {
     'pump_config':6,
     'oxygen_config':7,
     'sensor_config':8,
-    'lights_config':9
+    'lights_config':9,
+    'backwash_config':10
     }
 
 # Enter row title here when adding a new row to the csv:
@@ -94,10 +102,11 @@ init_dict = {
     'email_config': ['Email']*num_contacts,
     'upper_config': [1000]*11,
     'lower_config': [0]*11,
-    'pump_config': [0, 0, None, "off"],
+    'pump_config': [0, 0, None, None, "off"],
     'oxygen_config': [0],
     'sensor_config': ['off']*4,
-    'lights_config': ['off']*4+[0]*12
+    'lights_config': ['off']*4+['00:00']*8,
+    'backwash_config': [0, "off"]
 }
 
 # initializes csv, if not properly initialized
@@ -110,16 +119,9 @@ enable_text = config_settings[config_dict['enable_text']]
 
 #create figure for plots and set figure size/layout
 #f = figure.Figure(figsize=(8.5,17.5), dpi=100)
-f = figure.Figure(figsize=(16.6,15), dpi=100, facecolor='white')
+f = figure.Figure(figsize=(16.6,1.25*len(param_list)), dpi=100, facecolor='white') #edit figsize when adding new data rows
 #f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
-f.subplots_adjust(top=0.993, bottom=0.015, left=0.04, right = 0.96, hspace=0.65)
-
-param_dict = {}
-param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
-param_ylim = [(5, 9), (0, 1500), (20, 80), (15, 35), (15, 35), (0, 61)]
-#param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
-live_dict = {}
-
+f.subplots_adjust(top=0.992, bottom=0.05, left=0.04, right = 0.96, hspace=0.5) #might have to adjust this too if we add new data rows
 
 ########################
 #this is for texting
@@ -171,8 +173,9 @@ class Sensor_Plot:
 
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
+    num_row = len(param_list)//2 + (len(param_list) % 2 > 0) #calc how many rows of 2 graphs we need, round up
     try:
-        most_recent = reader.query_by_num(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
+        most_recent = reader.query_by_num(table="SensorData", num=17280) #initializes plot up to 20 if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -182,7 +185,7 @@ def initialize_plots(): #intiailizes plots...
                 tList.append(time_f)
                 most_recent_any_size.append(most_recent[j][i])
 
-            subplot = f.add_subplot(6, 2, i)  # sharex?
+            subplot = f.add_subplot(num_row, 2, i)  # sharex?
             x_ax = f.get_axes()
             
             current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param_ylim[i-1], param, most_recent_any_size, 'b')
@@ -191,7 +194,7 @@ def initialize_plots(): #intiailizes plots...
                     
     except: #if there is no data points available to plot, initialize the subplots
         for i, param in enumerate(param_list, 1):
-            subplot = f.add_subplot(6, 2, i)
+            subplot = f.add_subplot(num_row, 2, i)
             x_ax = f.get_axes()
             current_plot = Sensor_Plot(subplot, [], x_ax[i-1], param_ylim[i-1], param, [], 'b')
             param_dict[param] = current_plot
@@ -272,9 +275,9 @@ def animate(ii):
                 #time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
                 time_f = datetime.datetime.fromtimestamp(most_recent[0][0])
                 time_stream.insert(0, time_f)
-                if len(data_stream) < 20: #graph updates, growing to show 20 points
+                if len(data_stream) < 17280: #graph updates, growing to show 17280 points
                     current_plot.make_plot()
-                else:                      #there are 20 points and more available, so animation occurs
+                else:                      #there are 17280 points and more available, so animation occurs
                     data_stream.pop()
                     time_stream.pop()
                     current_plot.make_plot()
@@ -390,8 +393,8 @@ class HomePage(tk.Frame):
             entry = tk.Entry(self.popup, width = 20, highlightthickness = 0, textvariable = self.instru_list[i])
             entry.grid(row=i+4, column = 2, padx = (0,50), pady=(0,0))
             self.instru_list[i] = entry
-        self.instru_list[0].insert(0, '01/15/2021')
-        self.instru_list[1].insert(0, '08/15/2021')
+        self.instru_list[0].insert(0, '01/15/2022')
+        self.instru_list[1].insert(0, '08/15/2022')
         # self.instru_list[0].insert(0, 'Ex. 01/15/2021')
         # self.instru_list[1].insert(0, 'Ex. 02/15/2021')
         self.instru_list[2].insert(0, '/home/pi/Desktop/data.csv') #C:\Users\billm\Desktop\data.csv
@@ -435,23 +438,31 @@ class HomePage(tk.Frame):
         for i in range(len(param_list)):
             if checkButton_state[i] == 1:
                 columns.append(all_we_got_now[i+1]) #all_we_got_now is defined in DataLogger
-
+        
+        data = reader.query_by_time(start, end, columns)
+        
         if csvButton_state == 1: #this part of the code saves the specified data as a csv
-            data = reader.query_by_time(start, end, columns)
+            print('Exporting data to CSV...')
             with open(entry_text[2], 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(columns)
                 writer.writerows(data)
 
         if graphButton_state == 1: #this part of the code plots the specified data on same figure
-            x = reader.query_by_time(start, end, ["unix_time"])
+            print('Generating graph...')
+            x = [row[0] for row in data]#reader.query_by_time(start, end, ["unix_time"])
             for i in range(len(x)):
-                x[i] = datetime.datetime.fromtimestamp(x[i][0]).strftime('%Y-%m-%d %I:%M:%S %p') #uses local time, could be wonky
+                x[i] = datetime.datetime.fromtimestamp(x[i]).strftime('%Y-%m-%d %I:%M:%S %p') #uses local time, could be wonky
             fig, axes = matplotlib.pyplot.subplots(1,1)
-            for i in range(1, len(columns)):
-                y = reader.query_by_time(start, end, [columns[i]])
-                axes.plot(x, y, label = [columns[i]])
-                
+            old_data = data
+            width = len(old_data[0])
+            height = len(old_data)
+            data = [[0 for _ in range(height)] for _ in range(width)]
+            for i in range(height):
+                for j in range(width):
+                    data[j][i] = old_data[i][j]
+            for row in data[1:]:
+                matplotlib.pyplot.plot(x, row)
             matplotlib.pyplot.legend(labels=columns[1:], bbox_to_anchor=(1.05, 1.0), loc='upper left')
             axes.set_title("Exported Data")
             axes.set_xlabel("Time")
@@ -459,6 +470,7 @@ class HomePage(tk.Frame):
             matplotlib.pyplot.xticks(rotation=45)
             fig.tight_layout() #add margin around so xlabel doesn't pop out
             matplotlib.pyplot.show()
+        print('Done!')
 
 class Settings(tk.Frame):
     def __init__(self, parent, controller):
@@ -697,17 +709,21 @@ class ControlPanel(tk.Frame):
         tk.Frame.__init__(self, parent)
         #title
         tk.Label(self, text="Control Panel", bg="white", font=TITLE_FONT).pack(pady = 10)
+        
+        # send init message
+        config_settings = csv_read()[6:10]
+        ble.BLE_init(config_settings)
 
         #Setup for lables and button images
         self.ctrl_panel_labels = ["Lights", "Water Pump", "Fish Feeder", "Sensor Array", "Oxygenator", 
-                                  "Backwashing", "Back"] 
+                                  "Backwashing", "Back"]
         self.icons = ["light.png", "water.png", "food.png",  "sensor.png", "oxygen.png", 
                                  "backwash.png", "back.png"]
         self.ctrl_panel_image = []
         
         for image in self.icons:
             f = img_path + image
-            self.ctrl_panel_image.append(tk.PhotoImage(f)) #create array of images using image path
+            self.ctrl_panel_image.append(tk.PhotoImage(file = f)) #create array of images using image path
         
         buttonFrame = tk.Frame(master=self, bg='white')
         buttonFrame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
@@ -722,7 +738,7 @@ class ControlPanel(tk.Frame):
             frame.grid(row=i, column=j, padx=2, pady=2, sticky="nsew")
             button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP)
             if(counter == 0):
-                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Lights))
+                button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image= self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Lights))
             if(counter == 1):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(WaterPump))
             if(counter == 2):
@@ -735,6 +751,7 @@ class ControlPanel(tk.Frame):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(Backwashing))
             if(counter == 6):
                 button = tk.Button(master=frame, text=self.ctrl_panel_labels[counter], image=self.ctrl_panel_image[counter], compound = tk.TOP, command=lambda: controller.show_frame(HomePage))
+
             button.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
             j += 1
             if(j == 3):
@@ -742,6 +759,7 @@ class ControlPanel(tk.Frame):
                 j = 0
                 if(i == 2):
                     j = 1
+         
 
 class Lights(tk.Frame): 
     
@@ -808,8 +826,6 @@ class Lights(tk.Frame):
                 self.togTank.config(text="ON", fg="green")
             elif i == 3:
                 self.togBask.config(text="ON", fg="green")
-            # send message
-            ble.BLE_messenger(1,1) # 1 is on, outlet 1
         elif lights_config[i] == "on":
             lights_config[i] = "timer"
             if i == 0:
@@ -820,7 +836,6 @@ class Lights(tk.Frame):
                 self.togTank.config(text="TIMER", fg="purple")
             elif i == 3:
                 self.togBask.config(text="TIMER", fg="purple")
-            ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
         elif lights_config[i] == "timer":
             lights_config[i] = "off"
             if i == 0:
@@ -831,10 +846,8 @@ class Lights(tk.Frame):
                 self.togTank.config(text="OFF", fg="red")
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
-            ble.BLE_messenger(0,1) # 0 is off, outlet 1
+        ble.BLE_lights_mode(i, lights_config[i])
         csv_write('lights_config', lights_config)
-        #ble.BLE_message(0b10, )
-        #ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
 
     # shelf 1 popup window: for setting start and duration times
     def pop1(self):
@@ -848,29 +861,65 @@ class Lights(tk.Frame):
 
         lights_config = csv_read()[config_dict['lights_config']]
         self.start1, self.dur1 = tk.StringVar(self.pop1), tk.StringVar(self.pop1)
-        self.start1.set(lights_config[4])
-        self.dur1.set(lights_config[8])
+        self.start1.set(lights_config[4][:2])
+        self.dur1.set(lights_config[8][:2])
 
-        tk.Label(self.pop1, text="Start (HH:MM)").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration (HH:MM)").grid(row=1, column=0, padx=(100,0))
+        self.drop_start1_val, self.drop_dur1_val = tk.StringVar(self.pop1), tk.StringVar(self.pop1)
+        self.drop_start1_val.set(lights_config[4][3:])
+        self.drop_dur1_val.set(lights_config[8][3:])
 
-        tk.Label(self.pop1, text="Start").grid(row=0, column=0, padx=(30,0), pady=(20,0))
-        tk.Label(self.pop1, text="Duration").grid(row=1, column=0, padx=(30,0))
+        tk.Label(self.pop1, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop1, text="Duration HH:").grid(row=1, column=0, padx=(20,0), pady=(20,0))
         
         tk.Entry(self.pop1, width=9, bg="white", textvariable=self.start1).grid(row=0, column=1, pady=(20,0), padx=(0,0))
-        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,0))
+        tk.Entry(self.pop1, width=9, bg="white", textvariable=self.dur1).grid(row=1, column=1, padx=(0,0), pady=(20,0))
 
-        tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1(), self.pop1.destroy()]).grid(row=2, column=1, columnspan=3, padx=(20,20), pady=(20,20))
+        tk.Label(self.pop1, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop1, text="MM:").grid(row=1, column=2, padx=(20,0), pady=(20,0))
+        
+        self.options = ['00', '10', '20', '30', '40', '50']
+        tk.OptionMenu(self.pop1, self.drop_start1_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
+        tk.OptionMenu(self.pop1, self.drop_dur1_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
+
+        tk.Button(self.pop1, text="SAVE", width=9, command=lambda: [self.save1()]).grid(row=2, column=0, columnspan=4, padx=(20,20), pady=(20,20))
 
         self.pop1.mainloop()
 
     # saves shelf 1 start/duration values
     def save1(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[4] = self.start1.get()
-        lights_config[8] = self.dur1.get()
-        csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 37) #change 37 to some sort of encoding for the message
+        start = self.start1.get()
+        dur = self.dur1.get()
+        
+        if int(start) < 0 or int(dur) < 0:
+            # popup error
+            self.popupError = tk.Tk()
+            self.popupError.wm_title("Alert")
+            label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popupError.winfo_reqwidth()
+            popup_height = self.popupError.winfo_reqheight()
+            positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+            self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy()])
+            OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+            self.popupError.mainloop()
+        else:
+            if len(start) == 1:
+                start = '0'+start
+                self.start1.set(start)
+            if len(dur) == 1:
+                dur = '0'+dur
+                self.dur1.set(dur)
+            lights_config[4] = start+':'+self.drop_start1_val.get()
+            lights_config[8] = dur+':'+self.drop_dur1_val.get()
+            csv_write('lights_config', lights_config)
+            ble.BLE_lights_duration(0, lights_config[4], lights_config[8])
+            self.pop1.destroy()
 
     # shelf 2 popup window: for setting start and duration times
     def pop2(self):
@@ -883,27 +932,66 @@ class Lights(tk.Frame):
         self.pop2.geometry("+{}+{}".format(positionRight, positionDown))
 
         lights_config = csv_read()[config_dict['lights_config']]
-        self.start2, self.dur2 = tk.IntVar(self.pop2), tk.IntVar(self.pop2)
-        self.start2.set(lights_config[5])
-        self.dur2.set(lights_config[9])
+        self.start2, self.dur2 = tk.StringVar(self.pop2), tk.StringVar(self.pop2)
+        self.start2.set(lights_config[5][:2])
+        self.dur2.set(lights_config[9][:2])
 
-        tk.Label(self.pop2, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.pop2, text="Duration").grid(row=1, column=0, padx=(100,0))
+        self.drop_start2_val, self.drop_dur2_val = tk.StringVar(self.pop2), tk.StringVar(self.pop2)
+        self.drop_start2_val.set(lights_config[5][3:])
+        self.drop_dur2_val.set(lights_config[9][3:])
 
-        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.start2).grid(row=0, column=1, pady=(20,0), padx=(0,100))
-        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,100))
+        tk.Label(self.pop2, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop2, text="Duration HH:").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        
+        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.start2).grid(row=0, column=1, pady=(20,0), padx=(0,0))
+        tk.Entry(self.pop2, width=9, bg="white", textvariable=self.dur2).grid(row=1, column=1, padx=(0,0), pady=(20,0))
 
-        tk.Button(self.pop2, text="SAVE", width=9, command=lambda: [self.save2(), self.pop2.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+        tk.Label(self.pop2, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
+        tk.Label(self.pop2, text="MM:").grid(row=1, column=2, padx=(20,0), pady=(20,0))
+        
+        self.options = ['00', '10', '20', '30', '40', '50']
+        tk.OptionMenu(self.pop2, self.drop_start2_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
+        tk.OptionMenu(self.pop2, self.drop_dur2_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
+
+        tk.Button(self.pop2, text="SAVE", width=9, command=lambda: [self.save2()]).grid(row=2, column=0, columnspan=4, padx=(20,20), pady=(20,20))
 
         self.pop2.mainloop()
 
     # saves shelf 2 start/duration values
     def save2(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[5] = self.start2.get()
-        lights_config[9] = self.dur2.get()
-        csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 38) #change 38 to some sort of encoding for the message
+        start = self.start2.get()
+        dur = self.dur2.get()
+
+        if int(start) < 0 or int(dur) < 0:
+            # popup error
+            self.popupError = tk.Tk()
+            self.popupError.wm_title("Alert")
+            label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popupError.winfo_reqwidth()
+            popup_height = self.popupError.winfo_reqheight()
+            positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+            self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy()])
+            OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+            self.popupError.mainloop()
+        else:
+            if len(start) == 1:
+                start = '0'+start
+                self.start2.set(start)
+            if len(dur) == 1:
+                dur = '0'+dur
+                self.dur2.set(dur)
+            lights_config[5] = start+':'+self.drop_start2_val.get()
+            lights_config[9] = dur+':'+self.drop_dur2_val.get()
+            csv_write('lights_config', lights_config)
+            ble.BLE_lights_duration(1, lights_config[5], lights_config[9])
+            self.pop2.destroy()
 
     # fish tank popup window: for setting start and duration times
     def popTank(self):
@@ -916,27 +1004,66 @@ class Lights(tk.Frame):
         self.popTank.geometry("+{}+{}".format(positionRight, positionDown))
 
         lights_config = csv_read()[config_dict['lights_config']]
-        self.startTank, self.durTank = tk.IntVar(self.popTank), tk.IntVar(self.popTank)
-        self.startTank.set(lights_config[6])
-        self.durTank.set(lights_config[10])
+        self.startTank, self.durTank = tk.StringVar(self.popTank), tk.StringVar(self.popTank)
+        self.startTank.set(lights_config[6][:2])
+        self.durTank.set(lights_config[10][:2])
 
-        tk.Label(self.popTank, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.popTank, text="Duration").grid(row=1, column=0, padx=(100,0))
+        self.drop_startTank_val, self.drop_durTank_val = tk.StringVar(self.popTank), tk.StringVar(self.popTank)
+        self.drop_startTank_val.set(lights_config[6][3:])
+        self.drop_durTank_val.set(lights_config[10][3:])
 
-        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.startTank).grid(row=0, column=1, pady=(20,0), padx=(0,100))
-        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,100))
+        tk.Label(self.popTank, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popTank, text="Duration HH:").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        
+        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.startTank).grid(row=0, column=1, pady=(20,0), padx=(0,0))
+        tk.Entry(self.popTank, width=9, bg="white", textvariable=self.durTank).grid(row=1, column=1, padx=(0,0), pady=(20,0))
 
-        tk.Button(self.popTank, text="SAVE", width=9, command=lambda: [self.saveTank(), self.popTank.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+        tk.Label(self.popTank, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
+        tk.Label(self.popTank, text="MM:").grid(row=1, column=2, padx=(20,0), pady=(20,0))
+        
+        self.options = ['00', '10', '20', '30', '40', '50']
+        tk.OptionMenu(self.popTank, self.drop_startTank_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
+        tk.OptionMenu(self.popTank, self.drop_durTank_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
+
+        tk.Button(self.popTank, text="SAVE", width=9, command=lambda: [self.saveTank()]).grid(row=2, column=0, columnspan=4, padx=(20,20), pady=(20,20))
 
         self.popTank.mainloop()
 
     # saves fish tank start/duration values
     def saveTank(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[6] = self.startTank.get()
-        lights_config[10] = self.durTank.get()
-        csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 39) #change 39 to some sort of encoding for the message
+        start = self.startTank.get()
+        dur = self.durTank.get()
+
+        if int(start) < 0 or int(dur) < 0:
+            # popup error
+            self.popupError = tk.Tk()
+            self.popupError.wm_title("Alert")
+            label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popupError.winfo_reqwidth()
+            popup_height = self.popupError.winfo_reqheight()
+            positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+            self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy()])
+            OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+            self.popupError.mainloop()
+        else:
+            if len(start) == 1:
+                start = '0'+start
+                self.startTank.set(start)
+            if len(dur) == 1:
+                dur = '0'+dur
+                self.durTank.set(dur)
+            lights_config[6] = start+':'+self.drop_startTank_val.get()
+            lights_config[10] = dur+':'+self.drop_durTank_val.get()
+            csv_write('lights_config', lights_config)
+            ble.BLE_lights_duration(2, lights_config[6], lights_config[10])
+            self.popTank.destroy()
 
     # basking popup window: for setting start and duration times
     def popBask(self):
@@ -949,27 +1076,66 @@ class Lights(tk.Frame):
         self.popBask.geometry("+{}+{}".format(positionRight, positionDown))
 
         lights_config = csv_read()[config_dict['lights_config']]
-        self.startBask, self.durBask = tk.IntVar(self.popBask), tk.IntVar(self.popBask)
-        self.startBask.set(lights_config[7])
-        self.durBask.set(lights_config[11])
+        self.startBask, self.durBask = tk.StringVar(self.popBask), tk.StringVar(self.popBask)
+        self.startBask.set(lights_config[7][:2])
+        self.durBask.set(lights_config[11][:2])
 
-        tk.Label(self.popBask, text="Start").grid(row=0, column=0, padx=(100,0), pady=(20,0))
-        tk.Label(self.popBask, text="Duration").grid(row=1, column=0, padx=(100,0))
+        self.drop_startBask_val, self.drop_durBask_val = tk.StringVar(self.popBask), tk.StringVar(self.popBask)
+        self.drop_startBask_val.set(lights_config[7][3:])
+        self.drop_durBask_val.set(lights_config[11][3:])
 
-        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.startBask).grid(row=0, column=1, pady=(20,0), padx=(0,100))
-        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,100))
+        tk.Label(self.popBask, text="Start HH:").grid(row=0, column=0, padx=(20,0), pady=(20,0))
+        tk.Label(self.popBask, text="Duration HH:").grid(row=1, column=0, padx=(20,0), pady=(20,0))
+        
+        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.startBask).grid(row=0, column=1, pady=(20,0), padx=(0,0))
+        tk.Entry(self.popBask, width=9, bg="white", textvariable=self.durBask).grid(row=1, column=1, padx=(0,0), pady=(20,0))
 
-        tk.Button(self.popBask, text="SAVE", width=9, command=lambda: [self.saveBask(), self.popBask.destroy()]).grid(row=2, column=0, columnspan=2, padx=(20,20), pady=(20,20))
+        tk.Label(self.popBask, text="MM:").grid(row=0, column=2, padx=(20,0), pady=(20,0))
+        tk.Label(self.popBask, text="MM:").grid(row=1, column=2, padx=(20,0), pady=(20,0))
+        
+        self.options = ['00', '10', '20', '30', '40', '50']
+        tk.OptionMenu(self.popBask, self.drop_startBask_val, *self.options).grid(row=0, column=3, pady=(20,0), padx=(0,20))
+        tk.OptionMenu(self.popBask, self.drop_durBask_val, *self.options).grid(row=1, column=3, pady=(20,0), padx=(0,20))
+
+        tk.Button(self.popBask, text="SAVE", width=9, command=lambda: [self.saveBask()]).grid(row=2, column=0, columnspan=4, padx=(20,20), pady=(20,20))
 
         self.popBask.mainloop()
 
     # saves basking start/duration values
     def saveBask(self):
         lights_config = csv_read()[config_dict['lights_config']]
-        lights_config[7] = self.startBask.get()
-        lights_config[11] = self.durBask.get()
-        csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 40) #change 40 to some sort of encoding for the message
+        start = self.startBask.get()
+        dur = self.durBask.get()
+
+        if int(start) < 0 or int(dur) < 0:
+            # popup error
+            self.popupError = tk.Tk()
+            self.popupError.wm_title("Alert")
+            label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popupError.winfo_reqwidth()
+            popup_height = self.popupError.winfo_reqheight()
+            positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+            self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy()])
+            OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+            self.popupError.mainloop()
+        else:
+            if len(start) == 1:
+                start = '0'+start
+                self.startBask.set(start)
+            if len(dur) == 1:
+                dur = '0'+dur
+                self.durBask.set(dur)
+            lights_config[7] = start+':'+self.drop_startBask_val.get()
+            lights_config[11] = dur+':'+self.drop_durBask_val.get()
+            csv_write('lights_config', lights_config)
+            ble.BLE_lights_duration(3, lights_config[7], lights_config[11])
+            self.popBask.destroy()
 
 
 class WaterPump(tk.Frame):
@@ -983,12 +1149,13 @@ class WaterPump(tk.Frame):
         navibutton1.pack(pady = (0,10))
         
         # initialize tkinter variables for rate and time values
-        self.rateA, self.rateB, self.time = tk.IntVar(), tk.IntVar(), tk.IntVar()
+        self.rateA, self.rateB, self.timeA, self.timeB = tk.IntVar(), tk.IntVar(), tk.IntVar(), tk.IntVar()
         pump_config = csv_read()[config_dict['pump_config']]
         self.rateA.set(pump_config[0])
         self.rateB.set(pump_config[1])
-        self.time.set(pump_config[2])
-        self.mode = pump_config[3]
+        self.timeA.set(pump_config[2])
+        self.timeB.set(pump_config[3])
+        self.mode = pump_config[4]
 
         # initialize param text and padding text
         self.buttonFrame = tk.Frame(master=self, bg='white')
@@ -1014,63 +1181,143 @@ class WaterPump(tk.Frame):
             self.mode = "off"
         else:
             self.mode = "on"
-        self.switch()
+        self.switch(first=True)
 
     # switches the button state betwee 'off'/'on'/'timer'
-    def switch(self):
+    def switch(self, first=False):
         if self.mode == "off":
             self.mode = "on"
             self.control.config(text="ON", fg="green")
         elif self.mode == "on":
             self.mode = "timer"
             self.control.config(text="Timer ON", fg="purple")
-            self.mins = tk.Label(master=self.buttonFrame, text="(min):", bg = 'white')
-            self.mins.grid(row=0, column=3)
-            self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.time)
-            self.timer.grid(row=0, column=4, padx=(0,5), pady=5, columnspan=1)
+            self.mins = tk.Label(master=self.buttonFrame, text="Time Pumping (min):", bg = 'white')
+            self.mins.grid(row=1, column=3)
+            self.timer = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.timeA)
+            self.timer.grid(row=1, column=4, padx=(0,5), pady=5, columnspan=1)
+            
+            #edits
+            self.mins1 = tk.Label(master=self.buttonFrame, text="Time Pumping (min):", bg = 'white')
+            self.mins1.grid(row=2, column=3)
+            self.timer1 = tk.Entry(master=self.buttonFrame, width=4, textvariable=self.timeB)
+            self.timer1.grid(row=2, column=4, padx=(0,5), pady=5, columnspan=1)
+
         elif self.mode == "timer":
             self.mode = "off"
             self.control.config(text="OFF", fg="red")
             self.mins.destroy()
             self.timer.destroy()
+            self.mins1.destroy()
+            self.timer1.destroy()            
+            
         elif self.mode == "go to off":
             self.mode = "off"
             self.control.config(text="OFF", fg="red")
         config_settings = csv_read()
         pump_config = [config_settings[config_dict['pump_config']][0], config_settings[config_dict['pump_config']][1], \
-            config_settings[config_dict['pump_config']][2], self.mode]
+            config_settings[config_dict['pump_config']][2], config_settings[config_dict['pump_config']][3], self.mode]
         csv_write('pump_config', pump_config)
-        ble.BLE_write('0', 52) #change 52 to some sort of encoding for the message
+        # send message for timer mode (on/off/timer) if not initialization step
+        if not first:
+            ble.BLE_pump_mode(pump_config)
+        #ble.BLE_write('0', 52) #change 52 to some sort of encoding for the message
 
     # save popup
     def popup(self):
-        self.popup = tk.Tk()
-        self.popup.wm_title("Alert")
-        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
-        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
-        
-        # centers the popup window
-        popup_width = self.popup.winfo_reqwidth()
-        popup_height = self.popup.winfo_reqheight()
-        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
-        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
-        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
-        
-        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
-        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
-        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
-        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
-        self.popup.mainloop()
+        if self.mode == "timer":
+            real_timeA = int(self.timeA.get())
+            real_timeB = int(self.timeB.get())
+        else:
+            real_timeA = None
+            real_timeB = None
+        if self.mode == "timer":
+            if self.rateA.get() < 0 or self.rateB.get() < 0 or real_timeA < 0 or real_timeB < 0:
+                # popup error
+                self.popupError = tk.Tk()
+                self.popupError.wm_title("Alert")
+                label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+                label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+                # centers the popup window
+                popup_width = self.popupError.winfo_reqwidth()
+                popup_height = self.popupError.winfo_reqheight()
+                positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+                positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+                self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+                OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy(), self.popup.destroy()])
+                OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+                self.popupError.mainloop()
+            else:
+                # save popup
+                self.popup = tk.Tk()
+                self.popup.wm_title("Alert")
+                label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+                label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+                # centers the popup window
+                popup_width = self.popup.winfo_reqwidth()
+                popup_height = self.popup.winfo_reqheight()
+                positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+                positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+                self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+                YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+                YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
+                NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+                NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
+                self.popup.mainloop()
+        else:
+            if self.rateA.get() < 0 or self.rateB.get() < 0:
+                # popup error
+                self.popupError = tk.Tk()
+                self.popupError.wm_title("Alert")
+                label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+                label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+                # centers the popup window
+                popup_width = self.popupError.winfo_reqwidth()
+                popup_height = self.popupError.winfo_reqheight()
+                positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+                positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+                self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+                OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy(), self.popup.destroy()])
+                OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+                self.popupError.mainloop()
+            else:
+                # save popup
+                self.popup = tk.Tk()
+                self.popup.wm_title("Alert")
+                label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+                label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+                # centers the popup window
+                popup_width = self.popup.winfo_reqwidth()
+                popup_height = self.popup.winfo_reqheight()
+                positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+                positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+                self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+                YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+                YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
+                NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+                NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
+                self.popup.mainloop()
     
     # saves data to the csv
     def save(self):
         if self.mode == "timer":
-            real_time = self.timer.get()
+            real_timeA = int(self.timeA.get())
+            real_timeB = int(self.timeB.get())
         else:
-            real_time = None
-        pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
+            real_timeA = None
+            real_timeB = None
+        pump_config = [self.rateA.get(), self.rateB.get(), real_timeA, real_timeB, self.mode] # need to fix csv with new data
         csv_write('pump_config', pump_config)
-        ble.BLE_write('0', 51) #change 51 to some sort of encoding for the message
+        # send messages for timer durations (A and B)
+        ble.BLE_solenoid_interval(pump_config)
+        #ble.BLE_write('0', 51) #change 51 to some sort of encoding for the message
         
 
 class FishFeeder(tk.Frame):
@@ -1274,30 +1521,49 @@ class Oxygenator(tk.Frame):
 
     # save popup
     def popup(self):
-        self.popup = tk.Tk()
-        self.popup.wm_title("Alert")
-        label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
-        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
-        
-        # centers the popup window
-        popup_width = self.popup.winfo_reqwidth()
-        popup_height = self.popup.winfo_reqheight()
-        positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
-        positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
-        self.popup.geometry("+{}+{}".format(positionRight, positionDown))
-        
-        YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
-        YesB.grid(row=1, column=1, padx =(100,10), pady = (0,10))
-        NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
-        NoB.grid(row=1, column=2, padx=(10,100), pady = (0,10))
-        self.popup.mainloop()
+        if self.min.get() < 0:
+            # popup error
+            self.popupError = tk.Tk()
+            self.popupError.wm_title("Alert")
+            label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popupError.winfo_reqwidth()
+            popup_height = self.popupError.winfo_reqheight()
+            positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+            self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy(), self.popup.destroy()])
+            OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+            self.popupError.mainloop()
+        else:
+            # save popup
+            self.popup = tk.Tk()
+            self.popup.wm_title("Alert")
+            label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popup.winfo_reqwidth()
+            popup_height = self.popup.winfo_reqheight()
+            positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+            self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+            YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
+            NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+            NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
+            self.popup.mainloop()
     
     # saves value to csv
     def save(self):
         csv_write('oxygen_config', [self.min.get()])
 
 class Backwashing(tk.Frame):
-    
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #title
@@ -1307,12 +1573,115 @@ class Backwashing(tk.Frame):
                             command=lambda: controller.show_frame(ControlPanel))
         navibutton1.pack()
 
+        # init tkinter var: rate and mode
+        self.rate = tk.IntVar()
+        backwash_config = csv_read()[config_dict['backwash_config']]
+        self.rate.set(backwash_config[0])
+        self.mode = backwash_config[1]
+
+        # init frame
+        self.buttonFrame = tk.Frame(master=self, bg='white')
+        self.buttonFrame.pack()
+
+        # init labels
+        tk.Label(self, text="Backwash Status:", bg="white").pack()
+                # init on/off button
+        self.control = tk.Button(self, text="OFF", fg="red", width=9, command=self.switch)
+        self.control.pack()
+        tk.Label(master=self.buttonFrame, text="Backwash When Flow Rate Less Than (GPH):", bg="white").grid(row=1, column=0, padx=3, pady=5)
+        # init entry spaces
+        tk.Entry(master=self.buttonFrame, width=9, textvariable=self.rate, bg="white").grid(row=1, column=1, padx=5, pady=5)
+        # init buttons
+        ttk.Button(self, text="Backwash Now", width=15, command=self.popupNow).pack(pady = (11,0))
+        ttk.Button(self, text="Save", width=9, command=self.popup).pack(pady = (10,0))
+
+        # initialize correct button state (on vs. off)
+        if self.mode == "on":
+            self.initialize()
+    
+    def initialize(self):
+        if self.mode == "on":
+            self.control.config(text="ON", fg="green")
+        else:
+            self.control.config(text="OFF", fg="red")
+
+    def switch(self):
+        if self.mode == "off":
+            self.mode = "on"
+            self.control.config(text="ON", fg="green")
+        else:
+            self.mode = "off"
+            self.control.config(text="OFF", fg="red")
+
+    # Backwash Now popup
+    def popupNow(self):
+        self.popupNow = tk.Tk()
+        self.popupNow.wm_title("Alert")
+        label = ttk.Label(self.popupNow, text="Are you sure you want to backwash now?", font=MEDIUM_FONT)
+        label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+        
+        # centers the popup window
+        popup_width = self.popupNow.winfo_reqwidth()
+        popup_height = self.popupNow.winfo_reqheight()
+        positionRight = int(self.popupNow.winfo_screenwidth()/2 - popup_width/2 )
+        positionDown = int(self.popupNow.winfo_screenheight()/2 - popup_height/2 )
+        self.popupNow.geometry("+{}+{}".format(positionRight, positionDown))
+        
+        YesB = ttk.Button(self.popupNow, text="YES", command = lambda:[self.save(), self.popupNow.destroy()])
+        YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
+        NoB = ttk.Button(self.popupNow, text="NO", command = self.popupNow.destroy)
+        NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
+        self.popupNow.mainloop()
+
+        # save popup
+    def popup(self):
+        if self.rate.get() < 0:
+            # popup error
+            self.popupError = tk.Tk()
+            self.popupError.wm_title("Alert")
+            label = ttk.Label(self.popupError, text="Inputs are not valid!", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popupError.winfo_reqwidth()
+            popup_height = self.popupError.winfo_reqheight()
+            positionRight = int(self.popupError.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popupError.winfo_screenheight()/2 - popup_height/2 )
+            self.popupError.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            OkayB = ttk.Button(self.popupError, text="OKAY", command = lambda:[self.popupError.destroy(), self.popup.destroy()])
+            OkayB.grid(row=1, column=2, padx =(100,10), pady = (0,10))
+            self.popupError.mainloop()
+        else:
+            # save popup
+            self.popup = tk.Tk()
+            self.popup.wm_title("Alert")
+            label = ttk.Label(self.popup, text="Are you sure you want to save?", font=MEDIUM_FONT)
+            label.grid(row=0, columnspan=14, pady=(10,20), padx = (100,100))
+                    
+            # centers the popup window
+            popup_width = self.popup.winfo_reqwidth()
+            popup_height = self.popup.winfo_reqheight()
+            positionRight = int(self.popup.winfo_screenwidth()/2 - popup_width/2 )
+            positionDown = int(self.popup.winfo_screenheight()/2 - popup_height/2 )
+            self.popup.geometry("+{}+{}".format(positionRight, positionDown))
+                    
+            YesB = ttk.Button(self.popup, text="YES", command = lambda:[self.save(), self.popup.destroy()])
+            YesB.grid(row=1, column=6, padx =(100,10), pady = (0,10))
+            NoB = ttk.Button(self.popup, text="NO", command = self.popup.destroy)
+            NoB.grid(row=1, column=7, padx=(10,100), pady = (0,10))
+            self.popup.mainloop()
+
+    # saves value to csv
+    def save(self):
+            csv_write('backwash_config', [self.rate.get(), self.mode])
+
 app = AllWindow()
 #app.geometry('1280x623')
 app.geometry('1917x970')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
-ani = animation.FuncAnimation(f, animate, interval=5000)
+ani = animation.FuncAnimation(f, animate, interval=10000)
 #mainloop
 app.mainloop()

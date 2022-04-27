@@ -3,6 +3,15 @@ import numpy as np
 from datetime import datetime
 from time import sleep
 import os
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+from DataLogger import all_we_got_now
+
+cred = credentials.Certificate("./serviceAccountKey.json")
+app = firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 class Logger:
     def __init__(self,tgt_path,database):
@@ -31,7 +40,7 @@ class Logger:
         self.c.execute("SELECT name FROM sqlite_master WHERE type='table';")
         for n in self.c.fetchall():
             self.dbtables.append(n[0])
-
+        
         #Create an alert for when a new database is being made
         if newdb:
             print('ALERT: No prior database named ' + self.dbname + '. Created a new database in the target directory')
@@ -94,7 +103,7 @@ class Logger:
         while ct < nsamp:
             #print(dataget)
             getdata = dataget
-            print(getdata)
+            #print(getdata)
             tup_arr = np.asarray([getdata], dtype=np.float) #put the getdata() into array form, also replace None with np.nan if it appears
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1
@@ -107,7 +116,7 @@ class Logger:
         #adding the timestamp
         #data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_med
         data_log = (int(round(datetime.now().timestamp())),) + data_med #log time in unix as int
-        print(data_log) #timestamp is logged as int
+        #print(data_log) #timestamp is logged as int
         #print(Reader.query_by_time(self, 1622730196, 1622730226)) #test function, need to be changed
         
         #assign data to tables in data_dict
@@ -126,6 +135,11 @@ class Logger:
             for rdg in data:
                 cnt = len(rdg) - 1
                 params = '?' + ',?'*cnt
+                data_tuple = self.data_dict['SensorData'][0]
+                data_dict = {}
+                for i in range(len(data_tuple)):
+                    data_dict[all_we_got_now[i]] = data_tuple[i]
+                db.collection(u'stats').add(data_dict)
                 self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
         
@@ -168,7 +182,17 @@ class Reader:
         #print(self.c.fetchall())
     
     def query_by_num(self,table,num = 1,timeval = None): #this function lets you get the last num rows of data from the table
-        self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, num))
+        self.c.execute("SELECT COUNT(*) FROM {}".format(table))
+        n = self.c.fetchall()[0][0]
+        if n < num:
+            self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, n))
+        else:
+            self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, num))
+        #self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, num))
+        #result = self.c.fetchall()
+        #print('res:', result)
+        #print('len', len(result))
+        #return(result)
         return self.c.fetchall()
         #print(self.c.fetchall())
 
