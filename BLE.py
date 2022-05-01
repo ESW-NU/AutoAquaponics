@@ -112,9 +112,9 @@ class fakeBLE:
             self.BLE_lights_duration(i, lights[i+4], lights[i+8])
         
         # initialization end
-        red = self.red(1) # restart timer
+        blue = self.blue(1) # restart timer
         yellow = 0 # init identifier
-        message = red | yellow
+        message = blue | yellow
         self.BLE_write('0', message)
 
     def BLE_pump_mode(self, data):
