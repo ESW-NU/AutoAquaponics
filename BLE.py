@@ -94,11 +94,11 @@ class fakeBLE:
 
     def BLE_init(self, config_settings):
         # initialization start
-        red = 0 # stop timer
         now = datetime.datetime.now()
         time = [int(x) for x in now.strftime("%H:%M").split(":")]
         time = 6 * time[0] + time[1]//10
-        blue = self.blue(time) # current time
+        red = self.red(time) # current time
+        blue = 0 # stop timer
         yellow = 0 # init identifier
         message = red | blue | yellow
         self.BLE_write('0', message)
