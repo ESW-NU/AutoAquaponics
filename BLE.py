@@ -81,21 +81,26 @@ class fakeBLE:
     
 
     def brown(self, n):
-        return n << 22
+        return n << 21 # bits 21-31
     
     def red(self, n):
-        return n << 12
+        return n << 10 # bits 10-20
 
     def blue(self, n):
-        return n << 2
+        return n << 2 # bits 2-9
+
+    # yellow is bits 0-1
+
 
     def BLE_init(self, config_settings):
+        # initialization start
+        red = 0 # stop timer
         now = datetime.datetime.now()
         time = [int(x) for x in now.strftime("%H:%M").split(":")]
         time = 6 * time[0] + time[1]//10
-        blue = self.blue(time)
-        yellow = 0
-        message = blue | yellow
+        blue = self.blue(time) # current time
+        yellow = 0 # init identifier
+        message = red | blue | yellow
         self.BLE_write('0', message)
         
         # send settings saved in CSV
@@ -106,9 +111,11 @@ class fakeBLE:
             self.BLE_lights_mode(i, mode)
             self.BLE_lights_duration(i, lights[i+4], lights[i+8])
         
-        # end message
-        red = self.red(1)
-        self.BLE_write('0', red)
+        # initialization end
+        red = self.red(1) # restart timer
+        yellow = 0 # init identifier
+        message = red | yellow
+        self.BLE_write('0', message)
 
     def BLE_pump_mode(self, data):
         mode = data[4]
