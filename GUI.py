@@ -16,8 +16,8 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 #from BLE import BLE
 #ble = BLE() #initalize BLE class
 #import fake BLE stuff (comment 2 lines below if on RPi)
-from BLE import fakeBLE
-ble = fakeBLE()
+from BLE import BLE
+ble = BLE()
 
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
