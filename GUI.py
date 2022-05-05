@@ -15,6 +15,7 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 #import BLE stuff (uncomment 2 lines below if on computer)
 #from BLE import BLE
 #ble = BLE() #initalize BLE class
+
 #import fake BLE stuff (comment 2 lines below if on RPi)
 from BLE import BLE
 ble = BLE()
@@ -918,7 +919,9 @@ class Lights(tk.Frame):
             lights_config[4] = start+':'+self.drop_start1_val.get()
             lights_config[8] = dur+':'+self.drop_dur1_val.get()
             csv_write('lights_config', lights_config)
-            ble.BLE_lights_duration(0, lights_config[4], lights_config[8])
+            config_settings = csv_read()[6:10]
+            ble.BLE_init(config_settings)
+            # ble.BLE_lights_duration(0, lights_config[4], lights_config[8])
             self.pop1.destroy()
 
     # shelf 2 popup window: for setting start and duration times
@@ -990,7 +993,9 @@ class Lights(tk.Frame):
             lights_config[5] = start+':'+self.drop_start2_val.get()
             lights_config[9] = dur+':'+self.drop_dur2_val.get()
             csv_write('lights_config', lights_config)
-            ble.BLE_lights_duration(1, lights_config[5], lights_config[9])
+            config_settings = csv_read()[6:10]
+            ble.BLE_init(config_settings)
+            # ble.BLE_lights_duration(1, lights_config[5], lights_config[9])
             self.pop2.destroy()
 
     # fish tank popup window: for setting start and duration times
@@ -1062,7 +1067,9 @@ class Lights(tk.Frame):
             lights_config[6] = start+':'+self.drop_startTank_val.get()
             lights_config[10] = dur+':'+self.drop_durTank_val.get()
             csv_write('lights_config', lights_config)
-            ble.BLE_lights_duration(2, lights_config[6], lights_config[10])
+            config_settings = csv_read()[6:10]
+            ble.BLE_init(config_settings)
+            # ble.BLE_lights_duration(2, lights_config[6], lights_config[10])
             self.popTank.destroy()
 
     # basking popup window: for setting start and duration times
@@ -1134,7 +1141,9 @@ class Lights(tk.Frame):
             lights_config[7] = start+':'+self.drop_startBask_val.get()
             lights_config[11] = dur+':'+self.drop_durBask_val.get()
             csv_write('lights_config', lights_config)
-            ble.BLE_lights_duration(3, lights_config[7], lights_config[11])
+            config_settings = csv_read()[6:10]
+            ble.BLE_init(config_settings)
+            # ble.BLE_lights_duration(3, lights_config[7], lights_config[11])
             self.popBask.destroy()
 
 
@@ -1316,8 +1325,9 @@ class WaterPump(tk.Frame):
         pump_config = [self.rateA.get(), self.rateB.get(), real_timeA, real_timeB, self.mode] # need to fix csv with new data
         csv_write('pump_config', pump_config)
         # send messages for timer durations (A and B)
-        ble.BLE_solenoid_interval(pump_config)
-        #ble.BLE_write('0', 51) #change 51 to some sort of encoding for the message
+        config_settings = csv_read()[6:10]
+        ble.BLE_init(config_settings)
+        # ble.BLE_solenoid_interval(pump_config)
         
 
 class FishFeeder(tk.Frame):
