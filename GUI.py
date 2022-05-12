@@ -9,8 +9,8 @@ from PIL import Image, ImageTk
 
 #uncomment later
 import cv2   #open source computer vision library
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+#cap = cv2.VideoCapture(0)
+#cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 
 #import BLE stuff (uncomment 2 lines below if on computer)
 #from BLE import BLE
