@@ -9,7 +9,7 @@ class BLE:
     def __init__(self):
         print("Connecting to BLE...")
         #Device 1 (outlet box)
-        self.p = btle.Peripheral("AC:67:B2:37:2A:22") #unique address of our ESP32 in office
+        self.p = btle.Peripheral("AC:67:B2:36:AF:A2") #unique address of our ESP32 in office
         self.s = self.p.getServiceByUUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
         self.c = self.s.getCharacteristics()[0]
         print("Connected!")

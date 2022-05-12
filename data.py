@@ -139,7 +139,7 @@ class Logger:
                 data_dict = {}
                 for i in range(len(data_tuple)):
                     data_dict[all_we_got_now[i]] = data_tuple[i]
-                db.collection(u'stats').add(data_dict)
+                #db.collection(u'stats').add(data_dict)
                 self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
         
