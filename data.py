@@ -3,15 +3,15 @@ import numpy as np
 from datetime import datetime
 from time import sleep
 import os
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+#import firebase_admin
+#from firebase_admin import credentials
+#from firebase_admin import firestore
 from DataLogger import all_we_got_now
 
-cred = credentials.Certificate("./serviceAccountKey.json")
-app = firebase_admin.initialize_app(cred)
+#cred = credentials.Certificate("./serviceAccountKey.json")
+#app = firebase_admin.initialize_app(cred)
 
-db = firestore.client()
+#db = firestore.client()
 
 class Logger:
     def __init__(self,tgt_path,database):
@@ -139,7 +139,7 @@ class Logger:
                 data_dict = {}
                 for i in range(len(data_tuple)):
                     data_dict[all_we_got_now[i]] = data_tuple[i]
-                db.collection(u'stats').add(data_dict)
+                #db.collection(u'stats').add(data_dict)
                 self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
         
