@@ -9,8 +9,8 @@ from PIL import Image, ImageTk
 
 #uncomment later
 import cv2   #open source computer vision library
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+#cap = cv2.VideoCapture(0)
+#cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 
 #import BLE stuff (uncomment 2 lines below if on computer)
 #from BLE import BLE
@@ -672,37 +672,37 @@ class VideoStream(tk.Frame):
         self.imagel.pack(pady=10, padx=10)
 
         #initialize button with a picture
-        frame = self.get_frame()
-        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(cv2image)
-        imgtk = ImageTk.PhotoImage(image=img)
-        self.imagel.imgtk = imgtk
-        self.imagel.configure(image=imgtk)
-        #button to turn video on and off
-        self.toggle_button = tk.Button(self, text="Video OFF", bg= "red", fg= "white", width=10, 
-                           height=1, command=self.toggle)
-        self.toggle_button.pack(pady=10)
-        self.update()
-    def toggle(self):
-        if self.toggle_button['bg']=='red':
-            self.toggle_button.config(bg='green',text='Video ON')
-            self.update()
-        elif self.toggle_button['bg']=='green':
-            self.toggle_button.configure(bg='red',text='Video OFF')
-    def get_frame(self):
-        """get a frame from the cam and return it."""
-        ret, frame = cap.read()
-        return frame
-    def update(self):
-        """update frames."""
-        if self.toggle_button['bg']=='green':
-            frame = self.get_frame()
-            cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            img = Image.fromarray(cv2image)
-            imgtk = ImageTk.PhotoImage(image=img)
-            self.imagel.imgtk = imgtk
-            self.imagel.configure(image=imgtk)
-            self.imagel.after(15, self.update)
+    #     frame = self.get_frame()
+    #     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #     img = Image.fromarray(cv2image)
+    #     imgtk = ImageTk.PhotoImage(image=img)
+    #     self.imagel.imgtk = imgtk
+    #     self.imagel.configure(image=imgtk)
+    #     #button to turn video on and off
+    #     self.toggle_button = tk.Button(self, text="Video OFF", bg= "red", fg= "white", width=10, 
+    #                        height=1, command=self.toggle)
+    #     self.toggle_button.pack(pady=10)
+    #     self.update()
+    # def toggle(self):
+    #     if self.toggle_button['bg']=='red':
+    #         self.toggle_button.config(bg='green',text='Video ON')
+    #         self.update()
+    #     elif self.toggle_button['bg']=='green':
+    #         self.toggle_button.configure(bg='red',text='Video OFF')
+    # def get_frame(self):
+    #     """get a frame from the cam and return it."""
+    #     ret, frame = cap.read()
+    #     return frame
+    # def update(self):
+    #     """update frames."""
+    #     if self.toggle_button['bg']=='green':
+    #         frame = self.get_frame()
+    #         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #         img = Image.fromarray(cv2image)
+    #         imgtk = ImageTk.PhotoImage(image=img)
+    #         self.imagel.imgtk = imgtk
+    #         self.imagel.configure(image=imgtk)
+    #         self.imagel.after(15, self.update)
             
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):

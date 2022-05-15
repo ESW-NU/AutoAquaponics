@@ -9,10 +9,10 @@ class BLE:
     def __init__(self):
         print("Connecting to BLE...")
         #Device 1 (outlet box)
-        self.p = btle.Peripheral("AC:67:B2:37:2A:22") #unique address of our ESP32 in office
+        self.p = btle.Peripheral("AC:67:B2:36:AF:A2") #unique address of our ESP32 in office
         self.s = self.p.getServiceByUUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
         self.c = self.s.getCharacteristics()[0]
-
+        print("Connected!")
         # Device 2 (name of device)
         # self.p1 = btle.Peripheral("insert id here") #follow this format, so on and so forth
         # self.s1 = self.p1.getServiceByUUID("enter id here")
@@ -36,7 +36,8 @@ class BLE:
 
     # char is the characteristic we are writing to, message is the number we are sending
     def BLE_write(self, char, message):
-        print("Fake message here: ", str(self.charact[char]), ", " + bin(message), ", ", message)
+        print("BLE message here: ", str(self.charact[char]), ", " + bin(message), ", ", message)
+        self.charact[char].write(message.to_bytes(4, byteorder='big'))
 
     # peri is the code for the specific peripheral we are disconnecting
     def BLE_disconnect(self, peri):
