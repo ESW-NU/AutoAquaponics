@@ -48,7 +48,7 @@ BLECharacteristic *pCharacteristic = NULL;
 BLEAdvertising *pAdvertising = NULL;
 uint32_t message;
 
-const int outputs[10] = {15, 2, 0, 4, 16, 17, 5, 18, 19, 21};
+const int outputs[10] = {22,23, 25, 18, 26, 13, 12, 14, 27, 19};
 //const int outputs[10] = {23, 22, 14, 32, 15, 33, 27, 12, 13, 21};
 void IRAM_ATTR onTimer(){
   // Increment the counter and set the time of ISR
@@ -74,26 +74,18 @@ void IRAM_ATTR onTimer(){
     for (int i = 0; i < 20; i++){
       mod = min(mods[i], mod);
     }
-    Serial.println();
-    Serial.print("Extension: ");
-    for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
-      Serial.print(extension[i]);
-    }
-    Serial.println();
     for (int i = 0; i < max_index; i++){
       al_list[simul[i]].state = !al_list[simul[i]].state; 
     }
     for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
-      if (al_list[i].permanence == 1){
+      if (al_list[i].permanence){
         digitalWrite(outputs[i], al_list[i].permanent);
       }
       else{
-        digitalWrite(outputs[i], al_list[i].state); 
+        digitalWrite(outputs[i], al_list[i].state);
       }
     }
   }
-  max_index = find_closest_timer() + 1;
-  portEXIT_CRITICAL_ISR(&timerMux);
   Serial.print("Outlets: ");
   for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
     Serial.print(digitalRead(outputs[i]));
@@ -124,20 +116,18 @@ void IRAM_ATTR onTimer(){
   }
   Serial.println();
   Serial.print("Permanence: ");
-  for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
+  for (int i = 0; i < 10; i++){
     Serial.print(al_list[i].permanence);
     Serial.print(" ");
   }
   Serial.println();
-  Serial.print("day time: ");
-  Serial.println(day_time() % 1440);
+  Serial.print("Day Time: ");
+  Serial.print(day_time());
+  Serial.println();
+  max_index = find_closest_timer() + 1;
+  portEXIT_CRITICAL_ISR(&timerMux);
   timerAlarmWrite(timer, ((mod * 1440) + next_time - day_offset) * MIN, false);
   timerAlarmEnable(timer);
-  Serial.print("Next time: ");
-  Serial.print(mod * 1440);
-  Serial.print('+');
-  Serial.println(next_time);
-  Serial.println(timerAlarmReadSeconds(timer));
 }
 
 class MyCallbacks: public BLECharacteristicCallbacks {
@@ -187,9 +177,57 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           al_list[blue_part].time_hit_2 = red_part;
           al_list[blue_part].repeat_period = red_part * 2;
         } else if ((message & 3) == 2) {
+          full_reset();
+          day_offset = day_time();
+          timerAlarmDisable(timer);
+          timerRestart(timer);
+          timerStop(timer);
           al_list[blue_part].time_hit_1 = red_part;
           al_list[blue_part].time_hit_2 = (red_part + brown_part) % 1440;
           al_list[blue_part].repeat_period = 1440;
+          full_recombobulate();
+          max_index = find_closest_timer() + 1;
+          timerRestart(timer);
+          timerAlarmWrite(timer, (next_time - day_offset) * MIN, false);
+          timerAlarmEnable(timer);
+          Serial.print("Outlets: ");
+          for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
+            Serial.print(digitalRead(outputs[i]));
+          }
+          Serial.println();
+          Serial.print("Hit 1: ");
+          for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
+            Serial.print(al_list[i].time_hit_1);
+            Serial.print(" ");
+          }
+          Serial.println();
+          Serial.print("Hit 2: ");
+          for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
+            Serial.print(al_list[i].time_hit_2);
+            Serial.print(" ");
+          }
+          Serial.println();
+          Serial.print("State: ");
+          for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
+            Serial.print(al_list[i].state);
+            Serial.print(" ");
+          }
+          Serial.println();
+          Serial.print("Mods: ");
+          for (int i = 0; i < 20; i++){
+            Serial.print(mods[i]);
+            Serial.print(" ");
+          }
+          Serial.println();
+          Serial.print("Permanence: ");
+          for (int i = 0; i < 10; i++){
+            Serial.print(al_list[i].permanence);
+            Serial.print(" ");
+          }
+          Serial.println();
+          Serial.print("Day Time: ");
+          Serial.print(day_time());
+          Serial.println();
         } else if ((message & 3) == 3) {
           al_list[blue_part].permanent = brown_part;
           al_list[blue_part].permanence = red_part;
@@ -199,10 +237,8 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           Serial.print("Permanence: ");
           Serial.println(al_list[blue_part].permanence);
         }
-        Serial.println("Start Outlet: ");
-        Serial.println("End Outlet: ");
-        }
       }
+    }
 };
 
 uint32_t day_time() {
@@ -319,6 +355,7 @@ void setup() {
 
   for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
     pinMode(outputs[i], OUTPUT);
+    digitalWrite(outputs[i], HIGH);
   } 
 
   timerSemaphore = xSemaphoreCreateBinary();
@@ -327,18 +364,18 @@ void setup() {
 
   timerAttachInterrupt(timer, &onTimer, true);
 
-  al_list[0] = virt_alarm{(int32_t)0, (int32_t)100, (int32_t)1000, false, false, false};
-  al_list[1] = virt_alarm{(int32_t)0, (int32_t)200, (int32_t)1000, false, false, false};
-  al_list[2] = virt_alarm{(int32_t)0, (int32_t)300, (int32_t)1000, false, false, false};
-  al_list[3] = virt_alarm{(int32_t)300, (int32_t)400, (int32_t)1000, false, false, false};
-  al_list[4] = virt_alarm{(int32_t)400, (int32_t)500, (int32_t)1000, false, false, false};
-  al_list[5] = virt_alarm{(int32_t)1000, (int32_t)1100, (int32_t)500, false, false, false};
-  al_list[6] = virt_alarm{(int32_t)1100, (int32_t)1200, (int32_t)500, false, false, false};
-  al_list[7] = virt_alarm{(int32_t)1200, (int32_t)1300, (int32_t)500, false, false, false};
-  al_list[8] = virt_alarm{(int32_t)1300, (int32_t)1400, (int32_t)500, false, false, false};
-  al_list[9] = virt_alarm{(int32_t)1400, (int32_t)60, (int32_t)500, false, false, false};
+  al_list[0] = virt_alarm{(int32_t)0, (int32_t)1, (int32_t)5, false, false, false};
+  al_list[1] = virt_alarm{(int32_t)0, (int32_t)2, (int32_t)5, false, false, false};
+  al_list[2] = virt_alarm{(int32_t)0, (int32_t)3, (int32_t)5, false, false, false};
+  al_list[3] = virt_alarm{(int32_t)3, (int32_t)4, (int32_t)5, false, false, false};
+  al_list[4] = virt_alarm{(int32_t)4, (int32_t)5, (int32_t)5, false, false, false};
+  al_list[5] = virt_alarm{(int32_t)10, (int32_t)11, (int32_t)10, false, false, false};
+  al_list[6] = virt_alarm{(int32_t)11, (int32_t)12, (int32_t)10, false, false, false};
+  al_list[7] = virt_alarm{(int32_t)12, (int32_t)13, (int32_t)10, false, false, false};
+  al_list[8] = virt_alarm{(int32_t)13, (int32_t)14, (int32_t)10, false, false, false};
+  al_list[9] = virt_alarm{(int32_t)14, (int32_t)15, (int32_t)10, false, false, false};
 
-  day_offset = 1100;
+  day_offset = 0;
   full_recombobulate();
 
   max_index = find_closest_timer() + 1;
@@ -355,7 +392,7 @@ void setup() {
   timerAlarmEnable(timer);
   Serial.println(timerReadSeconds(timer));
 
-  BLEDevice::init("MyESP32");
+  BLEDevice::init("AutoAquaponicsOutleBox");
   pServer = BLEDevice::createServer();
 
   pService = pServer->createService(SERVICE_UUID);
