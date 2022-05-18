@@ -65,7 +65,7 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function tha
     #flow2 = getFlowRate(13, 0.273)
     #make sure distance is the last value on this list
     #order should be pH, TDS, hum, atemp, wtemp, distance
-    return pH, TDS, hum, atemp, wtemp, distance#, flow1, flow2
+    return pH, TDS, 12, 12, wtemp, distance#, flow1, flow2
 
 #DS18B20 functions
 def read_temp_raw():
