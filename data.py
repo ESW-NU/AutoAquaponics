@@ -12,9 +12,9 @@ cred = credentials.Certificate("./serviceAccountKey.json")
 app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
-LOG_EVERY = 1
+LOG_EVERY = 30
 
-def round(x, base):
+def roundup(x, base):
     maybe = base * round(x/base)
     if maybe < x:
         return maybe + base
@@ -60,7 +60,7 @@ class Logger:
             self.table_dict[table[0]] = ((),()) #TO DO: READ EXISTING COLUMN NAMES AND TYPES
         
         curr_time = datetime.timestamp(datetime.now())
-        self.time_to_log = self.round(curr_time, LOG_EVERY * 60)
+        self.time_to_log = roundup(curr_time, LOG_EVERY * 60)
 
     def table(self,newtable):
         #check that the length of the column names == length of the column types
@@ -152,7 +152,7 @@ class Logger:
                 if data_dict['unix_time'] > self.time_to_log:
                     db.collection(u'stats').add(data_dict)
                     curr_time = datetime.timestamp(datetime.now())
-                    self.time_to_log = self.round(curr_time, LOG_EVERY * 60)
+                    self.time_to_log = roundup(curr_time, LOG_EVERY * 60)
                 self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
         
