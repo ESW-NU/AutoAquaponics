@@ -79,10 +79,10 @@ void IRAM_ATTR onTimer(){
     }
     for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
       if (al_list[i].permanence){
-        digitalWrite(outputs[i], al_list[i].permanent);
+        digitalWrite(outputs[i], !al_list[i].permanent);
       }
       else{
-        digitalWrite(outputs[i], al_list[i].state);
+        digitalWrite(outputs[i], !al_list[i].state);
       }
     }
   }
@@ -206,7 +206,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           al_list[blue_part].permanent = brown_part;
           al_list[blue_part].permanence = red_part;
           if (al_list[blue_part].permanence) {
-            digitalWrite(outputs[blue_part], al_list[blue_part].permanent);
+            digitalWrite(outputs[blue_part], !al_list[blue_part].permanent);
           }
           Serial.print("Permanence: ");
           Serial.println(al_list[blue_part].permanence);
@@ -277,7 +277,7 @@ void full_reset() {
   reset_extension();
   for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
     al_list[i].state = 0;
-    digitalWrite(i, LOW);
+    digitalWrite(i, HIGH);
   }
   for (int i = 0; i < 2*sizeof(outputs)/sizeof(outputs[0]); i++) {
     mods[i] = 0;
@@ -292,7 +292,7 @@ void recombobulate(uint8_t outlet){
   if (day_t - al_list[outlet].time_hit_1 >= 0){
     if(((day_t - al_list[outlet].time_hit_1) % al_list[outlet].repeat_period) < ((1440 + al_list[outlet].time_hit_2 - al_list[outlet].time_hit_1) % 1440) % al_list[outlet].repeat_period) {
       al_list[outlet].state = true;
-      digitalWrite(outputs[outlet], al_list[outlet].state);
+      digitalWrite(outputs[outlet], !al_list[outlet].state);
     }
   }
   if ((day_t - al_list[outlet].time_hit_1) >= 0) {
@@ -324,7 +324,7 @@ void full_recombobulate(){
     if (day_offset - al_list[i].time_hit_1 >= 0){
       if(((day_offset - al_list[i].time_hit_1) % al_list[i].repeat_period) < ((1440 + al_list[i].time_hit_2 - al_list[i].time_hit_1) % 1440) % al_list[i].repeat_period) {
         al_list[i].state = true;
-        digitalWrite(outputs[i], al_list[i].state);
+        digitalWrite(outputs[i], !al_list[i].state);
       }
     }
     if ((day_offset - al_list[i].time_hit_1) >= 0) {
