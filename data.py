@@ -11,7 +11,18 @@ from DataLogger import all_we_got_now
 #cred = credentials.Certificate("./serviceAccountKey.json")
 #app = firebase_admin.initialize_app(cred)
 
+<<<<<<< HEAD
 #db = firestore.client()
+=======
+db = firestore.client()
+LOG_EVERY = 30
+
+def roundup(x, base):
+    maybe = base * round(x/base)
+    if maybe < x:
+        return maybe + base
+    return maybe
+>>>>>>> fd59184a256a72b5c6f36dfe07ece4513996ff3f
 
 class Logger:
     def __init__(self,tgt_path,database):
@@ -51,6 +62,9 @@ class Logger:
             #c.execute(f'PRAGMA table_info({table[0]})')
             self.c.execute(f'PRAGMA journal_mode=WAL')
             self.table_dict[table[0]] = ((),()) #TO DO: READ EXISTING COLUMN NAMES AND TYPES
+        
+        curr_time = datetime.timestamp(datetime.now())
+        self.time_to_log = roundup(curr_time, LOG_EVERY * 60)
 
     def table(self,newtable):
         #check that the length of the column names == length of the column types
@@ -126,7 +140,7 @@ class Logger:
         
         #return the last values for last_distance, last_wtemp, last_atemp, and last_hum
         return data_med[-1], data_med[-2], data_med[-3], data_med[-4] #make sure these are the last distance, wtemp, atemp, and hum values
-
+    
 
     def log_data(self):
         
@@ -139,7 +153,10 @@ class Logger:
                 data_dict = {}
                 for i in range(len(data_tuple)):
                     data_dict[all_we_got_now[i]] = data_tuple[i]
-                #db.collection(u'stats').add(data_dict)
+                if data_dict['unix_time'] > self.time_to_log:
+                    db.collection(u'stats').add(data_dict)
+                    curr_time = datetime.timestamp(datetime.now())
+                    self.time_to_log = roundup(curr_time, LOG_EVERY * 60)
                 self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
         
