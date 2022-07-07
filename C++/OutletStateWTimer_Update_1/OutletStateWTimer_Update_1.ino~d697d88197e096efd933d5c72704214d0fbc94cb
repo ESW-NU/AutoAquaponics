@@ -24,10 +24,12 @@ typedef struct virt_alarm {
 
 const uint32_t TIMER_SCALAR = 40000; //Timer ticks every half a millisecond
 const uint32_t SECOND = 80000000/TIMER_SCALAR; //Timer ticks in a second
-const uint32_t TENTH = SECOND; //Timer ticks in a second
+const uint32_t TENTH = SECOND/10; //Timer ticks in a second
 const uint32_t MIN = SECOND * 60; //Timer ticks in a second
 const uint32_t TEN_MIN = 10*SECOND; //Timer ticks in 10 minutes
 const uint64_t DAY = 24*60*60*SECOND; //Timer ticks in a day
+
+const uint32_t SCALE = TENTH;
 
 const int outputs[16] = {22,23, 25, 18, 26, 13, 12, 14, 27, 19, 15, 33, 4, 5, 32, 21};
 
@@ -132,7 +134,7 @@ void IRAM_ATTR onTimer(){
   Serial.print(mod);
   Serial.println();
   portEXIT_CRITICAL_ISR(&timerMux);
-  timerAlarmWrite(timer, ((mod * 1440) + next_time - day_offset) * SECOND, false);
+  timerAlarmWrite(timer, ((mod * 1440) + next_time - day_offset) * SCALE, false);
   timerAlarmEnable(timer);
 }
 
@@ -175,8 +177,12 @@ class MyCallbacks: public BLECharacteristicCallbacks {
             full_recombobulate();
             max_index = find_closest_timer() + 1;
             timerRestart(timer);
-            timerAlarmWrite(timer, (next_time - day_offset) * SECOND, false);
+            timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
             timerAlarmEnable(timer);
+            Serial.println("Restarted!");
+            Serial.println("Next time: ");
+            Serial.print(next_time);
+            Serial.println();
           }
         } else if ((message & 3) == 1) {
           timerAlarmDisable(timer);
@@ -185,7 +191,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           al_list[blue_part].time_hit_2 = (red_part + day_time() + 1) % 1440;
           al_list[blue_part].repeat_period = red_part * 2;
           max_index = find_closest_timer() + 1;
-          timerAlarmWrite(timer, (next_time - day_offset) * SECOND, false);
+          timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
           timerAlarmEnable(timer);
           timerStart(timer);
         } else if ((message & 3) == 2) {
@@ -199,7 +205,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           al_list[blue_part].repeat_period = 1440;
           recombobulate(blue_part);
           max_index = find_closest_timer() + 1;
-          timerAlarmWrite(timer, (next_time - day_offset) * SECOND, false);
+          timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
           timerAlarmEnable(timer);
           timerStart(timer);
         } else if ((message & 3) == 3) {
@@ -216,7 +222,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 };
 
 uint32_t day_time() {
-  uint32_t d_time = ((timerReadMicros(timer) / 1000) * 2 / SECOND) + day_offset;
+  uint32_t d_time = ((timerReadMicros(timer) / 1000) * 2 / SCALE) + day_offset;
   return d_time;
 }
 
@@ -397,7 +403,7 @@ void setup() {
   Serial.print("day time: ");
   Serial.println(day_time() % 1440);
 
-  timerAlarmWrite(timer, ((mod * 1440) + next_time - day_offset) * SECOND, false);
+  timerAlarmWrite(timer, ((mod * 1440) + next_time - day_offset) * SCALE, false);
 
   // Start an alarm
   timerAlarmEnable(timer);
@@ -449,7 +455,7 @@ void loop() {
   Serial.print("day time: ");
   Serial.println(day_time() % 1440);
   timerRestart(timer);
-  timerAlarmWrite(timer, (next_time - day_offset) * MIN, false);
+  timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
   timerAlarmEnable(timer);
   timerStart(timer);
   Serial.print("Next time: ");
