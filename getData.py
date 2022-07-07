@@ -52,20 +52,25 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function tha
     #GPIO.output(pin_num2,GPIO.LOW)
     sleep(0.5)
 #define readings from ADC
-    pH = -5.82*chan.voltage + 22.1 #calibrated equation
+    pH = -5.82*chan.voltage + 26.1 #calibrated equation
+    #pH = chan.voltage
     #pH = chan.voltage
 #read air temp and air humidity
     atemp, hum = getDHT()#dht.read_retry(dht.DHT22, DHT)
-    if hum == np.nan or atemp == np.nan:
-        hum, atemp = last_hum, last_atemp
-    distance = getDistance(last_distance)
-    
+    if type(hum) != float or type(atemp) != float:
+        #hum, atemp = last_hum, last_atemp
+        print(hum, atemp)
+        hum = 15
+        atemp = 15
+    distance = 58.42 - getDistance(last_distance)
+    #print(distance)
+    #distance = 60
 #read flow rate
     #flow1 = getFlowRate(12, 4.8)
     #flow2 = getFlowRate(13, 0.273)
     #make sure distance is the last value on this list
     #order should be pH, TDS, hum, atemp, wtemp, distance
-    return pH, TDS, 12, 12, wtemp, distance#, flow1, flow2
+    return pH, TDS, hum, atemp, wtemp, distance#, flow1, flow2
 
 #DS18B20 functions
 def read_temp_raw():
@@ -191,11 +196,21 @@ def getFlowRate(FLOW_SENSOR_GPIO, k):
         print('\nkeyboard interrupt!')
         GPIO.cleanup()
         sys.exit()
-'''
+
 from time import sleep
 from datetime import datetime
+'''
 while True:
      print('updating...')
      print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1, 1, 1))
+     
+     #pH sensor calibration code
+     #pH_data = []
+     #for i in range(20):
+     #    pH_data.append(getData(1,1,1,1)[0])
+     #    sleep(0.01)
+     #avg = sum(pH_data)/len(pH_data)
+     #print(avg)
      sleep(1)
+     
     '''
