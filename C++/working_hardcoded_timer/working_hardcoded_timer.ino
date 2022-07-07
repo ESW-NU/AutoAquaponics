@@ -13,7 +13,7 @@ int VALVE_2 = 33;
 int PUMP = 22;
 int UPPER_GLIGHT = 23;
 int LOWER_GLIGHT = 25;
-int FISH_LIGHT = 18;
+int FISH_LIGHT = 26;
 int gb1_duration = 5; //minutes
 int gb2_duration = 5; //minutes
 int upper_glight_dur = 10; //hours
@@ -77,7 +77,7 @@ void setup() {
   pinMode(LOWER_GLIGHT, OUTPUT); //screw terminal 2
   pinMode(FISH_LIGHT, OUTPUT); //screw terminal 1
   pinMode(PUMP, OUTPUT); //pump
-  digitalWrite(PUMP, HIGH); //always keep pump on
+  digitalWrite(PUMP, LOW); //always keep pump on
 }
 
 void loop() {
@@ -97,19 +97,19 @@ void loop() {
     Serial.println(" ms");
   }
   // toggle lights
-  digitalWrite(UPPER_GLIGHT, HIGH);
-  digitalWrite(LOWER_GLIGHT, HIGH);
-  digitalWrite(FISH_LIGHT, HIGH);
+  digitalWrite(UPPER_GLIGHT, LOW);
+  digitalWrite(LOWER_GLIGHT, LOW);
+  digitalWrite(FISH_LIGHT, LOW);
   Serial.println("All lights on");
   delay(fish_light_dur * 60 * 60 * 1000);
 
   //turn off fish light
-  digitalWrite(FISH_LIGHT, LOW);
+  digitalWrite(FISH_LIGHT, HIGH);
   Serial.println("Fish light off");
-  delay((upper_glight_dur-fish_light_dur)* 60 * 60 * 1000);
+  delay((upper_glight_dur-fish_light_dur) * 60 * 60 * 1000);
   //turn off plant lights 
-  digitalWrite(UPPER_GLIGHT, LOW);
-  digitalWrite(LOWER_GLIGHT, LOW);
+  digitalWrite(UPPER_GLIGHT, HIGH);
+  digitalWrite(LOWER_GLIGHT, HIGH);
   Serial.println("Plant lights off");
   delay((24-upper_glight_dur) * 60 * 60 * 1000);
 }

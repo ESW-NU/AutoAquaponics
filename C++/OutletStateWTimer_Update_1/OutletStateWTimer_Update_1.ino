@@ -20,28 +20,30 @@ typedef struct virt_alarm {
   bool state;
   bool permanent;
   bool permanence;
-} virt_alarm; 
+} virt_alarm;
 
 const uint32_t TIMER_SCALAR = 40000; //Timer ticks every half a millisecond
-const uint32_t SECOND = 80000000/TIMER_SCALAR; //Timer ticks in a second
-const uint32_t TENTH = SECOND; //Timer ticks in a second
+const uint32_t SECOND = 80000000 / TIMER_SCALAR; //Timer ticks in a second
+const uint32_t TENTH = SECOND / 10; //Timer ticks in a second
 const uint32_t MIN = SECOND * 60; //Timer ticks in a second
-const uint32_t TEN_MIN = 10*SECOND; //Timer ticks in 10 minutes
-const uint64_t DAY = 24*60*60*SECOND; //Timer ticks in a day
+const uint32_t TEN_MIN = 10 * SECOND; //Timer ticks in 10 minutes
+const uint64_t DAY = 24 * 60 * 60 * SECOND; //Timer ticks in a day
 
-const int outputs[16] = {22,23, 25, 18, 26, 13, 12, 14, 27, 19, 15, 33, 4, 5, 32, 21};
+const uint32_t SCALE = MIN;
+
+const int outputs[16] = {22, 23, 25, 18, 26, 13, 12, 14, 27, 19, 15, 33, 4, 5, 32, 21};
 
 hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-virt_alarm al_list[sizeof(outputs)/sizeof(outputs[0])];
-uint8_t simul[sizeof(outputs)/sizeof(outputs[0])] = {11};
-uint8_t extension[sizeof(outputs)/sizeof(outputs[0])] = {3};
+virt_alarm al_list[sizeof(outputs) / sizeof(outputs[0])];
+uint8_t simul[sizeof(outputs) / sizeof(outputs[0])] = {11};
+uint8_t extension[sizeof(outputs) / sizeof(outputs[0])] = {3};
 uint16_t day_offset = 0; //Changes every time a message is sent, used to place alarms
 uint32_t prev_time = 0;
 uint16_t next_time = 0;
 uint8_t max_index;
-uint32_t mods[2*sizeof(outputs)/sizeof(outputs[0])] = {0};
+uint32_t mods[2 * sizeof(outputs) / sizeof(outputs[0])] = {0};
 uint32_t mod = 0;
 
 BLEServer *pServer = NULL;
@@ -50,42 +52,42 @@ BLECharacteristic *pCharacteristic = NULL;
 BLEAdvertising *pAdvertising = NULL;
 uint32_t message;
 
-void IRAM_ATTR onTimer(){
-  portENTER_CRITICAL_ISR(&timerMux);  
-  Serial.println("Pog");
+void IRAM_ATTR onTimer() {
+  portENTER_CRITICAL_ISR(&timerMux);
+  //Serial.println("Pog");
   if (simul[0] != 255) {
-    for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
+    for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
       if (extension[i] == 1) {
         (al_list[i].time_hit_1 += al_list[i].repeat_period);
         if (al_list[i].time_hit_1 >= 1440) {
-          mods[2*i]++;
+          mods[2 * i]++;
           al_list[i].time_hit_1 %= 1440;
         }
       }
       else if (extension[i] == 2) {
         (al_list[i].time_hit_2 += al_list[i].repeat_period);
         if (al_list[i].time_hit_2 >= 1440) {
-          mods[2*i + 1]++;
+          mods[2 * i + 1]++;
           al_list[i].time_hit_2 %= 1440;
         }
       }
     }
     mod = mods[0];
-    for (int i = 0; i < 2*sizeof(outputs)/sizeof(outputs[0]); i++){
+    for (int i = 0; i < 2 * sizeof(outputs) / sizeof(outputs[0]); i++) {
       mod = min(mods[i], mod);
     }
-    for (int i = 0; i < max_index; i++){
-      al_list[simul[i]].state = !al_list[simul[i]].state; 
+    for (int i = 0; i < max_index; i++) {
+      al_list[simul[i]].state = !al_list[simul[i]].state;
     }
-    for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
-      if (al_list[i].permanence){
+    for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
+      if (al_list[i].permanence) {
         digitalWrite(outputs[i], !al_list[i].permanent);
       }
-      else{
+      else {
         digitalWrite(outputs[i], !al_list[i].state);
       }
     }
-  }
+  }/*
   Serial.print("Outlets: ");
   for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
     Serial.print(digitalRead(outputs[i]));
@@ -119,20 +121,22 @@ void IRAM_ATTR onTimer(){
   for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
     Serial.print(al_list[i].permanence);
     Serial.print(" ");
-  }
+  }*/
   max_index = find_closest_timer() + 1;
-  Serial.println();
-  Serial.print("Day Time: ");
-  Serial.print(day_time());
-  Serial.println();
-  Serial.print("Next Time: ");
-  Serial.print(next_time);
-  Serial.println();
-  Serial.print("Mod: ");
-  Serial.print(mod);
-  Serial.println();
+  /*
+    Serial.println();
+    Serial.print("Day Time: ");
+    Serial.print(day_time());
+    Serial.println();
+    Serial.print("Next Time: ");
+    Serial.print(next_time);
+    Serial.println();
+    Serial.print("Mod: ");
+    Serial.print(mod);
+    Serial.println();
+  */
   portEXIT_CRITICAL_ISR(&timerMux);
-  timerAlarmWrite(timer, ((mod * 1440) + next_time - day_offset) * SECOND, false);
+  timerAlarmWrite(timer, ((mod * 1440) + next_time - day_offset) * SCALE, false);
   timerAlarmEnable(timer);
 }
 
@@ -146,13 +150,13 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         message = 0;
         for (int i = 0; i < value.length(); i++) {
           message <<= 8;
-          message |= value[i]; 
+          message |= value[i];
         }
 
         uint16_t blue_part = (message >> 2) & 0xFF; //Usually outlet in binary
         uint16_t red_part = (message >> 10) & 0x7FF;
         uint16_t brown_part = (message >> 21) & 0x7FF;
-        
+
         Serial.println(message, BIN);
         Serial.print("Outlet: ");
         Serial.println(blue_part);
@@ -163,7 +167,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         Serial.println("*********");
 
         if ((message & 3) == 0) {
-          if (blue_part == 0){
+          if (blue_part == 0) {
             Serial.println("Start Message Sent!");
             full_reset();
             day_offset = red_part;
@@ -171,12 +175,16 @@ class MyCallbacks: public BLECharacteristicCallbacks {
             timerRestart(timer);
             timerStop(timer);
           }
-          if (blue_part == 1){
+          if (blue_part == 1) {
             full_recombobulate();
             max_index = find_closest_timer() + 1;
             timerRestart(timer);
-            timerAlarmWrite(timer, (next_time - day_offset) * SECOND, false);
+            timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
             timerAlarmEnable(timer);
+            Serial.println("Restarted!");
+            Serial.println("Next time: ");
+            Serial.print(next_time);
+            Serial.println();
           }
         } else if ((message & 3) == 1) {
           timerAlarmDisable(timer);
@@ -185,7 +193,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           al_list[blue_part].time_hit_2 = (red_part + day_time() + 1) % 1440;
           al_list[blue_part].repeat_period = red_part * 2;
           max_index = find_closest_timer() + 1;
-          timerAlarmWrite(timer, (next_time - day_offset) * SECOND, false);
+          timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
           timerAlarmEnable(timer);
           timerStart(timer);
         } else if ((message & 3) == 2) {
@@ -199,7 +207,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           al_list[blue_part].repeat_period = 1440;
           recombobulate(blue_part);
           max_index = find_closest_timer() + 1;
-          timerAlarmWrite(timer, (next_time - day_offset) * SECOND, false);
+          timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
           timerAlarmEnable(timer);
           timerStart(timer);
         } else if ((message & 3) == 3) {
@@ -216,12 +224,12 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 };
 
 uint32_t day_time() {
-  uint32_t d_time = ((timerReadMicros(timer) / 1000) * 2 / SECOND) + day_offset;
+  uint32_t d_time = ((timerReadMicros(timer) / 1000) * 2 / SCALE) + day_offset;
   return d_time;
 }
 
 void reset_extension() {
-  for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++) {
+  for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
     extension[i] = 0;
   }
 }
@@ -230,12 +238,12 @@ uint8_t find_closest_timer() {
   uint16_t running_min = 1500; //Minutes in a day is 1440
   uint8_t index = 0;
   uint8_t max_index = 0;
-  uint8_t alarm_index = sizeof(outputs)/sizeof(outputs[0]) + 1;
+  uint8_t alarm_index = sizeof(outputs) / sizeof(outputs[0]) + 1;
   simul[0] = 255;
-  
-  for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++) {
-    if (day_time() < al_list[i].time_hit_1 + 1440 * mods[2*i]) {
-      if ((al_list[i].time_hit_1 + 1440 * mods[2*i] - day_time()) < running_min) {
+
+  for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
+    if (day_time() < al_list[i].time_hit_1 + 1440 * mods[2 * i]) {
+      if ((al_list[i].time_hit_1 + 1440 * mods[2 * i] - day_time()) < running_min) {
         index = 0;
         max_index = 0;
         reset_extension();
@@ -243,16 +251,16 @@ uint8_t find_closest_timer() {
         next_time = al_list[i].time_hit_1;
         simul[index] = i;
         extension[i] = 1;
-        running_min = al_list[i].time_hit_1 + 1440 * mods[2*i] - day_time();
+        running_min = al_list[i].time_hit_1 + 1440 * mods[2 * i] - day_time();
       }
-      else if ((al_list[i].time_hit_1 + 1440 * mods[2*i] - day_time()) == running_min) {
+      else if ((al_list[i].time_hit_1 + 1440 * mods[2 * i] - day_time()) == running_min) {
         index++;
         simul[index] = i;
         extension[i] = 1;
       }
     }
-    if (day_time() < al_list[i].time_hit_2 + 1440 * mods[2*i + 1]) {
-      if ((al_list[i].time_hit_2 + 1440 * mods[2*i + 1] - day_time()) < running_min) {
+    if (day_time() < al_list[i].time_hit_2 + 1440 * mods[2 * i + 1]) {
+      if ((al_list[i].time_hit_2 + 1440 * mods[2 * i + 1] - day_time()) < running_min) {
         index = 0;
         max_index = 0;
         reset_extension();
@@ -260,9 +268,9 @@ uint8_t find_closest_timer() {
         next_time = al_list[i].time_hit_2;
         simul[index] = i;
         extension[i] = 2;
-        running_min = al_list[i].time_hit_2 + 1440 * mods[2*i + 1] - day_time();
+        running_min = al_list[i].time_hit_2 + 1440 * mods[2 * i + 1] - day_time();
       }
-      else if ((al_list[i].time_hit_2 + 1440 * mods[2*i + 1] - day_time()) == running_min) {
+      else if ((al_list[i].time_hit_2 + 1440 * mods[2 * i + 1] - day_time()) == running_min) {
         index++;
         simul[index] = i;
         extension[i] = 2;
@@ -275,22 +283,22 @@ uint8_t find_closest_timer() {
 
 void full_reset() {
   reset_extension();
-  for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
+  for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
     al_list[i].state = 0;
     digitalWrite(i, HIGH);
   }
-  for (int i = 0; i < 2*sizeof(outputs)/sizeof(outputs[0]); i++) {
+  for (int i = 0; i < 2 * sizeof(outputs) / sizeof(outputs[0]); i++) {
     mods[i] = 0;
   }
   mod = 0;
 }
 
-void recombobulate(uint8_t outlet){
+void recombobulate(uint8_t outlet) {
   int32_t day_t = day_time();
-  mods[2*outlet+1] = mod;
-  mods[2*outlet] = mod;
-  if (day_t - al_list[outlet].time_hit_1 >= 0){
-    if(((day_t - al_list[outlet].time_hit_1) % al_list[outlet].repeat_period) < ((1440 + al_list[outlet].time_hit_2 - al_list[outlet].time_hit_1) % 1440) % al_list[outlet].repeat_period) {
+  mods[2 * outlet + 1] = mod;
+  mods[2 * outlet] = mod;
+  if (day_t - al_list[outlet].time_hit_1 >= 0) {
+    if (((day_t - al_list[outlet].time_hit_1) % al_list[outlet].repeat_period) < ((1440 + al_list[outlet].time_hit_2 - al_list[outlet].time_hit_1) % 1440) % al_list[outlet].repeat_period) {
       al_list[outlet].state = true;
       digitalWrite(outputs[outlet], !al_list[outlet].state);
     }
@@ -300,29 +308,29 @@ void recombobulate(uint8_t outlet){
     Serial.println();
     al_list[outlet].time_hit_1 = (((day_t - al_list[outlet].time_hit_1) / al_list[outlet].repeat_period + 1) * al_list[outlet].repeat_period + al_list[outlet].time_hit_1);
     if (al_list[outlet].time_hit_1 >= 1440) {
-      mods[2*outlet]++;
+      mods[2 * outlet]++;
     }
     al_list[outlet].time_hit_1 %= 1440;
   }
-  if (al_list[outlet].time_hit_2 + 1440 * mods[2*outlet+1] <= al_list[outlet].time_hit_1 + 1440 * mods[2*outlet]) {
+  if (al_list[outlet].time_hit_2 + 1440 * mods[2 * outlet + 1] <= al_list[outlet].time_hit_1 + 1440 * mods[2 * outlet]) {
     if (al_list[outlet].state) {
-      while (al_list[outlet].time_hit_2 + al_list[outlet].repeat_period < al_list[outlet].time_hit_1 + 1440 * mods[2*outlet]) {
+      while (al_list[outlet].time_hit_2 + al_list[outlet].repeat_period < al_list[outlet].time_hit_1 + 1440 * mods[2 * outlet]) {
         al_list[outlet].time_hit_2 += al_list[outlet].repeat_period;
       }
     } else {
-      while (al_list[outlet].time_hit_2 < al_list[outlet].time_hit_1 + 1440 * mods[2*outlet]) {
+      while (al_list[outlet].time_hit_2 < al_list[outlet].time_hit_1 + 1440 * mods[2 * outlet]) {
         al_list[outlet].time_hit_2 += al_list[outlet].repeat_period;
       }
     }
-    mods[2*outlet+1] = al_list[outlet].time_hit_2 / 1440;
+    mods[2 * outlet + 1] = al_list[outlet].time_hit_2 / 1440;
     al_list[outlet].time_hit_2 %= 1440;
   }
 }
 
-void full_recombobulate(){
-  for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++) {
-    if (day_offset - al_list[i].time_hit_1 >= 0){
-      if(((day_offset - al_list[i].time_hit_1) % al_list[i].repeat_period) < ((1440 + al_list[i].time_hit_2 - al_list[i].time_hit_1) % 1440) % al_list[i].repeat_period) {
+void full_recombobulate() {
+  for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
+    if (day_offset - al_list[i].time_hit_1 >= 0) {
+      if (((day_offset - al_list[i].time_hit_1) % al_list[i].repeat_period) < ((1440 + al_list[i].time_hit_2 - al_list[i].time_hit_1) % 1440) % al_list[i].repeat_period) {
         al_list[i].state = true;
         digitalWrite(outputs[i], !al_list[i].state);
       }
@@ -330,38 +338,38 @@ void full_recombobulate(){
     if ((day_offset - al_list[i].time_hit_1) >= 0) {
       al_list[i].time_hit_1 = (((day_offset - al_list[i].time_hit_1) / al_list[i].repeat_period + 1) * al_list[i].repeat_period + al_list[i].time_hit_1);
       if (al_list[i].time_hit_1 >= 1440) {
-        mods[2*i]++;
+        mods[2 * i]++;
       }
       al_list[i].time_hit_1 %= 1440;
     }
-    if (al_list[i].time_hit_2 + 1440 * mods[2*i+1] <= al_list[i].time_hit_1 + 1440 * mods[2*i]) {
+    if (al_list[i].time_hit_2 + 1440 * mods[2 * i + 1] <= al_list[i].time_hit_1 + 1440 * mods[2 * i]) {
       if (al_list[i].state) {
-        while (al_list[i].time_hit_2 + al_list[i].repeat_period < al_list[i].time_hit_1 + 1440 * mods[2*i]) {
+        while (al_list[i].time_hit_2 + al_list[i].repeat_period < al_list[i].time_hit_1 + 1440 * mods[2 * i]) {
           al_list[i].time_hit_2 += al_list[i].repeat_period;
         }
       } else {
-        while (al_list[i].time_hit_2 < al_list[i].time_hit_1 + 1440 * mods[2*i]) {
+        while (al_list[i].time_hit_2 < al_list[i].time_hit_1 + 1440 * mods[2 * i]) {
           al_list[i].time_hit_2 += al_list[i].repeat_period;
         }
       }
-      mods[2*i+1] = al_list[i].time_hit_2 / 1440;
+      mods[2 * i + 1] = al_list[i].time_hit_2 / 1440;
       al_list[i].time_hit_2 %= 1440;
     }
   }
   mod = mods[0];
-  for (int i = 0; i < 2*sizeof(outputs)/sizeof(outputs[0]); i++){
+  for (int i = 0; i < 2 * sizeof(outputs) / sizeof(outputs[0]); i++) {
     mod = min(mods[i], mod);
-  } 
+  }
 }
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Beginning!");
 
-  for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
+  for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
     pinMode(outputs[i], OUTPUT);
     digitalWrite(outputs[i], HIGH);
-  } 
+  }
 
   timerSemaphore = xSemaphoreCreateBinary();
 
@@ -397,7 +405,7 @@ void setup() {
   Serial.print("day time: ");
   Serial.println(day_time() % 1440);
 
-  timerAlarmWrite(timer, ((mod * 1440) + next_time - day_offset) * SECOND, false);
+  timerAlarmWrite(timer, ((mod * 1440) + next_time - day_offset) * SCALE, false);
 
   // Start an alarm
   timerAlarmEnable(timer);
@@ -409,10 +417,10 @@ void setup() {
   pService = pServer->createService(SERVICE_UUID);
 
   pCharacteristic = pService->createCharacteristic(
-                               CHARACTERISTIC_UUID,
-                               BLECharacteristic::PROPERTY_READ |
-                               BLECharacteristic::PROPERTY_WRITE
-                             );
+                      CHARACTERISTIC_UUID,
+                      BLECharacteristic::PROPERTY_READ |
+                      BLECharacteristic::PROPERTY_WRITE
+                    );
 
   pCharacteristic->setCallbacks(new MyCallbacks());
 
@@ -426,35 +434,35 @@ void setup() {
 
 void loop() {
   /*delay(15000);
-  Serial.println("Restarting!");
-  Serial.println(prev_time);
-  full_reset();
-  timerAlarmDisable(timer);
-  timerRestart(timer);
-  timerStop(timer);
-  delay(2000);
-  al_list[0] = virt_alarm{(int32_t)0, (int32_t)100, (int32_t)1000, false, false, false};
-  al_list[1] = virt_alarm{(int32_t)0, (int32_t)200, (int32_t)1000, false, false, false};
-  al_list[2] = virt_alarm{(int32_t)0, (int32_t)300, (int32_t)1000, false, false, false};
-  al_list[3] = virt_alarm{(int32_t)300, (int32_t)400, (int32_t)1000, false, false, false};
-  al_list[4] = virt_alarm{(int32_t)400, (int32_t)500, (int32_t)1000, false, false, false};
-  al_list[5] = virt_alarm{(int32_t)1000, (int32_t)1100, (int32_t)500, false, false, false};
-  al_list[6] = virt_alarm{(int32_t)1100, (int32_t)1200, (int32_t)500, false, false, false};
-  al_list[7] = virt_alarm{(int32_t)1200, (int32_t)1300, (int32_t)500, false, false, false};
-  al_list[8] = virt_alarm{(int32_t)1300, (int32_t)1400, (int32_t)500, false, false, false};
-  al_list[9] = virt_alarm{(int32_t)1400, (int32_t)60, (int32_t)500, false, false, false};
-  full_recombobulate();
-  max_index = find_closest_timer() + 1;
-  Serial.println();
-  Serial.print("day time: ");
-  Serial.println(day_time() % 1440);
-  timerRestart(timer);
-  timerAlarmWrite(timer, (next_time - day_offset) * MIN, false);
-  timerAlarmEnable(timer);
-  timerStart(timer);
-  Serial.print("Next time: ");
-  Serial.print(mod * 1440);
-  Serial.print('+');
-  Serial.println(next_time);
-  Serial.println(timerReadSeconds(timer));*/
+    Serial.println("Restarting!");
+    Serial.println(prev_time);
+    full_reset();
+    timerAlarmDisable(timer);
+    timerRestart(timer);
+    timerStop(timer);
+    delay(2000);
+    al_list[0] = virt_alarm{(int32_t)0, (int32_t)100, (int32_t)1000, false, false, false};
+    al_list[1] = virt_alarm{(int32_t)0, (int32_t)200, (int32_t)1000, false, false, false};
+    al_list[2] = virt_alarm{(int32_t)0, (int32_t)300, (int32_t)1000, false, false, false};
+    al_list[3] = virt_alarm{(int32_t)300, (int32_t)400, (int32_t)1000, false, false, false};
+    al_list[4] = virt_alarm{(int32_t)400, (int32_t)500, (int32_t)1000, false, false, false};
+    al_list[5] = virt_alarm{(int32_t)1000, (int32_t)1100, (int32_t)500, false, false, false};
+    al_list[6] = virt_alarm{(int32_t)1100, (int32_t)1200, (int32_t)500, false, false, false};
+    al_list[7] = virt_alarm{(int32_t)1200, (int32_t)1300, (int32_t)500, false, false, false};
+    al_list[8] = virt_alarm{(int32_t)1300, (int32_t)1400, (int32_t)500, false, false, false};
+    al_list[9] = virt_alarm{(int32_t)1400, (int32_t)60, (int32_t)500, false, false, false};
+    full_recombobulate();
+    max_index = find_closest_timer() + 1;
+    Serial.println();
+    Serial.print("day time: ");
+    Serial.println(day_time() % 1440);
+    timerRestart(timer);
+    timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
+    timerAlarmEnable(timer);
+    timerStart(timer);
+    Serial.print("Next time: ");
+    Serial.print(mod * 1440);
+    Serial.print('+');
+    Serial.println(next_time);
+    Serial.println(timerReadSeconds(timer));*/
 }
