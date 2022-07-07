@@ -2,7 +2,8 @@
 #include <Arduino.h>
 #include "stepper_motor.h"
 
-int wait = 2; //changes the speed of the motor in step()
+int wait = 10; //changes the speed of the auger motor in step()
+int wait2 = 2; //speed of door, can be much faster
 Steppers stepper1, stepper2; //define the steppers locally here
 
 void init_steppers(){ //called in setup() to initialize all GPIO pins used for both motors
@@ -33,7 +34,7 @@ void init_stepper(Steppers motor){ //initializes GPIO pins of one motor to outpu
 // Make one motor take a certain number of steps
 // num is how many steps it takes, + num will make motor turn in CW direction, - will go CCW
 // motor is the stepper motor we want to move
-void step(int num, Steppers motor) { 
+void step(int num, Steppers motor, int t) { 
   int cur_num = 0; //current number of steps
   if (num > 0){ //procedure for positive num
     while (cur_num < num){
@@ -41,23 +42,23 @@ void step(int num, Steppers motor) {
       digitalWrite(motor.INT3, LOW);
       digitalWrite(motor.INT2, LOW);
       digitalWrite(motor.INT4, LOW);
-      delay(wait);
+      delay(t);
       digitalWrite(motor.INT1, LOW);
       digitalWrite(motor.INT3, LOW);
       digitalWrite(motor.INT2, HIGH);
       digitalWrite(motor.INT4, LOW);
-      delay(wait);
+      delay(t);
       digitalWrite(motor.INT1, LOW);
       digitalWrite(motor.INT3, HIGH);
       digitalWrite(motor.INT2, LOW);
       digitalWrite(motor.INT4, LOW);
-      delay(wait);
+      delay(t);
       digitalWrite(motor.INT1, LOW);
       digitalWrite(motor.INT3, LOW);
       digitalWrite(motor.INT2, LOW);
       digitalWrite(motor.INT4, HIGH);
       cur_num = cur_num + 1;
-      delay(wait);
+      delay(t);
     }
   }
    else if (num < 0){ //procedure for negative num
@@ -66,23 +67,23 @@ void step(int num, Steppers motor) {
       digitalWrite(motor.INT3, LOW);
       digitalWrite(motor.INT2, LOW);
       digitalWrite(motor.INT4, HIGH);
-      delay(wait);
+      delay(t);
       digitalWrite(motor.INT1, LOW);
       digitalWrite(motor.INT3, HIGH);
       digitalWrite(motor.INT2, LOW);
       digitalWrite(motor.INT4, LOW);
-      delay(wait);
+      delay(t);
       digitalWrite(motor.INT1, LOW);
       digitalWrite(motor.INT3, LOW);
       digitalWrite(motor.INT2, HIGH);
       digitalWrite(motor.INT4, LOW);
-      delay(wait);
+      delay(t);
       digitalWrite(motor.INT1, HIGH);
       digitalWrite(motor.INT3, LOW);
       digitalWrite(motor.INT2, LOW);
       digitalWrite(motor.INT4, LOW);
       cur_num = cur_num - 1;
-      delay(wait);
+      delay(t);
    }
   }
   //turn off all pins after stepping
@@ -94,10 +95,11 @@ void step(int num, Steppers motor) {
 
 // Move feeder cover in and out to dispense food
 void dispense_food(){
-  step(-180, stepper1); //experimentally figured out 180 steps is optimal to open gate
-  step(180, stepper1);
+  step(-180, stepper1, wait2); //experimentally figured out 180 steps is optimal to open gate
+  step(180, stepper1, wait2);
 }
 
-void turn_auger(){
-  step(1, stepper2); //turn auger a single step
+// dir is either 1 or -1, 1 makes auger turn in a way that dispenses food
+void turn_auger(int dir){
+  step(dir*10, stepper2, wait); //turn auger a single step
 }

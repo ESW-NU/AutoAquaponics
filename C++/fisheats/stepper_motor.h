@@ -12,8 +12,8 @@ struct Steppers { //define new data type for stepper motor
 
 void init_stepper(Steppers motor);
 void init_steppers();
-void step(int num, Steppers motor);
+void step(int num, Steppers motor, int t);
 void dispense_food();
-void turn_auger();
+void turn_auger(int dir);
 
 #endif
