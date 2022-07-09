@@ -60,7 +60,7 @@ void init_interrupt() {
 
   // Set alarm to call onTimer function every second (value in microseconds).
   // Repeat the alarm (third parameter)
-  timerAlarmWrite(timer, gb1_duration*1000000, true);
+  timerAlarmWrite(timer, gb1_duration*60  *1000000, true);
 
   // Start an alarm
   timerAlarmEnable(timer);
