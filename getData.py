@@ -52,7 +52,8 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function tha
     #GPIO.output(pin_num2,GPIO.LOW)
     sleep(0.5)
 #define readings from ADC
-    pH = -5.82*chan.voltage + 26.1 #calibrated equation
+    pH = -5.82*chan.voltage + 22.1 #calibrated equation
+    #pH = chan.voltage
     #pH = chan.voltage
     #pH = chan.voltage
 #read air temp and air humidity
@@ -201,16 +202,14 @@ from time import sleep
 from datetime import datetime
 '''
 while True:
-     print('updating...')
-     print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1, 1, 1))
-     
-     #pH sensor calibration code
-     #pH_data = []
-     #for i in range(20):
-     #    pH_data.append(getData(1,1,1,1)[0])
-     #    sleep(0.01)
-     #avg = sum(pH_data)/len(pH_data)
-     #print(avg)
-     sleep(1)
-     
-    '''
+    print('updating...')
+    print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData(1, 1, 1, 1))
+
+    #pH sensor calibration code
+    #pH_data = []
+    #for i in range(20):
+    #    pH_data.append(getData(1,1,1,1)[0])
+    #    sleep(0.01)
+    #avg = sum(pH_data)/len(pH_data)
+    #print(avg)
+    sleep(1)'''

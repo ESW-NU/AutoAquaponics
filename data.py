@@ -3,17 +3,14 @@ import numpy as np
 from datetime import datetime
 from time import sleep
 import os
-#import firebase_admin
-#from firebase_admin import credentials
-#from firebase_admin import firestore
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 from DataLogger import all_we_got_now
 
-#cred = credentials.Certificate("./serviceAccountKey.json")
-#app = firebase_admin.initialize_app(cred)
+cred = credentials.Certificate("./serviceAccountKey.json")
+app = firebase_admin.initialize_app(cred)
 
-<<<<<<< HEAD
-#db = firestore.client()
-=======
 db = firestore.client()
 LOG_EVERY = 30
 
@@ -22,7 +19,6 @@ def roundup(x, base):
     if maybe < x:
         return maybe + base
     return maybe
->>>>>>> fd59184a256a72b5c6f36dfe07ece4513996ff3f
 
 class Logger:
     def __init__(self,tgt_path,database):

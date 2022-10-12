@@ -9,7 +9,7 @@ class BLE:
     def __init__(self):
         print("Connecting to BLE...")
         #Device 1 (outlet box)
-        self.p = btle.Peripheral("AC:67:B2:36:AF:A2") #unique address of our ESP32 in office
+        self.p = btle.Peripheral("AC:67:B2:35:4D:2E") #unique address of our ESP32 in office
         self.s = self.p.getServiceByUUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b")
         self.c = self.s.getCharacteristics()[0]
         print("Connected!")
@@ -36,8 +36,8 @@ class BLE:
 
     # char is the characteristic we are writing to, message is the number we are sending
     def BLE_write(self, char, message):
-        print("BLE message here: ", str(self.charact[char]), ", " + bin(message), ", ", message)
         self.charact[char].write(message.to_bytes(4, byteorder='big'))
+        print("BLE message here: ", str(self.charact[char]), ", " + bin(message), ", ", message)
 
     # peri is the code for the specific peripheral we are disconnecting
     def BLE_disconnect(self, peri):
@@ -142,9 +142,9 @@ class BLE:
 
     def BLE_lights_duration(self, index, start, duration):
         start = [int(start[:2]), int(start[3:])]
-        start = 6 * start[0] + start[1]//10
+        start = 60 * start[0] + start[1]
         duration = [int(duration[:2]), int(duration[3:])]
-        duration = 6 * duration[0] + duration[1]//10
+        duration = 60 * duration[0] + duration[1]
         brown = self.brown(duration)
         red = self.red(start)
         blue = self.blue(index)
