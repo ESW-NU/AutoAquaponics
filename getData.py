@@ -212,4 +212,8 @@ while True:
     #    sleep(0.01)
     #avg = sum(pH_data)/len(pH_data)
     #print(avg)
+<<<<<<< HEAD
     sleep(1)'''
+=======
+    sleep(1)'''
+>>>>>>> 5821b1cf2cec9027de707b01d91f9e5a319cae24
