@@ -1,5 +1,5 @@
 from main import user_settings
-#from getData import getData
+from getData import getData
 
 config_path, db_path, img_path = user_settings()
 db_name = 'sensor_db.db'
