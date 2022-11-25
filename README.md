@@ -1,4 +1,4 @@
-# AutoAquaponics Prototype 2.0
+# AutoAquaponics Prototype 1.0
 ## Overview
 The AutoAquaponics software program is a graphical user interface (GUI) program that allows the user to monitor and control an automated aquaponic system remotely. AutoAquaponics is compatible with Raspberry Pi only, and it has so far been developed for [Raspbian Buster 10](https://www.raspberrypi.org/software/). It also requires the use of the latest versions (as of December of 2020) of Python 3, Matplotlib, NumPy, Pillow, OpenCV, and a variety of libraries for the sensors and electronics incorporated into AutoAquaponics (full list of libraries will come once the system is completed). 
 
