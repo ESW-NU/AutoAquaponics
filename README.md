@@ -20,6 +20,6 @@ The Video Stream page contains a canvas in the middle that shows a live stream v
 - Video ON and GUI is displaying a page other than Video Stream (less CPU, ~37%)
 - Video OFF and GUI is displaying any page (least CPU, ~10-20%)
 
-*Note: AutoAquaponics Prototype 2.0 was developed on a Raspberry Pi 4, and the amount of CPUs used by the program might not be the same on other versions of Raspberry Pi.*
+*Note: AutoAquaponics Prototype 1.0 was developed on a Raspberry Pi 4, and the amount of CPUs used by the program might not be the same on other versions of Raspberry Pi.*
 ### Control Panel
-Currently a work in progress and non-functional. The UI of Control Panel will be replaced by something similar to the UI in the Alternate Control Panel page, which is also non-functional at the moment. Prototype 2.0 currently only serves as a monitoring system, and does not allow the user to actuate anything. The controlling aspects of AutoAquaponics will come in future iterations of the program, so stay tuned!
+Currently a work in progress and non-functional. The UI of Control Panel will be replaced by something similar to the UI in the Alternate Control Panel page, which is also non-functional at the moment. Prototype 1.0 currently only serves as a monitoring system, and does not allow the user to actuate anything. The controlling aspects of AutoAquaponics will come in future iterations of the program, so stay tuned!
