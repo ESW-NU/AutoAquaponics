@@ -78,7 +78,7 @@ class Logger:
             # add table(s) to the table dictionary...
             self.table_dict[table] = info
 
-    def collect_data(self,table,dataget,last_distance,last_wtemp,last_hum,last_atemp,tsamp=0,nsamp=1):
+    def collect_data(self,table,dataget,tsamp=0,nsamp=1):
         #daily table mode 
         if table == 'DAILY':
             table = self.datef
@@ -94,7 +94,7 @@ class Logger:
         while ct < nsamp:
             #print(dataget)
             getdata = dataget
-            print(getdata)
+            #print(getdata)
             tup_arr = np.asarray([getdata], dtype=np.float) #put the getdata() into array form, also replace None with np.nan if it appears
             data_arr = np.append(data_arr, tup_arr, axis=0) #append as new row in the array
             ct += 1

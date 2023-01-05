@@ -8,16 +8,16 @@ from tkinter import ttk, W, LEFT, END
 from PIL import Image, ImageTk
 
 #uncomment later
-import cv2   #open source computer vision library
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+#import cv2   #open source computer vision library
+#cap = cv2.VideoCapture(0)
+#cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
 
 #import BLE stuff (uncomment 2 lines below if on computer)
 #from BLE import BLE
 #ble = BLE() #initalize BLE class
 #import fake BLE stuff (comment 2 lines below if on RPi)
-from BLE import fakeBLE
-ble = fakeBLE()
+#from BLE import fakeBLE
+#ble = fakeBLE()
 
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
@@ -42,6 +42,13 @@ from sendtext import pCheck
 from sendtext import allOk
 from main import user_settings
 config_path, db_path, img_path = user_settings()
+
+# list of parameters (try to link with list in DataLogger?)
+param_dict = {}
+param_list = ['Sealed air cell v0 (mV)', 'Sealed air v1 (mV)', 'Sealed air cell v2 (mV)', 'Hori. cell v3 (mV)', 'Hori. cell v4 (mV)', 'Hori. cell v5 (mV)', 'Incubating v6 (mV)', 'v7 (mV)', 'v8 (mV)', 'v9 (mV)', 'v10 (mV)', 'v11 (mV)', 'v12 (mV)', 'v13 (mV)', 'v14 (mV)', 'p0 (uW)','p1 (uW)', 'p2 (uW)', 'p3 (uW)', 'p4 (uW)', 'p5 (uW)', 'p6 (uW)', 'p7 (uW)', 'p8 (uW)', 'p9 (uW)','p10 (uW)','p11 (uW)', 'p12 (uW)','p13 (uW)', 'p14 (uW)', 'Soil Temp (\N{DEGREE SIGN}C)', 'Soil Moisture (%)', 'Raw Moisture Reading (mV)']
+param_ylim = [(-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800),(-300, 800), (-300, 800), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500),(0, 500),(0, 500),(10, 35), (0, 100), (0, 2000)]
+#param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
+live_dict = {}
 
 # returns the current csv in a 2D list, where list[i][j] is the jth element of the ith row of the list
 def csv_read():
@@ -92,8 +99,8 @@ init_dict = {
     'num_config': ['Enter Phone Number Here:']*num_contacts,
     'provider_config': ['']*num_contacts,
     'email_config': ['Email']*num_contacts,
-    'upper_config': [1000]*11,
-    'lower_config': [0]*11,
+    'upper_config': [1000]*len(param_list),
+    'lower_config': [0]*len(param_list),
     'pump_config': [0, 0, None, "off"],
     'oxygen_config': [0],
     'sensor_config': ['off']*4,
@@ -109,17 +116,10 @@ config_settings = csv_read()
 enable_text = config_settings[config_dict['enable_text']]
 
 #create figure for plots and set figure size/layout
-#f = figure.Figure(figsize=(8.5,17.5), dpi=100)
-f = figure.Figure(figsize=(16.6,15), dpi=100, facecolor='white')
-#f.subplots_adjust(top=0.993, bottom=0.015, hspace=0.4)
-f.subplots_adjust(top=0.993, bottom=0.015, left=0.04, right = 0.96, hspace=0.65)
-
-param_dict = {}
-param_list = ['pH', 'TDS (ppm)', 'Rela. Humidity (%)', 'Air Temp (\N{DEGREE SIGN}C)', 'Water Temp (\N{DEGREE SIGN}C)', 'Water Level (cm)']
-param_ylim = [(5, 9), (0, 1500), (20, 80), (15, 35), (15, 35), (0, 61)]
-#param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
-live_dict = {}
-
+#f = figure.Figure(figsize=(16.6,15), dpi=100, facecolor='white')
+f = figure.Figure(figsize=(16.6,1*len(param_list)), dpi=100, facecolor='white')
+#f.subplots_adjust(top=0.993, bottom=0.35, hspace=0.4)
+f.subplots_adjust(top=0.993, bottom=0.01, left=0.04, right = 0.96, hspace=0.65)
 
 ########################
 #this is for texting
@@ -171,8 +171,9 @@ class Sensor_Plot:
 
 def initialize_plots(): #intiailizes plots...
     global initialize_plots
+    num_row = len(param_list)//2 + (len(param_list) % 2 > 0) #calc how many rows of 2 graphs we need, round up
     try:
-        most_recent = reader.query_by_num(table="SensorData", num=100) #initializes plot up to 20 if possible if possible
+        most_recent = reader.query_by_num(table="SensorData", num=604800) #initializes plot up to 20 if possible if possible
         for i, param in enumerate(param_list, 1):
             tList = []
             most_recent_any_size = []
@@ -182,7 +183,7 @@ def initialize_plots(): #intiailizes plots...
                 tList.append(time_f)
                 most_recent_any_size.append(most_recent[j][i])
 
-            subplot = f.add_subplot(6, 2, i)  # sharex?
+            subplot = f.add_subplot(num_row, 2, i)  # sharex?
             x_ax = f.get_axes()
             
             current_plot = Sensor_Plot(subplot, tList, x_ax[i-1], param_ylim[i-1], param, most_recent_any_size, 'b')
@@ -191,7 +192,8 @@ def initialize_plots(): #intiailizes plots...
                     
     except: #if there is no data points available to plot, initialize the subplots
         for i, param in enumerate(param_list, 1):
-            subplot = f.add_subplot(6, 2, i)
+            
+            subplot = f.add_subplot(num_row, 2, i)
             x_ax = f.get_axes()
             current_plot = Sensor_Plot(subplot, [], x_ax[i-1], param_ylim[i-1], param, [], 'b')
             param_dict[param] = current_plot
@@ -272,7 +274,7 @@ def animate(ii):
                 #time_f = datetime.strptime(most_recent[0][0], "%m/%d/%Y %H:%M:%S")
                 time_f = datetime.datetime.fromtimestamp(most_recent[0][0])
                 time_stream.insert(0, time_f)
-                if len(data_stream) < 20: #graph updates, growing to show 20 points
+                if len(data_stream) < 4320: #graph updates, growing to show 20 points
                     current_plot.make_plot()
                 else:                      #there are 20 points and more available, so animation occurs
                     data_stream.pop()
@@ -286,7 +288,7 @@ class AllWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         #add title
-        tk.Tk.wm_title(self, "AutoAquaponics")
+        tk.Tk.wm_title(self, "SMFC Tracker")
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -390,8 +392,8 @@ class HomePage(tk.Frame):
             entry = tk.Entry(self.popup, width = 20, highlightthickness = 0, textvariable = self.instru_list[i])
             entry.grid(row=i+4, column = 2, padx = (0,50), pady=(0,0))
             self.instru_list[i] = entry
-        self.instru_list[0].insert(0, '01/15/2021')
-        self.instru_list[1].insert(0, '08/15/2021')
+        self.instru_list[0].insert(0, '01/15/2022')
+        self.instru_list[1].insert(0, '08/15/2022')
         # self.instru_list[0].insert(0, 'Ex. 01/15/2021')
         # self.instru_list[1].insert(0, 'Ex. 02/15/2021')
         self.instru_list[2].insert(0, '/home/pi/Desktop/data.csv') #C:\Users\billm\Desktop\data.csv
@@ -574,7 +576,7 @@ class Settings(tk.Frame):
         num_config = [entry.get() for entry in self.phone_number]
         provider_config = [option.get() for option in self.options]
         email_config = [entry.get() for entry in self.email]
-        upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]  
+        upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]
         lower_config = [round(float(entry.get()),2) for entry in self.lower_entries]
         to_write = [enable_text, num_config, provider_config, email_config, upper_config, lower_config]
         names = ['enable_text', 'num_config', 'provider_config', 'email_config', 'upper_config', 'lower_config']
@@ -656,7 +658,7 @@ class VideoStream(tk.Frame):
         navibutton1.pack()
 
         #main label for showing the feed 
-        self.imagel = tk.Label(self)
+        '''self.imagel = tk.Label(self)
         self.imagel.pack(pady=10, padx=10)
 
         #initialize button with a picture
@@ -690,7 +692,7 @@ class VideoStream(tk.Frame):
             imgtk = ImageTk.PhotoImage(image=img)
             self.imagel.imgtk = imgtk
             self.imagel.configure(image=imgtk)
-            self.imagel.after(15, self.update)
+            self.imagel.after(15, self.update)'''
             
 class ControlPanel(tk.Frame):
     def __init__(self, parent, controller):
@@ -809,7 +811,7 @@ class Lights(tk.Frame):
             elif i == 3:
                 self.togBask.config(text="ON", fg="green")
             # send message
-            ble.BLE_messenger(1,1) # 1 is on, outlet 1
+            #ble.BLE_messenger(1,1) # 1 is on, outlet 1
         elif lights_config[i] == "on":
             lights_config[i] = "timer"
             if i == 0:
@@ -820,7 +822,7 @@ class Lights(tk.Frame):
                 self.togTank.config(text="TIMER", fg="purple")
             elif i == 3:
                 self.togBask.config(text="TIMER", fg="purple")
-            ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
+            #ble.BLE_messenger(2,1) # 2 is timer mode, outlet 1
         elif lights_config[i] == "timer":
             lights_config[i] = "off"
             if i == 0:
@@ -831,7 +833,7 @@ class Lights(tk.Frame):
                 self.togTank.config(text="OFF", fg="red")
             elif i == 3:
                 self.togBask.config(text="OFF", fg="red")
-            ble.BLE_messenger(0,1) # 0 is off, outlet 1
+            #ble.BLE_messenger(0,1) # 0 is off, outlet 1
         csv_write('lights_config', lights_config)
         #ble.BLE_message(0b10, )
         #ble.BLE_write('0', 50) #0 is the outlet box, make the message dependent on which button is pressed (not just 50)
@@ -870,7 +872,7 @@ class Lights(tk.Frame):
         lights_config[4] = self.start1.get()
         lights_config[8] = self.dur1.get()
         csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 37) #change 37 to some sort of encoding for the message
+        #ble.BLE_write('0', 37) #change 37 to some sort of encoding for the message
 
     # shelf 2 popup window: for setting start and duration times
     def pop2(self):
@@ -903,7 +905,7 @@ class Lights(tk.Frame):
         lights_config[5] = self.start2.get()
         lights_config[9] = self.dur2.get()
         csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 38) #change 38 to some sort of encoding for the message
+        #ble.BLE_write('0', 38) #change 38 to some sort of encoding for the message
 
     # fish tank popup window: for setting start and duration times
     def popTank(self):
@@ -936,7 +938,7 @@ class Lights(tk.Frame):
         lights_config[6] = self.startTank.get()
         lights_config[10] = self.durTank.get()
         csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 39) #change 39 to some sort of encoding for the message
+        #ble.BLE_write('0', 39) #change 39 to some sort of encoding for the message
 
     # basking popup window: for setting start and duration times
     def popBask(self):
@@ -969,7 +971,7 @@ class Lights(tk.Frame):
         lights_config[7] = self.startBask.get()
         lights_config[11] = self.durBask.get()
         csv_write('lights_config', lights_config)
-        ble.BLE_write('0', 40) #change 40 to some sort of encoding for the message
+        #ble.BLE_write('0', 40) #change 40 to some sort of encoding for the message
 
 
 class WaterPump(tk.Frame):
@@ -1040,7 +1042,7 @@ class WaterPump(tk.Frame):
         pump_config = [config_settings[config_dict['pump_config']][0], config_settings[config_dict['pump_config']][1], \
             config_settings[config_dict['pump_config']][2], self.mode]
         csv_write('pump_config', pump_config)
-        ble.BLE_write('0', 52) #change 52 to some sort of encoding for the message
+        #ble.BLE_write('0', 52) #change 52 to some sort of encoding for the message
 
     # save popup
     def popup(self):
@@ -1070,7 +1072,7 @@ class WaterPump(tk.Frame):
             real_time = None
         pump_config = [self.rateA.get(), self.rateB.get(), real_time, self.mode]
         csv_write('pump_config', pump_config)
-        ble.BLE_write('0', 51) #change 51 to some sort of encoding for the message
+        #ble.BLE_write('0', 51) #change 51 to some sort of encoding for the message
         
 
 class FishFeeder(tk.Frame):
@@ -1313,6 +1315,6 @@ app.geometry('1917x970')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
-ani = animation.FuncAnimation(f, animate, interval=5000)
+ani = animation.FuncAnimation(f, animate, interval=60000)
 #mainloop
 app.mainloop()
