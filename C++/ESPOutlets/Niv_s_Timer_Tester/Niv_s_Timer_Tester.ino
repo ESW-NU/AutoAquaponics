@@ -8,8 +8,7 @@
  This example code is in the public domain.
  */
 
-// Stop button is attached to PIN 0 (IO0)
-#define BTN_STOP_ALARM    0
+
 #define O_1               22            // O define's show pin numbers for Outlets 1-10
 #define O_2               23
 #define O_3               25
@@ -29,6 +28,7 @@
 #include <string> 
 #include <iostream> 
 #include <stdint.h>
+const outlet_pins[16] = {O_1, O_2, O_3, O_4, O_5, O_6, O_7, O_8, O_9, O_10, T_1, T_2, T_3, T_4, T_5, T_6}; 
 
 hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
@@ -44,7 +44,6 @@ uint32_t on_time[15];                  // array holding times at which outlets w
 uint32_t on_or_off[15];                // array holding values for whether outlet is on or off 
 uint32_t duration[15];                 // array holding the durations an outlet will be on in daily-repeat and time cycle modes
 uint32_t cyc_cnts[15];                 // array that specifies how much time is left for on/off mode on outlets in time-cycle mode
-const outlet_pins[16] = {O_1, O_2, O_3, O_4, O_5, O_6, O_7, O_8, O_9, O_10, T_1, T_2, T_3, T_4, T_5, T_6}; 
 
 // Interrupt that is called every minute and increments the time counters accordingly
 void IRAM_ATTR on_min(){
@@ -114,9 +113,6 @@ void IRAM_ATTR on_min(){
 void setup() {
   Serial.begin(115200);
 
-  // Set BTN_STOP_ALARM to input mode
-  pinMode(BTN_STOP_ALARM, INPUT);
-
   // for loop that will set ESP32 pins correlating to outlets as OUTPUT
   for (int i = 0; i < 16; i++){
     pinMode(outlet_pins[i], OUTPUT);
@@ -142,20 +138,12 @@ void setup() {
 }
 
 void loop() {
-  // If Timer has fired
-  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
-    uint32_t isrCount = 0, isrTime = 0;
-    // Read the interrupt count and time
-    portENTER_CRITICAL(&timerMux);
-    //set counter values that will be checked in here
-    portEXIT_CRITICAL(&timerMux);
-  }
   
   // The message that has been received will be broken down into segments specified by
   // the AutoOutlet C++ Code Documentation on Google Drive: 
   // https://docs.google.com/document/d/17H-WvJsHd-YGuLblgH95uoM-LP0ZRlJ7i7fLkkYbfUw/edit
   
-  uint32_t message;                             // needs to be assigned to BLE message from RPi
+  uint32_t message;                             // needs to be assigned to BLE message from RPi, then if statement if message has been changed. If it has, run switch cases below.
   uint32_t req_mode = (message & 0x3);
   uint32_t blue_bits = (message >> 2) & 0xFF;
   uint32_t red_bits = (message >> 10) & 0x7FF;
@@ -178,7 +166,6 @@ void loop() {
     case 1:                                   // Time Cycle Mode (01) (mode 1)
       uint32_t outlet_num = blue_bits;
       outlet_mode[outlet_num] = req_mode;
-      uint32_t cyc_time = red_bits;
       duration[outlet_num] = red_bits;
       break;
 
