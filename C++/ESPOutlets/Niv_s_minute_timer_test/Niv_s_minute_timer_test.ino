@@ -1,5 +1,21 @@
 // Stop button is attached to PIN 0 (IO0)
 #define BTN_STOP_ALARM    0
+#define Outlet_1          22
+#define Outlet_2          23
+#define Outlet_3          25
+#define Outlet_4          7
+#define Outlet_5          26
+#define Outlet_6          13
+#define Outlet_7          12
+#define Outlet_8          14
+#define Outlet_9          27
+#define Outlet_10         19
+#define Terminal_1        15  
+#define Terminal_2        33
+#define Terminal_3        4
+#define Terminal_4        5
+#define Terminal_5        32
+#define Terminal_6        21
 
 hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;

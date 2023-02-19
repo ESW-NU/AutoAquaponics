@@ -10,6 +10,22 @@
 
 // Stop button is attached to PIN 0 (IO0)
 #define BTN_STOP_ALARM    0
+#define O_1               22            // O define's show pin numbers for Outlets 1-10
+#define O_2               23
+#define O_3               25
+#define O_4               7
+#define O_5               26
+#define O_6               13
+#define O_7               12
+#define O_8               14
+#define O_9               27
+#define O_10              19
+#define T_1               15            // T define's show Screw Terminals 1-6 (will be regarded as outlets 11-16 in arrays below)   
+#define T_2               33 
+#define T_3               4
+#define T_4               5
+#define T_5               32
+#define T_6               21
 #include <string> 
 #include <iostream> 
 #include <stdint.h>
@@ -28,10 +44,11 @@ uint32_t on_time[15];                  // array holding times at which outlets w
 uint32_t on_or_off[15];                // array holding values for whether outlet is on or off 
 uint32_t duration[15];                 // array holding the durations an outlet will be on in daily-repeat and time cycle modes
 uint32_t cyc_cnts[15];                 // array that specifies how much time is left for on/off mode on outlets in time-cycle mode
+const outlet_pins[16] = {O_1, O_2, O_3, O_4, O_5, O_6, O_7, O_8, O_9, O_10, T_1, T_2, T_3, T_4, T_5, T_6}; 
 
 // Interrupt that is called every minute and increments the time counters accordingly
 void IRAM_ATTR on_min(){
-  // Increment the counter every ten seconds 
+  // Increments counters based on values of smaller value counters 
   portENTER_CRITICAL_ISR(&timerMux);
   mins_counter++;
   if (mins_counter == 10){
@@ -56,16 +73,29 @@ void IRAM_ATTR on_min(){
   // for loop for checking counters against arrays and changing values
   // will check the mode for all outlets and change on/off and duration values accordingly
   // Needs to be in on_min interrupt because time_cycle values will change too quickly otherwise
-  for (int i = 0; i < 15; i++) {
+  for (int i = 0; i < 16; i++) {
       mode = outlet_mode[i];
       swtich(mode){
         case 0:
         break;
 
         case 1:                                   // Time Cycle Mode (01) (mode 1)
+        if (outlet_mode[i] == 1){
+          if (cyc_cnts[i] == 0){                  // Check to see if the time_cycle has ended for given outlet
+            cyc_cnts[i] = duration[i];            // Assign time cycle duration that is permanently stored in duration array
+            if (on_or_off[i] == 0){               // When cyc_cnts[i] == 0, that means the current time cycle has ended,
+              on_or_off[i] == 1;                  // so the outlet will be turned on or off at this time and a new cycle starts
+            }                                     // using the number in the duration array.
+            if (on_or_off[i] == 0){
+              on_or_off[i] == 0;
+            }
+          }
+          else{
+            cyc_cnts[i] --;                       // Decreases current time cycle by 1 every minute (ISR called every minute)
+          }
+        }
 
         break;
-
         case 2:                                   // Daily Repeat Mode (10) (mode 2)
         break;
 
@@ -87,6 +117,11 @@ void setup() {
   // Set BTN_STOP_ALARM to input mode
   pinMode(BTN_STOP_ALARM, INPUT);
 
+  // for loop that will set ESP32 pins correlating to outlets as OUTPUT
+  for (int i = 0; i < 16; i++){
+    pinMode(outlet_pins[i], OUTPUT);
+  }
+
   // Create semaphore to inform us when the timer has fired
   timerSemaphore = xSemaphoreCreateBinary();
 
@@ -104,8 +139,6 @@ void setup() {
 
   // Start an alarm
   timerAlarmEnable(timer);
-
-  pinMode(ledPin, OUTPUT);
 }
 
 void loop() {
@@ -122,7 +155,7 @@ void loop() {
   // the AutoOutlet C++ Code Documentation on Google Drive: 
   // https://docs.google.com/document/d/17H-WvJsHd-YGuLblgH95uoM-LP0ZRlJ7i7fLkkYbfUw/edit
   
-  uint32_t message;
+  uint32_t message;                             // needs to be assigned to BLE message from RPi
   uint32_t req_mode = (message & 0x3);
   uint32_t blue_bits = (message >> 2) & 0xFF;
   uint32_t red_bits = (message >> 10) & 0x7FF;
@@ -130,7 +163,7 @@ void loop() {
 
 
   // switch cases need to be placed in interrupt for receiving messages
-  // will need its own interrupt
+  // will alwaye
   switch (req_mode) {
     case 0:                                   // Initialization Mode (00)
       time = red_bits;                        // Message from RPi showing number of ten-minute intervals from start of day
@@ -168,11 +201,15 @@ void loop() {
       break;      
   }
 
-
   // for loop for turning outlets on/off based on on_or_off array
-  for (int i = 0; i < 15; i ++){
-      power = on_or_off[i];
-      // use if statements to turn on/off GPIO pins
-      // make array of GPIO pins?
+  for (int i = 0; i < 16; i ++){
+      switch (on_or_off[i]){
+        case 0:
+          digitalWrite(on_or_off[i], LOW);          // Turns pin off if on_or_off[i] value is 0
+          break;
+        case 1:
+          digitalWrite(on_or_off[i], HIGH)          // Turns pin on if on_or_off[i] value is 1
+          break;          
+      }
   }
 }
