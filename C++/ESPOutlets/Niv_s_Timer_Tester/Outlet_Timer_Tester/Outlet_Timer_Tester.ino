@@ -34,17 +34,19 @@ hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
-volatile uint32_t mins_counter = 0;    // counts the number of minutes that have passed in ten minute interval
-volatile uint32_t tens_counter = 0;    // counts the number of ten-minute increments that have passed in current hour
-volatile uint32_t hour_counter = 0;    // counts the number of hours that have passed in current day
+volatile uint32_t mins_counter = 5;    // counts the number of minutes that have passed in ten minute interval
+volatile uint32_t tens_counter = 1;    // counts the number of ten-minute increments that have passed in current hour
+volatile uint32_t hour_counter = 11;    // counts the number of hours that have passed in current day
 volatile uint32_t day_counter = 0;     // counts the number of days that have passed in current week
 
-uint32_t outlet_mode[15];              // array holding values for the mode an outlet is set to
-uint32_t on_time[15];                  // array holding times at which outlets will turn on in ten-minute intervals from the start of the day
-uint32_t on_or_off[15];                // array holding values for whether outlet is on or off 
-uint32_t duration[15];                 // array holding the durations an outlet will be on in daily-repeat and time cycle modes
-uint32_t cyc_cnts[15];                 // array that specifies how much time is left for on/off mode on outlets in time-cycle mode
-
+uint32_t outlet_mode[16] = {3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 2, 3, 3, 3, 3};              // array holding values for the mode an outlet is set to
+uint32_t on_time[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 102, 0, 0, 0, 0};              // array holding times at which outlets will turn on in ten-minute intervals from the start of the day
+uint32_t on_or_off[16] = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;                // array holding values for whether outlet is on or off 
+uint32_t duration[16] = {0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 18, 0, 0, 0, 0};                // array holding the durations an outlet will be on in daily-repeat and time cycle modes
+uint32_t cyc_cnts[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;                 // array that specifies how much time is left for on/off mode on outlets in time-cycle mode
+                                                                                           //FOR duration[] ARRAY: time-cycle input is in minutes
+                                                                                                                // daily repeat mode input it in intervals of ten minutes
+ 
 // Interrupt that is called every minute and increments the time counters accordingly
 void IRAM_ATTR on_min(){
   // Increments counters based on values of smaller value counters 
@@ -93,9 +95,18 @@ void IRAM_ATTR on_min(){
             cyc_cnts[i] --;                       // Decreases current time cycle by 1 every minute (ISR called every minute)
           }
         }
-
         break;
+
         case 2:                                   // Daily Repeat Mode (10) (mode 2)
+        if ((tens_counter + 6 * hour_counter) < on_time[i]){
+          on_or_off[i] = 0;
+        }
+        else if ((tens_counter + 6 * hour_counter) < (on_time[i] + duration[i])){
+            on_or_off[i] = 1;
+        }
+        else{
+          on_or_off[i] = 0;
+        }
         break;
 
         case 3:                                   // Permanent State Mode (11) (mode 3)  
@@ -114,9 +125,13 @@ void setup() {
   Serial.begin(115200);
 
   // for loop that will set ESP32 pins correlating to outlets as OUTPUT
-  for (int i = 0; i < 16; i++){
-    pinMode(outlet_pins[i], OUTPUT);
-  }
+  //for (int i = 0; i < 16; i++){
+  //  pinMode(outlet_pins[i], OUTPUT);
+  //}
+  
+  pinMode(outlet_pins[7], OUTPUT);
+  pinMode(outlet_pins[11], OUTPUT);
+  pinMode(outlet_pins[4], OUTPUT);
 
   // Create semaphore to inform us when the timer has fired
   timerSemaphore = xSemaphoreCreateBinary();
@@ -150,8 +165,7 @@ void loop() {
   uint32_t green_bits = (message >> 21) & 0x7FF;
 
 
-  // switch cases need to be placed in interrupt for receiving messages
-  // will alwaye
+  
   switch (req_mode) {
     case 0:                                   // Initialization Mode (00)
     {
@@ -198,10 +212,10 @@ void loop() {
   for (int i = 0; i < 16; i ++){
       switch (on_or_off[i]){
         case 0:
-          digitalWrite(on_or_off[i], LOW);          // Turns pin off if on_or_off[i] value is 0
+          digitalWrite(outlet_pins[i], LOW);          // Turns pin off if on_or_off[i] value is 0
           break;
         case 1:
-          digitalWrite(on_or_off[i], HIGH);          // Turns pin on if on_or_off[i] value is 1
+          digitalWrite(outlet_pins[i], HIGH);          // Turns pin on if on_or_off[i] value is 1
           break;          
       }
   }
