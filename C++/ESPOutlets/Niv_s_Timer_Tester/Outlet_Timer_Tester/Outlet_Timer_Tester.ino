@@ -34,15 +34,15 @@ hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
-volatile uint32_t mins_counter = 5;    // counts the number of minutes that have passed in ten minute interval
-volatile uint32_t tens_counter = 1;    // counts the number of ten-minute increments that have passed in current hour
-volatile uint32_t hour_counter = 11;    // counts the number of hours that have passed in current day
+volatile uint32_t mins_counter = 0;    // counts the number of minutes that have passed in ten minute interval
+volatile uint32_t tens_counter = 3;    // counts the number of ten-minute increments that have passed in current hour
+volatile uint32_t hour_counter = 19;    // counts the number of hours that have passed in current day
 volatile uint32_t day_counter = 0;     // counts the number of days that have passed in current week
 
 uint32_t outlet_mode[16] = {3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 2, 3, 3, 3, 3};              // array holding values for the mode an outlet is set to
-uint32_t on_time[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 102, 0, 0, 0, 0};              // array holding times at which outlets will turn on in ten-minute intervals from the start of the day
+uint32_t on_time[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 0, 0, 0, 0};              // array holding times at which outlets will turn on in ten-minute intervals from the start of the day
 uint32_t on_or_off[16] = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;                // array holding values for whether outlet is on or off 
-uint32_t duration[16] = {0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 18, 0, 0, 0, 0};                // array holding the durations an outlet will be on in daily-repeat and time cycle modes
+uint32_t duration[16] = {0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0};                // array holding the durations an outlet will be on in daily-repeat and time cycle modes
 uint32_t cyc_cnts[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;                 // array that specifies how much time is left for on/off mode on outlets in time-cycle mode
                                                                                            //FOR duration[] ARRAY: time-cycle input is in minutes
                                                                                                                 // daily repeat mode input it in intervals of ten minutes
@@ -54,6 +54,12 @@ void IRAM_ATTR on_min(){
   mins_counter++;
   if (mins_counter == 10){
     tens_counter++;
+    if (on_or_off[8] == 1){
+      on_or_off[8] = 0;
+    } 
+    if (on_or_off[8] == 0){
+      on_or_off[8] = 1;
+    }
     mins_counter = 0;
   }
   if (tens_counter == 6){
@@ -74,24 +80,29 @@ void IRAM_ATTR on_min(){
   // for loop for checking counters against arrays and changing values
   // will check the mode for all outlets and change on/off and duration values accordingly
   // Needs to be in on_min interrupt because time_cycle values will change too quickly otherwise
-  for (int i = 0; i < 16; i++) {
+ for (int i = 0; i < 16; i++) {
       int mode = outlet_mode[i];
       switch(mode){
         case 0:
         break;
 
         case 1:                                   // Time Cycle Mode (01) (mode 1)
+        //Serial.println("Fixing Time Cycle Pin");
         if (outlet_mode[i] == 1){
           if (cyc_cnts[i] == 0){                  // Check to see if the time_cycle has ended for given outlet
-            cyc_cnts[i] = duration[i];            // Assign time cycle duration that is permanently stored in duration array
+              //Serial.println("Time Cycle Counter being set to duration");
+              cyc_cnts[i] = duration[i] - 1;            // Assign time cycle duration that is permanently stored in duration array
             if (on_or_off[i] == 0){               // When cyc_cnts[i] == 0, that means the current time cycle has ended,
-              on_or_off[i] == 1;                  // so the outlet will be turned on or off at this time and a new cycle starts
+              //Serial.println("Time Cycle being turned on");
+              on_or_off[i] = 1;                  // so the outlet will be turned on or off at this time and a new cycle starts
             }                                     // using the number in the duration array.
-            if (on_or_off[i] == 0){
-              on_or_off[i] == 0;
+            else {
+              //Serial.println("Time Cycle being turned off");
+              on_or_off[i] = 0;
             }
           }
           else{
+            //Serial.println("Time Cycle deincremented");
             cyc_cnts[i] --;                       // Decreases current time cycle by 1 every minute (ISR called every minute)
           }
         }
@@ -113,12 +124,23 @@ void IRAM_ATTR on_min(){
         break;
       }
 
+      //Serial.println("Current Time: ");
+      //Serial.print(hour_counter);
+      //Serial.print(":");
+      //Serial.print(tens_counter);
+      //Serial.print(mins_counter);
   }
-
+  
   portEXIT_CRITICAL_ISR(&timerMux);
   // Give a semaphore that we can check in the loop
   xSemaphoreGiveFromISR(timerSemaphore, NULL);
   // It is safe to use digitalRead/Write here if you want to toggle an output  
+  Serial.println("Current Time: ");
+  Serial.print(hour_counter);
+  Serial.print(":");
+  Serial.print(tens_counter);
+  Serial.print(mins_counter);
+  Serial.println();
 }
 
 void setup() {
@@ -142,11 +164,11 @@ void setup() {
   timer = timerBegin(0, 80, true);
 
   // Attach onTimer function to our timer.
- timerAttachInterrupt(timer, &on_min, true);
+  timerAttachInterrupt(timer, &on_min, true);
 
   // Set alarm to call onmin function every minute (value in microseconds).
   // Repeat the alarm (third parameter)
-  timerAlarmWrite(timer, 60000000, true);
+  timerAlarmWrite(timer, 2000000, true);
 
   // Start an alarm
   timerAlarmEnable(timer);
@@ -158,54 +180,54 @@ void loop() {
   // the AutoOutlet C++ Code Documentation on Google Drive: 
   // https://docs.google.com/document/d/17H-WvJsHd-YGuLblgH95uoM-LP0ZRlJ7i7fLkkYbfUw/edit
   
-  uint32_t message  = 0b00000000010000000000000000000011;                             // needs to be assigned to BLE message from RPi, then if statement if message has been changed. If it has, run switch cases below.
-  uint32_t req_mode = (message & 0x3);
-  uint32_t blue_bits = (message >> 2) & 0xFF;
-  uint32_t red_bits = (message >> 10) & 0x7FF;
-  uint32_t green_bits = (message >> 21) & 0x7FF;
-
-
+  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
+    uint32_t message  = 0b00000000010000000000000000000011;                             // needs to be assigned to BLE message from RPi, then if statement if message has been changed. If it has, run switch cases below.
+    uint32_t req_mode = (message & 0x3);
+    uint32_t blue_bits = (message >> 2) & 0xFF;
+    uint32_t red_bits = (message >> 10) & 0x7FF;
+    uint32_t green_bits = (message >> 21) & 0x7FF;
   
-  switch (req_mode) {
-    case 0:                                   // Initialization Mode (00)
-    {
-      uint32_t time = red_bits;               // Message from RPi showing number of ten-minute intervals from start of day
-      int hrs = time/60;                      // Number of hours from start of the day
-      int tens = (time % 60) / 10;            // Number of ten minute intervals that have passed in given hour
-      portENTER_CRITICAL(&timerMux);
-      tens_counter = tens;
-      hour_counter = hrs;                     // Counter values will be reset here based on time from RPi
-      portEXIT_CRITICAL(&timerMux);
-    }
-      break;
+    switch (req_mode) {
+      case 0:                                   // Initialization Mode (00)
+      {
+        uint32_t time = red_bits;               // Message from RPi showing number of ten-minute intervals from start of day
+        int hrs = time/60;                      // Number of hours from start of the day
+        int tens = (time % 60) / 10;            // Number of ten minute intervals that have passed in given hour
+        portENTER_CRITICAL(&timerMux);
+        tens_counter = tens;
+        hour_counter = hrs;                     // Counter values will be reset here based on time from RPi
+        portEXIT_CRITICAL(&timerMux);
+      }
+        break;
 
-    case 1:                                   // Time Cycle Mode (01) (mode 1)
-    {
-      uint32_t outlet_num = blue_bits;
-      outlet_mode[outlet_num] = req_mode;
-      duration[outlet_num] = red_bits;
-    }
-      break;
+      case 1:                                   // Time Cycle Mode (01) (mode 1)
+      {
+        uint32_t outlet_num = blue_bits;
+        outlet_mode[outlet_num] = req_mode;
+        duration[outlet_num] = red_bits;
+      }
+        break;
 
-    case 2:                                   // Daily Repeat Mode (10) (mode 2)
-    {
-      uint32_t outlet_num = blue_bits;
-      outlet_mode[outlet_num] = req_mode;
-      uint32_t time_to_turn_on = red_bits;
-      on_time[outlet_num] = time_to_turn_on;
-      uint32_t duration_10 = green_bits;      // Gets duration in increments of 10 (i.e. value of 4 = 40 minutes)
-      duration[outlet_num] = duration_10;
-    }
-      break;
+      case 2:                                   // Daily Repeat Mode (10) (mode 2)
+      {
+        uint32_t outlet_num = blue_bits;
+        outlet_mode[outlet_num] = req_mode;
+        uint32_t time_to_turn_on = red_bits;
+        on_time[outlet_num] = time_to_turn_on;
+        uint32_t duration_10 = green_bits;      // Gets duration in increments of 10 (i.e. value of 4 = 40 minutes)
+        duration[outlet_num] = duration_10;
+     }
+        break;
 
-    case 3:                                   // Permanent State Mode (11) (mode 3)     
-    { 
-      uint32_t outlet_num = blue_bits;
-      outlet_mode[outlet_num] = req_mode;
-      uint32_t state = green_bits;
-      on_or_off[outlet_num] = state;
+      case 3:                                   // Permanent State Mode (11) (mode 3)     
+      { 
+        uint32_t outlet_num = blue_bits;
+        outlet_mode[outlet_num] = req_mode;
+        uint32_t state = green_bits;
+        on_or_off[outlet_num] = state;
+      }
+        break;      
     }
-      break;      
   }
 
   // for loop for turning outlets on/off based on on_or_off array
