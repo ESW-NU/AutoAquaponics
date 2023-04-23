@@ -1,0 +1,17 @@
+declare -A package_cfg_names=(
+    ["libcamera_dev"]="libcamera_dev_links.txt"
+    ["libcamera_apps"]="libcamera_apps_links.txt"
+    ["kernel_driver"]="kernel_driver_links.txt"
+    ["imx519_kernel_driver"]="imx519_kernel_driver_links.txt"
+    ["imx519_kernel_driver_low_speed"]="imx519_kernel_driver_low_speed_links.txt"
+    ["64mp_pi_hawk_eye_kernel_driver"]="64mp_pi_hawk_eye_kernel_driver_links.txt"
+)
+
+declare -A package_cfg_download_links=(
+    ["libcamera_dev"]="https://github.com/ArduCAM/Arducam-Pivariety-V4L2-Driver/releases/download/install_script/libcamera_dev_links.txt"
+    ["libcamera_apps"]="https://github.com/ArduCAM/Arducam-Pivariety-V4L2-Driver/releases/download/install_script/libcamera_apps_links.txt"
+    ["kernel_driver"]="https://github.com/ArduCAM/Arducam-Pivariety-V4L2-Driver/releases/download/install_script/kernel_driver_links.txt"
+    ["imx519_kernel_driver"]="https://github.com/ArduCAM/Arducam-Pivariety-V4L2-Driver/releases/download/install_script/imx519_kernel_driver_links.txt"
+    ["imx519_kernel_driver_low_speed"]="https://github.com/ArduCAM/Arducam-Pivariety-V4L2-Driver/releases/download/install_script/imx519_kernel_driver_low_speed_links.txt"
+    ["64mp_pi_hawk_eye_kernel_driver"]="https://github.com/ArduCAM/Arducam-Pivariety-V4L2-Driver/releases/download/install_script/64mp_pi_hawk_eye_kernel_driver_links.txt"
+)
