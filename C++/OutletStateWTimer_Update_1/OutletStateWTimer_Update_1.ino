@@ -1,4 +1,4 @@
-/*
+w/*
     Based on Neil Kolban example for IDF: https://github.com/nkolban/esp32-snippets/blob/master/cpp_utils/tests/BLE%20Tests/SampleWrite.cpp
     Ported to Arduino ESP32 by Evandro Copercini
 */
@@ -17,10 +17,10 @@ typedef struct virt_alarm {
   int32_t time_hit_1; //When the alarm activates a light (unit defined in onTimer)
   int32_t time_hit_2; //When the alarm deactivates a light
   uint16_t repeat_period; //How oftern the timer repeats
-  bool state;
-  bool permanent;
-  bool permanence;
-} virt_alarm;
+  bool state; //1 when light is on, 0 when off
+  bool permanent; //1 if light should be on in permanent mode, 0 if should be off
+  bool permanence; //1 if permanently switched on or off, 0 if following schedule
+} virt_alarm; 
 
 const uint32_t TIMER_SCALAR = 40000; //Timer ticks every half a millisecond
 const uint32_t SECOND = 80000000 / TIMER_SCALAR; //Timer ticks in a second
@@ -36,15 +36,14 @@ const int outputs[16] = {22, 23, 25, 18, 26, 13, 12, 14, 27, 19, 15, 33, 4, 5, 3
 hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-virt_alarm al_list[sizeof(outputs) / sizeof(outputs[0])];
-uint8_t simul[sizeof(outputs) / sizeof(outputs[0])] = {11};
-uint8_t extension[sizeof(outputs) / sizeof(outputs[0])] = {3};
-uint16_t day_offset = 0; //Changes every time a message is sent, used to place alarms
-uint32_t prev_time = 0;
-uint16_t next_time = 0;
-uint8_t max_index;
-uint32_t mods[2 * sizeof(outputs) / sizeof(outputs[0])] = {0};
-uint32_t mod = 0;
+virt_alarm al_list[sizeof(outputs)/sizeof(outputs[0])]; //Initializes the array of alarms, amount equal to how many outputs there are
+uint8_t simul[sizeof(outputs)/sizeof(outputs[0])] = {11}; //Array used to see which lights switch simultaneously (e.g. holds [1,6] if lights 1 and 6 need to toggle)
+uint8_t extension[sizeof(outputs)/sizeof(outputs[0])] = {3}; //Array used to keep track of which timers need to be extended, with index being output number and holding 1 or 2
+uint16_t day_offset = 0; //The offset from the start of the day (timers start at 0 time, but is not always sent at 12 am)
+uint16_t next_time = 0; //The next timer value the timer goes off
+uint8_t max_index; //Tells simul how many timers go off at the same time
+uint32_t mods[2*sizeof(outputs)/sizeof(outputs[0])] = {0}; //Holds the number to be multiplied by 1440 (10 min-intervals in a day) for the absolute time
+uint32_t mod = 0; //The smallest number in mods[]
 
 BLEServer *pServer = NULL;
 BLEService *pService = NULL;
@@ -56,15 +55,15 @@ void IRAM_ATTR onTimer() {
   portENTER_CRITICAL_ISR(&timerMux);
   //Serial.println("Pog");
   if (simul[0] != 255) {
-    for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
-      if (extension[i] == 1) {
-        (al_list[i].time_hit_1 += al_list[i].repeat_period);
-        if (al_list[i].time_hit_1 >= 1440) {
-          mods[2 * i]++;
+    for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++){
+      if (extension[i] == 1) { //If output i needs an extension at alarm 1
+        (al_list[i].time_hit_1 += al_list[i].repeat_period); //Extend by the period
+        if (al_list[i].time_hit_1 >= 1440) { //Change mods if needed
+          mods[2*i]++;
           al_list[i].time_hit_1 %= 1440;
         }
       }
-      else if (extension[i] == 2) {
+      else if (extension[i] == 2) { //Same logic as above applied to alarm 2
         (al_list[i].time_hit_2 += al_list[i].repeat_period);
         if (al_list[i].time_hit_2 >= 1440) {
           mods[2 * i + 1]++;
@@ -73,11 +72,11 @@ void IRAM_ATTR onTimer() {
       }
     }
     mod = mods[0];
-    for (int i = 0; i < 2 * sizeof(outputs) / sizeof(outputs[0]); i++) {
-      mod = min(mods[i], mod);
+    for (int i = 0; i < 2*sizeof(outputs)/sizeof(outputs[0]); i++){
+      mod = min(mods[i], mod); //Finds smallest mod 
     }
-    for (int i = 0; i < max_index; i++) {
-      al_list[simul[i]].state = !al_list[simul[i]].state;
+    for (int i = 0; i < max_index; i++){
+      al_list[simul[i]].state = !al_list[simul[i]].state; //Toggles all simultaneous alarms
     }
     for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
       if (al_list[i].permanence) {
@@ -152,8 +151,8 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           message <<= 8;
           message |= value[i];
         }
-
-        uint16_t blue_part = (message >> 2) & 0xFF; //Usually outlet in binary
+        //Documentation for his found on drive (bluetooth protocol)
+        uint16_t blue_part = (message >> 2) & 0xFF; 
         uint16_t red_part = (message >> 10) & 0x7FF;
         uint16_t brown_part = (message >> 21) & 0x7FF;
 
@@ -224,7 +223,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 };
 
 uint32_t day_time() {
-  uint32_t d_time = ((timerReadMicros(timer) / 1000) * 2 / SCALE) + day_offset;
+  uint32_t d_time = ((timerReadMicros(timer) / 1000) * 2 / SCALE) + day_offset; //Used as the relative counter based off day_offset's 0 time
   return d_time;
 }
 
@@ -240,27 +239,27 @@ uint8_t find_closest_timer() {
   uint8_t max_index = 0;
   uint8_t alarm_index = sizeof(outputs) / sizeof(outputs[0]) + 1;
   simul[0] = 255;
-
-  for (int i = 0; i < sizeof(outputs) / sizeof(outputs[0]); i++) {
-    if (day_time() < al_list[i].time_hit_1 + 1440 * mods[2 * i]) {
-      if ((al_list[i].time_hit_1 + 1440 * mods[2 * i] - day_time()) < running_min) {
+  
+  for (int i = 0; i < sizeof(outputs)/sizeof(outputs[0]); i++) {
+    if (day_time() < al_list[i].time_hit_1 + 1440 * mods[2*i]) {
+      if ((al_list[i].time_hit_1 + 1440 * mods[2*i] - day_time()) < running_min) { //If the turn on timer for this index comes sooner than the current next timer,
         index = 0;
         max_index = 0;
         reset_extension();
         alarm_index = i;
         next_time = al_list[i].time_hit_1;
-        simul[index] = i;
-        extension[i] = 1;
-        running_min = al_list[i].time_hit_1 + 1440 * mods[2 * i] - day_time();
+        simul[index] = i; //Base of one "simultaneous" alarm being hit
+        extension[i] = 1; //extend the activation timer
+        running_min = al_list[i].time_hit_1 + 1440 * mods[2*i] - day_time(); //Shifts the time hit to be relative to our time system
       }
-      else if ((al_list[i].time_hit_1 + 1440 * mods[2 * i] - day_time()) == running_min) {
+      else if ((al_list[i].time_hit_1 + 1440 * mods[2*i] - day_time()) == running_min) { //If the turn on timer for this index comes at the same time as the next timer
         index++;
-        simul[index] = i;
-        extension[i] = 1;
+        simul[index] = i; //Add the timer to the simul array
+        extension[i] = 1; //Add the on timer to the list of timers that needs to be extended
       }
     }
-    if (day_time() < al_list[i].time_hit_2 + 1440 * mods[2 * i + 1]) {
-      if ((al_list[i].time_hit_2 + 1440 * mods[2 * i + 1] - day_time()) < running_min) {
+    if (day_time() < al_list[i].time_hit_2 + 1440 * mods[2*i + 1]) {
+      if ((al_list[i].time_hit_2 + 1440 * mods[2*i + 1] - day_time()) < running_min) { //Same logic as above, but for the turn off timer
         index = 0;
         max_index = 0;
         reset_extension();
@@ -276,7 +275,7 @@ uint8_t find_closest_timer() {
         extension[i] = 2;
       }
     }
-    max_index = max(max_index, index);
+    max_index = max(max_index, index); //max_index determines how many simultaneous timers are hit
   }
   return max_index;
 }
@@ -292,8 +291,8 @@ void full_reset() {
   }
   mod = 0;
 }
-
-void recombobulate(uint8_t outlet) {
+//Nah this won't work
+void recombobulate(uint8_t outlet){
   int32_t day_t = day_time();
   mods[2 * outlet + 1] = mod;
   mods[2 * outlet] = mod;
