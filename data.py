@@ -12,7 +12,7 @@ cred = credentials.Certificate("./serviceAccountKey.json")
 app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
-LOG_EVERY = 30
+LOG_EVERY = 15
 
 def roundup(x, base):
     maybe = base * round(x/base)

@@ -53,16 +53,17 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function tha
     sleep(0.5)
 #define readings from ADC
     pH = -5.82*chan.voltage + 22.1 #calibrated equation
+    pH = pH/3 #wrong thing
     #pH = chan.voltage
     #pH = chan.voltage
     #pH = chan.voltage
 #read air temp and air humidity
     atemp, hum = getDHT()#dht.read_retry(dht.DHT22, DHT)
     if type(hum) != float or type(atemp) != float:
-        #hum, atemp = last_hum, last_atemp
+        hum, atemp = last_hum, last_atemp
         print(hum, atemp)
-        hum = 15
-        atemp = 15
+        #hum = 15
+        #atemp = 15
     distance = 58.42 - getDistance(last_distance)
     #print(distance)
     #distance = 60
@@ -71,6 +72,8 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function tha
     #flow2 = getFlowRate(13, 0.273)
     #make sure distance is the last value on this list
     #order should be pH, TDS, hum, atemp, wtemp, distance
+    #print(atemp, hum)
+    #print(type(atemp), type(hum))
     return pH, TDS, hum, atemp, wtemp, distance#, flow1, flow2
 
 #DS18B20 functions
@@ -212,8 +215,5 @@ while True:
     #    sleep(0.01)
     #avg = sum(pH_data)/len(pH_data)
     #print(avg)
-<<<<<<< HEAD
-    sleep(1)'''
-=======
-    sleep(1)'''
->>>>>>> 5821b1cf2cec9027de707b01d91f9e5a319cae24
+    sleep(1)
+'''

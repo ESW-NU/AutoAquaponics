@@ -6,6 +6,28 @@ import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
 from PIL import Image, ImageTk
+###
+
+# need to figure out firestore firebase reference url
+
+import firebase_admin
+from firebase_admin import db
+# from firebase_admin import credentials, firestore
+# from firebase.database import onValue
+
+cred = firebase_admin.credentials.Certificate("./serviceAccountKey.json")
+# app = firebase_admin.initialize_app(cred)
+db = firebase_admin.firestore.client()
+ref = db.collection(u'tolerances').document(u'pH')
+
+def on_snapshot(doc_snapshot, changes, read_time):
+    for doc in doc_snapshot:
+        docDict = doc.to_dict()
+        print(docDict)
+        
+doc_watch = ref.on_snapshot(on_snapshot)
+
+###
 
 #uncomment later
 #import cv2   #open source computer vision library
@@ -16,8 +38,8 @@ from PIL import Image, ImageTk
 #from BLE import BLE
 #ble = BLE() #initalize BLE class
 #import fake BLE stuff (comment 2 lines below if on RPi)
-from BLE import BLE
-ble = BLE()
+from BLE import fakeBLE
+ble = fakeBLE()
 
 #font types
 TITLE_FONT = ("Verdana", 14, 'bold')
@@ -586,7 +608,7 @@ class Settings(tk.Frame):
         num_config = [entry.get() for entry in self.phone_number]
         provider_config = [option.get() for option in self.options]
         email_config = [entry.get() for entry in self.email]
-        upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]  
+        upper_config = [round(float(entry.get()),2) for entry in self.upper_entries]
         lower_config = [round(float(entry.get()),2) for entry in self.lower_entries]
         to_write = [enable_text, num_config, provider_config, email_config, upper_config, lower_config]
         names = ['enable_text', 'num_config', 'provider_config', 'email_config', 'upper_config', 'lower_config']
@@ -1682,6 +1704,6 @@ app.geometry('1917x970')
 #this makes app full screen, not sure if it's good for us or not
 #app.attributes('-fullscreen', True)
 #update animation first
-ani = animation.FuncAnimation(f, animate, interval=10000)
+#ani = animation.FuncAnimation(f, animate, interval=10000)
 #mainloop
 app.mainloop()
