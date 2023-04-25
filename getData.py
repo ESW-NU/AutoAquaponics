@@ -78,27 +78,31 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function tha
 
 #DS18B20 functions
 def read_temp_raw():
-    f = open(device_file, 'r')
+    try:
+        f = open(device_file, 'r')
+    except:
+        return []
     lines = f.readlines()
     f.close()
     return lines
 
 def getWTemp():
-    lines = read_temp_raw()
-    #print(lines)
-    if len(lines) > 0: #only index below if lines is not empty
-        while lines[0].strip()[-3:] != 'YES':
-            time.sleep(0.2)
-            lines = read_temp_raw()
-        equals_pos = lines[1].find('t=')
-        if equals_pos != -1:
-            temp_string = lines[1][equals_pos+2:]
-            temp_c = float(temp_string) / 1000.0
-            #print("temp_c = " + str(temp_c))
-            return temp_c
-    else:
-        print("READING DS18B20 AGAIN!")
-        return getWTemp() #rerun function again
+    for _ in range(5):
+        lines = read_temp_raw()
+        #print(lines)
+        if len(lines) > 0: #only index below if lines is not empty
+            while lines[0].strip()[-3:] != 'YES':
+                time.sleep(0.2)
+                lines = read_temp_raw()
+            equals_pos = lines[1].find('t=')
+            if equals_pos != -1:
+                temp_string = lines[1][equals_pos+2:]
+                temp_c = float(temp_string) / 1000.0
+                #print("temp_c = " + str(temp_c))
+                return temp_c
+            break
+        else:
+            print("READING DS18B20 AGAIN!") #rerun the function again
         
 #TDS sensor function
 def getTDS(wtemp):
