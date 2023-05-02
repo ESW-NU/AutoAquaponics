@@ -47,14 +47,16 @@ def user_settings():
     return _config_file, _tgt_db_dir, _tgt_img_path
 
 def start_GUI():
-    import GUI
+    pass
+    #import GUI
 
 def start_data_logging():
     from DataLogger import DataLogger
     DataLogger()
 
 def emailSender():
-    sendemail.sendEmail(user_settings) #figure out the arguments because settings
+    pass
+    #sendemail.sendEmail(user_settings) #figure out the arguments because settings
 
 if(__name__ == '__main__'):
     p1 = Process(target=start_data_logging)
