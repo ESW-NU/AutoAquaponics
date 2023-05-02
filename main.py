@@ -1,8 +1,8 @@
 from time import sleep
 import csv
 from multiprocessing import Process
-import sendtext
-import sendemail
+#import sendtext
+#import sendemail
 
 # Set your own file path & config path in file setup.json
 # or as environment variables AQUA_testfile_dir, AQUA_config_file, AQUA_img_path
