@@ -12,6 +12,7 @@ cred = credentials.Certificate("./serviceAccountKey.json")
 app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
+print(db)
 LOG_EVERY = 15
 
 def roundup(x, base):
