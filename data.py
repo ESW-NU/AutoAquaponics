@@ -15,6 +15,15 @@ db = firestore.client()
 print(db)
 LOG_EVERY = 15
 
+ref = db.collection(u'tolerances').document(u'pH')
+
+def on_snapshot(doc_snapshot, changes, read_time):
+    for doc in doc_snapshot:
+        docDict = doc.to_dict()
+        print(docDict)
+        
+doc_watch = ref.on_snapshot(on_snapshot)
+
 def roundup(x, base):
     maybe = base * round(x/base)
     if maybe < x:

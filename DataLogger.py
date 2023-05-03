@@ -1,29 +1,6 @@
 from main import user_settings
 from getData import getData
 
-###
-
-# need to figure out firestore firebase reference url
-
-import firebase_admin
-from firebase_admin import db
-from firebase_admin import credentials, firestore
-# from firebase.database import onValue
-
-cred = firebase_admin.credentials.Certificate("./serviceAccountKey.json")
-# app = firebase_admin.initialize_app(cred)
-db = firestore.client()
-ref = db.collection(u'tolerances').document(u'pH')
-
-def on_snapshot(doc_snapshot, changes, read_time):
-    for doc in doc_snapshot:
-        docDict = doc.to_dict()
-        print(docDict)
-        
-doc_watch = ref.on_snapshot(on_snapshot)
-
-###
-
 config_path, db_path, img_path = user_settings()
 db_name = 'sensor_db.db'
 
