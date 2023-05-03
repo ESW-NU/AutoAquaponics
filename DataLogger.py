@@ -22,7 +22,7 @@ def data_fxn(last_distance, last_wtemp):
     return pH, TDS, hum, atemp, wtemp, distance #N-tuple of random ints from 0 to 10.
 
 def DataLogger():
-    from data import Reader, Logger
+    from data import Logger
     #from getData import getData #comment out if you are testing on computer
     import numpy as np
     sensor_plot_table = {'SensorData':(all_we_got_now, now_data_types)}
