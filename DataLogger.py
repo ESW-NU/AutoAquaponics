@@ -51,8 +51,8 @@ from firebase_admin import db
 # from firebase.database import onValue
 
 cred = firebase_admin.credentials.Certificate("./serviceAccountKey.json")
-# app = firebase_admin.initialize_app(cred)
-db = firebase_admin.firestore.client()
+app = firebase_admin.initialize_app(cred)
+db = firebase_admin.firestore.client(app)
 ref = db.collection(u'tolerances').document(u'pH')
 
 def on_snapshot(doc_snapshot, changes, read_time):
@@ -63,5 +63,5 @@ def on_snapshot(doc_snapshot, changes, read_time):
 doc_watch = ref.on_snapshot(on_snapshot)
 
 ###
-#        
+       
 DataLogger()
