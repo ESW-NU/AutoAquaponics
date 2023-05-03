@@ -51,8 +51,8 @@ from firebase_admin import credentials, firestore
 # from firebase.database import onValue
 
 cred = firebase_admin.credentials.Certificate("./serviceAccountKey.json")
-app = firebase_admin.initialize_app(cred)
-db = firestore.client(app)
+# app = firebase_admin.initialize_app(cred)
+db = firestore.client()
 ref = db.collection(u'tolerances').document(u'pH')
 
 def on_snapshot(doc_snapshot, changes, read_time):
