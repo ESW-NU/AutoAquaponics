@@ -46,13 +46,14 @@ def DataLogger():
 # need to figure out firestore firebase reference url
 
 import firebase_admin
-from firebase_admin import db
+#from firebase_admin import db
+from data import db
 from firebase_admin import credentials, firestore
 # from firebase.database import onValue
 
-cred = firebase_admin.credentials.Certificate("./serviceAccountKey.json")
-app = firebase_admin.initialize_app()
-db = firestore.client()
+#cred = firebase_admin.credentials.Certificate("./serviceAccountKey.json")
+#app = firebase_admin.initialize_app()
+#db = firestore.client()
 ref = db.collection(u'tolerances').document(u'pH')
 
 def on_snapshot(doc_snapshot, changes, read_time):
