@@ -1,6 +1,29 @@
 from main import user_settings
 from getData import getData
 
+###
+
+# need to figure out firestore firebase reference url
+
+import firebase_admin
+from firebase_admin import db
+# from firebase_admin import credentials, firestore
+# from firebase.database import onValue
+
+cred = firebase_admin.credentials.Certificate("./serviceAccountKey.json")
+# app = firebase_admin.initialize_app(cred)
+db = firebase_admin.firestore.client()
+ref = db.collection(u'tolerances').document(u'pH')
+
+def on_snapshot(doc_snapshot, changes, read_time):
+    for doc in doc_snapshot:
+        docDict = doc.to_dict()
+        print(docDict)
+        
+doc_watch = ref.on_snapshot(on_snapshot)
+
+###
+
 config_path, db_path, img_path = user_settings()
 db_name = 'sensor_db.db'
 
@@ -40,29 +63,5 @@ def DataLogger():
         #last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", data_fxn(last_distance, last_wtemp), last_distance, last_wtemp, last_hum, last_atemp, tsamp=1, nsamp=5),2)
         logger.log_data()
         logger.commit()
-
-###
-
-# need to figure out firestore firebase reference url
-
-import firebase_admin
-#from firebase_admin import db
-from data import db
-from firebase_admin import credentials, firestore
-# from firebase.database import onValue
-
-#cred = firebase_admin.credentials.Certificate("./serviceAccountKey.json")
-#app = firebase_admin.initialize_app()
-#db = firestore.client()
-ref = db.collection(u'tolerances').document(u'pH')
-
-def on_snapshot(doc_snapshot, changes, read_time):
-    for doc in doc_snapshot:
-        docDict = doc.to_dict()
-        print(docDict)
-        
-doc_watch = ref.on_snapshot(on_snapshot)
-
-###
        
 DataLogger()
