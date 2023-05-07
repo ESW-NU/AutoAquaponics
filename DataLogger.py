@@ -41,7 +41,7 @@ def DataLogger():
     while True:
         pH, TDS, hum, atemp, wtemp, distance = np.round(getData(distance, wtemp, hum, atemp), 2)
         curr_time = round(time.time())
-        if curr_time < time_to_log:
+        if curr_time <= time_to_log:
             continue
         data_tuple = (curr_time, pH, TDS, hum, atemp, wtemp, distance)
         
