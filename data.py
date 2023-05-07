@@ -153,18 +153,21 @@ class Logger:
         ## LOGGING
         for tbl, data in self.data_dict.items(): #FOR ALL DATA IN DICT
             for rdg in data:
+                print(rdg)
                 cnt = len(rdg) - 1
                 params = '?' + ',?'*cnt
+                print(params)
                 data_tuple = self.data_dict['SensorData'][0]
+                print(data_tuple)
                 data_dict = {}
                 for i in range(len(data_tuple)):
                     data_dict[all_we_got_now[i]] = data_tuple[i]
                 if data_dict['unix_time'] > self.time_to_log:
                     db.collection(u'stats').add(data_dict)
-                    curr_time = datetime.timestamp(datetime.now())
-                    self.time_to_log = roundup(curr_time, LOG_EVERY * 60)
-                self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
-                self.conn.commit()
+                #     curr_time = datetime.timestamp(datetime.now())
+                #     self.time_to_log = roundup(curr_time, LOG_EVERY * 60)
+                # self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
+                # self.conn.commit()
         
         #empty the data dictionary
         self.data_dict = {}
