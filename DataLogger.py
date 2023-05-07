@@ -22,8 +22,6 @@ def on_snapshot(doc_snapshot, changes, read_time):
         
 doc_watch = ref.on_snapshot(on_snapshot)
 
-all_we_got_now = ('unix_time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
-
 def find_next_log_time(x, base):
     maybe = base * round(x/base)
     if maybe < x:
