@@ -152,6 +152,7 @@ class Logger:
         
         ## LOGGING
         for tbl, data in self.data_dict.items(): #FOR ALL DATA IN DICT
+            print('dict:', self.data_dict)
             for rdg in data:
                 print(rdg)
                 cnt = len(rdg) - 1
