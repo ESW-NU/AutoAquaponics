@@ -36,7 +36,7 @@ def DataLogger():
     hum = np.nan
     atemp = np.nan
     curr_time = round(time.time())
-    time_to_log = find_next_log_time(curr_time, LOG_EVERY)
+    time_to_log = find_next_log_time(curr_time, LOG_EVERY * 60)
     
     while True:
         pH, TDS, hum, atemp, wtemp, distance = np.round(getData(distance, wtemp, hum, atemp), 2)
@@ -49,6 +49,6 @@ def DataLogger():
         for i in range(len(data_tuple)):
             data_dict[all_we_got_now[i]] = data_tuple[i]
         db.collection(u'stats').add(data_dict)
-        time_to_log = find_next_log_time(curr_time, LOG_EVERY)
+        time_to_log = find_next_log_time(curr_time, LOG_EVERY * 60)
        
 DataLogger()
