@@ -7,9 +7,9 @@ import numpy as np
 from BLE import BLE
 from BLE import fakeBLE
 
-ble = BLE()
-#ble = fakeBLE()
-#ble.BLE_init(config_settings)
+# ble = BLE()
+# ble = fakeBLE()
+# ble.BLE_init(config_settings)
 
 all_we_got_now = ('unix_time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
 cred = credentials.Certificate("./serviceAccountKey.json")
