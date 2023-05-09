@@ -4,6 +4,12 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 import numpy as np
+from BLE import BLE
+from BLE import fakeBLE
+
+ble = BLE()
+#ble = fakeBLE()
+#ble.BLE_init(config_settings)
 
 all_we_got_now = ('unix_time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
 cred = credentials.Certificate("./serviceAccountKey.json")
@@ -15,12 +21,21 @@ LOG_EVERY = 15
 
 ref = db.collection(u'tolerances').document(u'pH')
 
-def on_snapshot(doc_snapshot, changes, read_time):
+def on_snapshot(doc_snapshot):
     for doc in doc_snapshot:
         docDict = doc.to_dict()
         print(docDict)
         
 doc_watch = ref.on_snapshot(on_snapshot)
+
+ref = db.collection(u'lights').document(u'shelf1')
+doc_watch2 = ref.on_snapshot(on_snapshot)
+
+ref = db.collection(u'lights').document(u'shelf2')
+doc_watch3 = ref.on_snapshot(on_snapshot)
+
+ref = db.collection(u'lights')
+doc_watch3 = ref.on_snapshot(on_snapshot)
 
 def find_next_log_time(x, base):
     maybe = base * round(x/base)
