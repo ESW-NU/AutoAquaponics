@@ -19,7 +19,7 @@ db = firestore.client()
 print(db)
 LOG_EVERY = 15
 
-ref = db.collection(u'tolerances').document(u'pH')
+ref = db.collection(u'lights').document(u'shelf1')
 
 def on_snapshot(doc_snapshot):
     for doc in doc_snapshot:
@@ -28,14 +28,14 @@ def on_snapshot(doc_snapshot):
         
 doc_watch = ref.on_snapshot(on_snapshot)
 
-ref = db.collection(u'lights').document(u'shelf1')
-doc_watch2 = ref.on_snapshot(on_snapshot)
+# ref = db.collection(u'lights').document(u'shelf1')
+# doc_watch2 = ref.on_snapshot(on_snapshot)
 
-ref = db.collection(u'lights').document(u'shelf2')
-doc_watch3 = ref.on_snapshot(on_snapshot)
+# ref = db.collection(u'lights').document(u'shelf2')
+# doc_watch3 = ref.on_snapshot(on_snapshot)
 
-ref = db.collection(u'lights')
-doc_watch3 = ref.on_snapshot(on_snapshot)
+# ref = db.collection(u'lights')
+# doc_watch3 = ref.on_snapshot(on_snapshot)
 
 def find_next_log_time(x, base):
     maybe = base * round(x/base)
