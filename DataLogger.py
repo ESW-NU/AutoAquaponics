@@ -25,21 +25,10 @@ def snap(doc_snapshot, changes, read_time, arg):
         docDict = doc.to_dict()
         print(docDict)
         return docDict
-    
-def pass_through(doc_snapshot, changes, read_time):
-    return snap(doc_snapshot, changes, read_time, 'hippo')
-
-# ref = db.collection(u'lights').document(u'shelf1')
-# doc_watch = ref.on_snapshot(pass_through)
-
-# ref = db.collection(u'lights').document(u'shelf2')
-# doc_watch = ref.on_snapshot(pass_through)
 
 for shelf in ['shelf1', 'shelf2']:
-    def pass_through(doc_snapshot, changes, read_time):
-        return snap(doc_snapshot, changes, read_time, shelf)
     ref = db.collection('lights').document(shelf)
-    doc_watch = ref.on_snapshot(pass_through)
+    doc_watch = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, changes, read_time, shelf))
     
 
 def find_next_log_time(x, base):
