@@ -19,13 +19,12 @@ db = firestore.client()
 print(db)
 LOG_EVERY = 15
 
-ref = db.collection(u'tolerances').document(u'pH')
-
-def on_snapshot(doc_snapshot):
+def on_snapshot(doc_snapshot, changes, read_time):
     for doc in doc_snapshot:
         docDict = doc.to_dict()
         print(docDict)
-        
+
+ref = db.collection(u'lights').document(u'shelf1')  
 doc_watch = ref.on_snapshot(on_snapshot)
 
 # ref = db.collection(u'lights').document(u'shelf1')
