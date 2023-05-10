@@ -5,11 +5,11 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 import numpy as np
 from BLE import BLE
-from BLE import fakeBLE
+from BLE import FakeBLE
 
 # ble = BLE()
-# ble = fakeBLE()
-# ble.BLE_init(config_settings)
+ble = FakeBLE()
+ble.BLE_init()
 
 all_we_got_now = ('unix_time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
 cred = credentials.Certificate("./serviceAccountKey.json")
@@ -19,10 +19,26 @@ db = firestore.client()
 print(db)
 LOG_EVERY = 15
 
+names = {
+    'lights': ['shelf1', 'shelf2', 'fish-tank', 'basking'],
+    'water-pump': ['status', 'bed-A', 'bed-B']
+}
+
 def snap(doc_snapshot, col_name, doc_name):
     print(col_name, doc_name)
     doc = doc_snapshot[0].to_dict()
-    print(doc)
+
+    if col_name == 'lights':
+        i = names['lights'].index(doc_name)
+        mode = doc['status']
+        ble.BLE_lights_mode(i, mode)
+        ble.BLE_lights_duration(i, doc['starthh'], doc['startmm'], doc['durationhh'], doc['durationmm'], doc['meridiem'])
+    
+    elif col_name == 'water-pump':
+        if doc_name == 'status':
+            ble.BLE_pump_mode(doc['status'])
+        else:
+            ble.BLE_solenoid_interval(doc_name, doc['pumpTime'])
 
 # ref = db.collection('lights').document('shelf1')
 # doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf1'))
@@ -30,8 +46,8 @@ def snap(doc_snapshot, col_name, doc_name):
 # ref = db.collection('lights').document('shelf2')
 # doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf2'))
 
-for col_name in ['lights']:
-    for doc_name in ['shelf1', 'shelf2']:
+for col_name in names.keys():
+    for doc_name in names[col_name]:
         ref = db.collection(col_name).document(doc_name)
         doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, col_name, doc_name))
     
