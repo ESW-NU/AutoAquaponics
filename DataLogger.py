@@ -20,7 +20,7 @@ print(db)
 LOG_EVERY = 15
 
 def snap(doc_snapshot, col_name, doc_name):
-    print(doc_name)
+    print(col_name, doc_name)
     doc = doc_snapshot[0].to_dict()
     print(doc)
 
