@@ -28,7 +28,7 @@ ref = db.collection('lights').document('shelf1')
 doc = ref.on_snapshot(snap)
 
 ref = db.collection('lights').document('shelf2')
-doc = ref.on_snapshot(snap)
+doc2 = ref.on_snapshot(snap)
     
 
 def find_next_log_time(x, base):
