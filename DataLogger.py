@@ -28,7 +28,7 @@ def snap(doc_snapshot, changes, read_time, arg4=''):
     print(read_time)
 
 ref = db.collection(u'lights').document(u'shelf1')
-doc_watch = ref.on_snapshot(snap(arg4='hippotamus'))
+doc_watch = ref.on_snapshot(snap, arg4='hippotamus')
 
 ref = db.collection(u'lights').document(u'shelf2')
 doc_watch = ref.on_snapshot(snap)
