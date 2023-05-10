@@ -30,10 +30,10 @@ def snap(doc_snapshot, col_name, doc_name):
 # ref = db.collection('lights').document('shelf2')
 # doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf2'))
 
-for col in ['lights']:
-    for doc in ['shelf1', 'shelf2']:
-        ref = db.collection(col).document(doc)
-        doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, col, doc))
+for col_name in ['lights']:
+    for doc_name in ['shelf1', 'shelf2']:
+        ref = db.collection(col_name).document(doc_name)
+        doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, col_name, doc_name))
     
 
 def find_next_log_time(x, base):
