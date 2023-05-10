@@ -21,7 +21,7 @@ LOG_EVERY = 15
 
 def snap(doc_snapshot, changes, read_time):
     for doc in doc_snapshot:
-        print(doc)
+        print(doc.to_dict())
     return doc_snapshot
 
 ref = db.collection('lights').document('shelf1')
