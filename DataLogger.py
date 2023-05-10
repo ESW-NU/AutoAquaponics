@@ -20,6 +20,7 @@ print(db)
 LOG_EVERY = 15
 
 def snap(doc_snapshot, changes, read_time):
+    print(doc_snapshot)
     return doc_snapshot
 
 for shelf in ['shelf1', 'shelf2']:
