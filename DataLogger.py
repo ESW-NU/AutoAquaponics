@@ -24,10 +24,8 @@ def snap(doc_snapshot, changes, read_time):
         print(doc)
     return doc_snapshot
 
-for shelf in ['shelf1', 'shelf2']:
-    ref = db.collection('lights').document(shelf)
-    doc = ref.on_snapshot(snap)
-    print(doc)
+ref = db.collection('lights').document('shelf1')
+doc = ref.on_snapshot(snap)
     
 
 def find_next_log_time(x, base):
