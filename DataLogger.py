@@ -19,19 +19,28 @@ db = firestore.client()
 print(db)
 LOG_EVERY = 15
 
-def snap(doc_snapshot, changes, read_time, arg4=''):
-    print(arg4)
+def snap(doc_snapshot, changes, read_time, arg):
+    print(arg)
     for doc in doc_snapshot:
         docDict = doc.to_dict()
         print(docDict)
-    print(changes)
-    print(read_time)
+        return docDict
+    
+def pass_through(doc_snapshot, changes, read_time):
+    return snap(doc_snapshot, changes, read_time, 'hippo')
 
-ref = db.collection(u'lights').document(u'shelf1')
-doc_watch = ref.on_snapshot(snap, arg4='hippotamus')
+# ref = db.collection(u'lights').document(u'shelf1')
+# doc_watch = ref.on_snapshot(pass_through)
 
-ref = db.collection(u'lights').document(u'shelf2')
-doc_watch = ref.on_snapshot(snap)
+# ref = db.collection(u'lights').document(u'shelf2')
+# doc_watch = ref.on_snapshot(pass_through)
+
+for shelf in ['shelf1', 'shelf2']:
+    def pass_through(doc_snapshot, changes, read_time):
+        return snap(doc_snapshot, changes, read_time, shelf)
+    ref = db.collection('lights').document(shelf)
+    doc_watch = ref.on_snapshot(pass_through)
+    
 
 def find_next_log_time(x, base):
     maybe = base * round(x/base)
