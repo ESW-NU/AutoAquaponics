@@ -19,7 +19,7 @@ db = firestore.client()
 print(db)
 LOG_EVERY = 15
 
-def snap(doc_snapshot):
+def snap(doc_snapshot, changes, read_time):
     doc = doc_snapshot[0].to_dict()
     print(doc)
     return(doc)
