@@ -27,9 +27,7 @@ names = {
 }
 
 def snap(doc_snapshot, col_name, doc_name):
-    print(col_name, doc_name)
     doc = doc_snapshot[0].to_dict()
-    print(doc)
 
     if col_name == 'lights':
         i = names['lights'].index(doc_name)
