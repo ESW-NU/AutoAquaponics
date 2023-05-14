@@ -85,6 +85,7 @@ class ParentBLE:
 
     def BLE_lights_duration(self, index, starthh, startmm, durationhh, durationmm, am_pm):
         shelves = ['', 'shelf1', 'shelf2', 'fish', 'basking']
+        starthh, startmm, durationhh, durationmm = str(starthh), str(startmm), str(durationhh), str(durationmm)
         print('lights duration - shelf:', shelves[index], 'start time:', starthh+':'+startmm+' '+am_pm, ', duration:', durationhh+'h'+durationmm+'m')
         starthh, startmm, durationhh, durationmm = int(starthh), int(startmm), int(durationhh), int(durationmm)
         if am_pm == 'AM' and starthh == 12:
