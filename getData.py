@@ -104,8 +104,7 @@ def getWTemp():
                 #print("temp_c = " + str(temp_c))
                 return temp_c
             break
-        else:
-            print("READING DS18B20 AGAIN!") #rerun the function again
+    print("UNABLE TO READ DS18B20") #rerun the function again
     return np.nan
         
 #TDS sensor function
