@@ -80,6 +80,7 @@ class ParentBLE:
         self.BLE_write('0', message)
 
     def BLE_lights_duration(self, index, starthh, startmm, durationhh, durationmm, am_pm):
+        starthh, startmm, durationhh, durationmm = int(starthh), int(startmm), int(durationhh), int(durationmm)
         if am_pm == 'AM' and starthh == 12:
             starthh = 0
         elif am_pm == 'PM' and starthh < 12:
