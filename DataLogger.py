@@ -16,12 +16,14 @@ cred = credentials.Certificate("./serviceAccountKey.json")
 app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
-print(db)
 LOG_EVERY = 15
 
 names = {
     'lights': ['shelf1', 'shelf2', 'fish-tank', 'basking'],
     'water-pump': ['status', 'bed-A', 'bed-B']
+    # add more sensors here in the future; also add documents to firebase
+    # 'backwashing': [],
+    # 'fish-feeder': []
 }
 
 def snap(doc_snapshot, col_name, doc_name):
@@ -41,31 +43,29 @@ def snap(doc_snapshot, col_name, doc_name):
         else:
             ble.BLE_solenoid_interval(doc_name, doc['pumpTime'])
 
-# ref = db.collection('lights').document('shelf1')
-# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf1'))
 
-# ref = db.collection('lights').document('shelf2')
-# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf2'))
+# Event handlers: Add more handlers in the future based on the key/values in names
 
-# ref = db.collection('lights').document('fish-tank')
-# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'fish-tank'))
+ref = db.collection('lights').document('shelf1')
+doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf1'))
 
-# ref = db.collection('lights').document('basking')
-# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'basking'))
+ref = db.collection('lights').document('shelf2')
+doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf2'))
 
-# ref = db.collection('water-pump').document('status')
-# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'status'))
+ref = db.collection('lights').document('fish-tank')
+doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'fish-tank'))
 
-# ref = db.collection('water-pump').document('bed-A')
-# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-A'))
+ref = db.collection('lights').document('basking')
+doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'basking'))
 
-# ref = db.collection('water-pump').document('bed-B')
-# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-B'))
+ref = db.collection('water-pump').document('status')
+doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'status'))
 
-for col_name in names.keys():
-    for doc_name in names[col_name]:
-        ref = db.collection(col_name).document(doc_name)
-        doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, col_name, doc_name))
+ref = db.collection('water-pump').document('bed-A')
+doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-A'))
+
+ref = db.collection('water-pump').document('bed-B')
+doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-B'))
     
 
 def find_next_log_time(x, base):
