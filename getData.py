@@ -64,7 +64,7 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp): #main function tha
     atemp, hum = getDHT()#dht.read_retry(dht.DHT22, DHT)
     if type(hum) != float or type(atemp) != float:
         hum, atemp = last_hum, last_atemp
-        print(hum, atemp)
+        # print(hum, atemp)
         #hum = 15
         #atemp = 15
     distance = 58.42 - getDistance(last_distance)
