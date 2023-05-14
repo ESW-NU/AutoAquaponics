@@ -41,31 +41,31 @@ def snap(doc_snapshot, col_name, doc_name):
         else:
             ble.BLE_solenoid_interval(doc_name, doc['pumpTime'])
 
-ref = db.collection('lights').document('shelf1')
-doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf1'))
+# ref = db.collection('lights').document('shelf1')
+# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf1'))
 
-ref = db.collection('lights').document('shelf2')
-doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf2'))
+# ref = db.collection('lights').document('shelf2')
+# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'shelf2'))
 
-ref = db.collection('lights').document('fish-tank')
-doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'fish-tank'))
+# ref = db.collection('lights').document('fish-tank')
+# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'fish-tank'))
 
-ref = db.collection('lights').document('basking')
-doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'basking'))
+# ref = db.collection('lights').document('basking')
+# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'lights', 'basking'))
 
-ref = db.collection('water-pump').document('status')
-doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'status'))
+# ref = db.collection('water-pump').document('status')
+# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'status'))
 
-ref = db.collection('water-pump').document('bed-A')
-doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-A'))
+# ref = db.collection('water-pump').document('bed-A')
+# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-A'))
 
-ref = db.collection('water-pump').document('bed-B')
-doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-B'))
+# ref = db.collection('water-pump').document('bed-B')
+# doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-B'))
 
-# for col_name in names.keys():
-#     for doc_name in names[col_name]:
-#         ref = db.collection(col_name).document(doc_name)
-#         doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, col_name, doc_name))
+for col_name in names.keys():
+    for doc_name in names[col_name]:
+        ref = db.collection(col_name).document(doc_name)
+        doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, col_name, doc_name))
     
 
 def find_next_log_time(x, base):
