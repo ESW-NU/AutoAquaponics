@@ -58,7 +58,7 @@ class ParentBLE:
         self.BLE_write('0', message)
 
     def BLE_solenoid_interval(self, bed, timer):
-        print('pump time - bed:', bed, ', time:', timer)
+        print('pump time:', bed, ', time:', timer)
         red = self.red(timer)
         outlet = 15 if bed == 'bed-A' else 16  # solenoid A = outlet 15, solenoid B = outlet 16
         blue = self.blue(outlet)
@@ -67,7 +67,7 @@ class ParentBLE:
         self.BLE_write('0', message)
 
     def BLE_lights_mode(self, index, mode):
-        shelves = ['', 'shelf1', 'shelf2', 'fish', 'basking']
+        shelves = ['shelf1', 'shelf2', 'fish', 'basking']
         print('lights mode - shelf:', shelves[index], ', mode:', mode)
         if mode == 'on':
             brown = self.brown(1)
@@ -84,7 +84,7 @@ class ParentBLE:
         self.BLE_write('0', message)
 
     def BLE_lights_duration(self, index, starthh, startmm, durationhh, durationmm, am_pm):
-        shelves = ['', 'shelf1', 'shelf2', 'fish', 'basking']
+        shelves = ['shelf1', 'shelf2', 'fish', 'basking']
         starthh, startmm, durationhh, durationmm = str(starthh), str(startmm), str(durationhh), str(durationmm)
         print('lights duration - shelf:', shelves[index], 'start time:', starthh+':'+startmm+' '+am_pm, ', duration:', durationhh+'h'+durationmm+'m')
         starthh, startmm, durationhh, durationmm = int(starthh), int(startmm), int(durationhh), int(durationmm)
