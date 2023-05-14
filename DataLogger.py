@@ -33,7 +33,8 @@ def snap(doc_snapshot, col_name, doc_name):
         i = names['lights'].index(doc_name)
         mode = doc['status']
         ble.BLE_lights_mode(i, mode)
-        ble.BLE_lights_duration(i, doc['starthh'], doc['startmm'], doc['durationhh'], doc['durationmm'], doc['meridiem'])
+        if mode == 'timer':
+            ble.BLE_lights_duration(i, doc['starthh'], doc['startmm'], doc['durationhh'], doc['durationmm'], doc['meridiem'])
     
     elif col_name == 'water-pump':
         if doc_name == 'status':
