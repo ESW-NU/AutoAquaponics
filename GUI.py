@@ -45,14 +45,16 @@ config_path, db_path, img_path = user_settings()
 
 # list of parameters (try to link with list in DataLogger?)
 param_dict = {}
-param_list = ['Sealed air cell v0 (mV)', 'Sealed air v1 (mV)', 'Sealed air cell v2 (mV)', 'Hori. cell v3 (mV)', 'Hori. cell v4 (mV)', 'Hori. cell v5 (mV)',
-              'MARS v0 cell (mV)', 'MARS v3 cell (mV)', 'v8 (mV)', 'v9 (mV)', 'v10 (mV)', 'v11 (mV)', 'v12 (mV)', 'v13 (mV)', 'v14 (mV)', 'p0 (uW)','p1 (uW)',
-              'p2 (uW)', 'p3 (uW)', 'p4 (uW)', 'p5 (uW)', 'p6 (uW)', 'p7 (uW)', 'p8 (uW)', 'p9 (uW)','p10 (uW)','p11 (uW)', 'p12 (uW)','p13 (uW)',
-              'p14 (uW)', 'Soil Temp (\N{DEGREE SIGN}C)', 'Soil Moisture (%)', 'Raw Moisture Reading (mV)', 'TEROS Soil Moisture (%)', 'TEROS Temp (C)',
-              'EC (uS/cm)', 'Matric Potential (kPa)', 'O2 at v0 depth (%)', 'O2 at v3 depth (%)']
-param_ylim = [(-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800),
-              (-300, 800), (-300, 800), (-300, 800),(-300, 800), (-300, 800), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500),
-              (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500),(0, 500),(0, 500),(10, 35), (0, 100), (0, 2000), (0, 100), (10, 35), (0, 600), (-1000, 0), (0, 22), (0, 22)]
+param_list = ['v3 0 (mV)', 'v3 1 (mV)', 'v4 2 (mV)', 'v0 3 (mV)', 'v0 4 (mV)', 'v0 5 (mV)', 'MARS+v0 (mV)', 'MARS+v3 (mV)',
+              'v8 (mV)', 'v9 (mV)', 'v10 (mV)', 'v11 (mV)',
+              'v3 0 (uW)', 'v3 1 (uW)', 'v3 2 (uW)', 'v0 3 (uW)', 'v0 4 (uW)', 'v0 5 (uW)', 'MARS+v0 (uW)', 'MARS+v3 (uW)',
+              'p8 (uW)', 'p9 (uW)','p10 (uW)','p11 (uW)',
+              'DS18B20 Temp (\N{DEGREE SIGN}C)', 'EC-5 VWC (%)', 'EC-5 Raw (mV)', 'TEROS VWC (%)', 'TEROS Temp (\N{DEGREE SIGN}C)',
+              'TEROS EC (uS/cm)', 'Matric Pot. (kPa)', 'O2 at v0 (%)', 'O2 at v3 (%)']
+param_ylim = [(-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800),
+              (-300, 800), (-300, 800), (-300, 800),(-300, 800), (-300, 800), (0, 500), (0, 500), (0, 500), (0, 500),
+              (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500),(0, 500),(0, 500),
+              (10, 35), (0, 100), (0, 2000), (0, 100), (10, 35), (0, 600), (-1000, 0), (0, 22), (0, 22)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 

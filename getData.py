@@ -61,6 +61,13 @@ base_dir = '/sys/bus/w1/devices/'
 device_folder = glob.glob(base_dir + '28*')[0]
 device_file = device_folder + '/w1_slave'
 
+#read serial for Arduino
+try:
+    ser = serial.Serial('/dev/ttyACM0', 1200, timeout=1)
+except:
+    print("/dev/ttyACM0 not found, trying /dev/ttyACM1")
+    ser = serial.Serial('/dev/ttyACM1', 1200, timeout=1)
+
 # UNCOMMENT TO ADD MORE CHANNELS
 adc0 = ADS.ADS1115(i2c4, address=0x48)
 adc0.gain = 1
@@ -88,14 +95,17 @@ chan4 = AnalogIn(ads2, ADS.P0, ADS.P1)
 chan5 = AnalogIn(ads2, ADS.P2, ADS.P3)
 chan6 = AnalogIn(ads3, ADS.P0, ADS.P1)
 #singular analog read
-chan7_sing = AnalogIn(adc3, ADS.P2)
-chan8_sing = AnalogIn(adc3, ADS.P3)
+chan7_1_sing = AnalogIn(adc3, ADS.P2)
+chan7_2_sing = AnalogIn(adc3, ADS.P3)
 
 c0 = AnalogIn(adc0, ADS.P0, ADS.P1)
 c1 = AnalogIn(adc0, ADS.P2, ADS.P3)
 c2 = AnalogIn(adc1, ADS.P0, ADS.P1)
 c3 = AnalogIn(adc1, ADS.P2, ADS.P3)
-c4 = AnalogIn(adc2, ADS.P0, ADS.P1)
+#singular analog read
+c4_1_sing = AnalogIn(adc2, ADS.P0)
+c4_2_sing = AnalogIn(adc2, ADS.P1)
+#differential connection read
 c5 = AnalogIn(adc2, ADS.P2, ADS.P3)
 c6 = AnalogIn(adc3, ADS.P0, ADS.P1)
 c7 = AnalogIn(ads3, ADS.P2, ADS.P3)
@@ -134,22 +144,10 @@ def getData(): #main function that calls on all other functions to generate data
 #read w1 water temp sensor
     temp = getWTemp()
 #read soil moisture sensor
-    moisture_raw = chan7_sing.voltage*1000
+    moisture_raw = chan7_1_sing.voltage*1000
 #calibrated value
     moisture = 0.0000000081*(moisture_raw**3) - 0.0000175897*(moisture_raw**2) + 0.0131376197*moisture_raw - 3.0743960987
     moisture = moisture * 100 #convert to percents
-
-    #GPIO.output(pin_num,GPIO.HIGH) #turn TDS sensor on
-    #GPIO.output(pin_num2,GPIO.HIGH)
-    #sleep(0.5)
-    #call TDS function to get a value while pin is HIGH
-    #if wtemp == np.nan: #use last wtemp value if it's NaN
-    #    TDS = getTDS(last_wtemp)
-    #else:
-    #    TDS = getTDS(wtemp)        
-    #GPIO.output(pin_num,GPIO.LOW) #turn TDS sensor off
-    #GPIO.output(pin_num2,GPIO.LOW)
-    #sleep(0.5)
 #define readings from ADC
     #pH = -5.82*chan.voltage + 22.1 #calibrated equation
     v0 = chan0.voltage*1000
@@ -164,16 +162,16 @@ def getData(): #main function that calls on all other functions to generate data
     v_1 = c1.voltage*1000
     v_2 = c2.voltage*1000
     v_3 = c3.voltage*1000
-    v_4 = c4.voltage*1000
+    #v_4 = c4.voltage*1000 #sacrificed for O2 sensor thermistors
     v_5 = c5.voltage*1000
     v_6 = c6.voltage*1000
     v_7 = c7.voltage*1000
     
     #read oxygen sensor
     #therm_raw = chan8_sing.voltage #in volts
-    v0_anode_o2 = readO2([chan8_sing.voltage, v_6]) #thermistor reading in volts and differential oxygen reading in mV
-    v3_anode_o2 = readO2([chan8_sing.voltage, v_6]) #thermistor reading in volts and differential oxygen reading in mV
-    
+    #therm_raw, o2_v, mVc, Tc (last two are calibration values)
+    v0_anode_o2 = readO2([c4_1_sing.voltage, v_5, 52.8766, 22.486]) #thermistor reading in volts and differential oxygen reading in mV
+    v3_anode_o2 = readO2([c4_2_sing.voltage, v_6, 52.1266, 22.491]) #thermistor reading in volts and differential oxygen reading in mV
 #read air temp and air humidity
     #atemp, hum = getDHT()#dht.read_retry(dht.DHT22, DHT)
     #if hum == np.nan or atemp == np.nan:
@@ -194,21 +192,19 @@ def getData(): #main function that calls on all other functions to generate data
     p_1 = v_1*(v_1/2000)
     p_2 = v_2*(v_2/2000)
     p_3 = v_3*(v_3/2000)
-    p_4 = v_4*(v_4/2000)
+    #p_4 = v_4*(v_4/2000)
     p_5 = v_5*(v_5/2000)
     p_6 = v_6*(v_6/2000)
     p_7 = v_7*(v_7/2000)
     GPIO.output(25, GPIO.LOW)
     VWC_TEROS, temp_TEROS, EC, matric_pot = readTEROS()
     
-    # return v0, v1, v2, v3, v4, v5, v6, v8, adc1_diff[0], adc1_diff[1], adc1_diff[2], adc1_diff[3], P0, P1, P2, P3, P4, P5, P6, P8, adc1_power[0], adc1_power[1], adc1_power[2], adc1_power[3], temp, moisture, distance
-    return [v0, v1, v2, v3, v4, v5, v6, v_0, v_1, v_2, v_3, v_4, v_5, v_6, v_7,
-            P0, P1, P2, P3, P4, P5, P6, p_0, p_1, p_2, p_3, p_4, p_5, p_6, p_7,
+    return [v0, v1, v2, v3, v4, v5, v6, v_0, v_1, v_2, v_3, v_7,
+            P0, P1, P2, P3, P4, P5, P6, p_0, p_1, p_2, p_3, p_7,
             temp, moisture, moisture_raw, VWC_TEROS, temp_TEROS, EC, matric_pot, v0_anode_o2, v3_anode_o2
             ]
 #TEROS sensors:
 def readTEROS():
-    ser = serial.Serial('/dev/ttyACM1', 1200, timeout=1)
     ser.reset_input_buffer()
     while True:
         ser.write(b"data\n")
@@ -221,17 +217,14 @@ def readTEROS():
 
 def readO2(sensor):
     #unpack sensor readings here
-    therm_raw = sensor[0]
-    
-    o2_v = sensor[1]
-    Rt = 24900*(2.494/therm_raw -1) #2.494v excitation signal for thermistor, might change if it's not 2.5v
+    therm_raw, o2_v, mVc, Tc = sensor
+    Rt = 24900*(2.494/therm_raw -1) #2.494v excitation signal for thermistor, might change if it's not 2.494v
     A = 1.129241e-3
     B = 2.341077e-4
     C = 8.775468e-8
     Ts = 1/(A+B*math.log(Rt)+C*(math.log(Rt))**3) - 273.15 #in Celsius
-    Tc = 23.7 #measured temperature at calibration in C
+    #print("O2 temp, mVc: " + str(Ts) + ", " + str(mVc))
     #Pb = 101.35 #barometric pressure in kPa, used for absolute concentration
-    mVc = 50.1 #mV
     mV0 = 3 #mV, estimated for SO-100 series sensors
     #CF = 0.295*Pb/(mVc-mV0) #kPa O2/mV, absolute concentration
     CF = 20.95/(mVc - mV0) #% O2/mV, relative concentration
