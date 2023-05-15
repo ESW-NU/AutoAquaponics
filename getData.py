@@ -1,6 +1,7 @@
 import time
 import ADS1263
 import RPi.GPIO as GPIO
+import math
 
 #Waveshare ADC Hat Initialization
 #######################
@@ -26,7 +27,8 @@ GPIO.setup(pin_num,GPIO.OUT)
 GPIO.setup(pin_num2,GPIO.OUT)
 import time #need this for sleep and distance sensor
 from time import sleep
-import time
+
+import serial #for TEROS sensor to interface with Arduino
 
 #initalize debugging LED
 GPIO.setup(25, GPIO.OUT)
@@ -85,8 +87,9 @@ chan3 = AnalogIn(ads1, ADS.P2, ADS.P3)
 chan4 = AnalogIn(ads2, ADS.P0, ADS.P1)
 chan5 = AnalogIn(ads2, ADS.P2, ADS.P3)
 chan6 = AnalogIn(ads3, ADS.P0, ADS.P1)
+#singular analog read
 chan7_sing = AnalogIn(adc3, ADS.P2)
-#chan8_sing = AnalogIn(ads3, ADS.P3)
+chan8_sing = AnalogIn(adc3, ADS.P3)
 
 c0 = AnalogIn(adc0, ADS.P0, ADS.P1)
 c1 = AnalogIn(adc0, ADS.P2, ADS.P3)
@@ -135,6 +138,7 @@ def getData(): #main function that calls on all other functions to generate data
 #calibrated value
     moisture = 0.0000000081*(moisture_raw**3) - 0.0000175897*(moisture_raw**2) + 0.0131376197*moisture_raw - 3.0743960987
     moisture = moisture * 100 #convert to percents
+
     #GPIO.output(pin_num,GPIO.HIGH) #turn TDS sensor on
     #GPIO.output(pin_num2,GPIO.HIGH)
     #sleep(0.5)
@@ -164,6 +168,12 @@ def getData(): #main function that calls on all other functions to generate data
     v_5 = c5.voltage*1000
     v_6 = c6.voltage*1000
     v_7 = c7.voltage*1000
+    
+    #read oxygen sensor
+    #therm_raw = chan8_sing.voltage #in volts
+    v0_anode_o2 = readO2([chan8_sing.voltage, v_6]) #thermistor reading in volts and differential oxygen reading in mV
+    v3_anode_o2 = readO2([chan8_sing.voltage, v_6]) #thermistor reading in volts and differential oxygen reading in mV
+    
 #read air temp and air humidity
     #atemp, hum = getDHT()#dht.read_retry(dht.DHT22, DHT)
     #if hum == np.nan or atemp == np.nan:
@@ -189,8 +199,51 @@ def getData(): #main function that calls on all other functions to generate data
     p_6 = v_6*(v_6/2000)
     p_7 = v_7*(v_7/2000)
     GPIO.output(25, GPIO.LOW)
+    VWC_TEROS, temp_TEROS, EC, matric_pot = readTEROS()
+    
     # return v0, v1, v2, v3, v4, v5, v6, v8, adc1_diff[0], adc1_diff[1], adc1_diff[2], adc1_diff[3], P0, P1, P2, P3, P4, P5, P6, P8, adc1_power[0], adc1_power[1], adc1_power[2], adc1_power[3], temp, moisture, distance
-    return v0, v1, v2, v3, v4, v5, v6, v_0, v_1, v_2, v_3, v_4, v_5, v_6, v_7, P0, P1, P2, P3, P4, P5, P6, p_0, p_1, p_2, p_3, p_4, p_5, p_6, p_7, temp, moisture, moisture_raw
+    return [v0, v1, v2, v3, v4, v5, v6, v_0, v_1, v_2, v_3, v_4, v_5, v_6, v_7,
+            P0, P1, P2, P3, P4, P5, P6, p_0, p_1, p_2, p_3, p_4, p_5, p_6, p_7,
+            temp, moisture, moisture_raw, VWC_TEROS, temp_TEROS, EC, matric_pot, v0_anode_o2, v3_anode_o2
+            ]
+#TEROS sensors:
+def readTEROS():
+    ser = serial.Serial('/dev/ttyACM1', 1200, timeout=1)
+    ser.reset_input_buffer()
+    while True:
+        ser.write(b"data\n")
+        data = ser.readline().decode('utf-8').rstrip().replace('-','+-').replace('\r', '+').split('+')
+        #print(data)
+        if len(data) == 7:
+            raw_data = [float(x) for x in data] #[sensor0_id, VWC_adc_count, temp0, EC, sensor1_id, water_potential, temp1]
+            VWC = (1.147e-9)*raw_data[1]**3 - (8.638e-6)*raw_data[1]**2 + (2.187e-2)*raw_data[1] - 1.821e1
+            return([VWC, raw_data[2], raw_data[3], raw_data[5]]) #[VWC(%), temp0(C), EC(μS/cm normalized to 25C), water_potential(kPa)]
+
+def readO2(sensor):
+    #unpack sensor readings here
+    therm_raw = sensor[0]
+    
+    o2_v = sensor[1]
+    Rt = 24900*(2.494/therm_raw -1) #2.494v excitation signal for thermistor, might change if it's not 2.5v
+    A = 1.129241e-3
+    B = 2.341077e-4
+    C = 8.775468e-8
+    Ts = 1/(A+B*math.log(Rt)+C*(math.log(Rt))**3) - 273.15 #in Celsius
+    Tc = 23.7 #measured temperature at calibration in C
+    #Pb = 101.35 #barometric pressure in kPa, used for absolute concentration
+    mVc = 50.1 #mV
+    mV0 = 3 #mV, estimated for SO-100 series sensors
+    #CF = 0.295*Pb/(mVc-mV0) #kPa O2/mV, absolute concentration
+    CF = 20.95/(mVc - mV0) #% O2/mV, relative concentration
+    offset = CF*mV0
+    O2M = CF*o2_v - offset
+    C1 = -6.949e-2
+    C2 = 1.422e-3
+    C3 = -8.213e-7
+    C0 = -(C3*(Tc**3)+C2*(Tc**2)+C1*Tc)
+    O2 = O2M + C3*Ts**3 + C2*Ts**2 + C1*Ts + C0 #unit of % O2, relative level
+    return O2
+
 #DS18B20 functions
 def read_temp_raw():
     f = open(device_file, 'r')
@@ -273,7 +326,7 @@ def getDistance(last_distance): #output distance in cm
         return distance/10 #return distance in cm
     else:
         return 9999999'''
-
+'''
 from time import sleep
 from datetime import datetime
 while True:
@@ -283,3 +336,4 @@ while True:
      #getData()
      print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData())
      sleep(1)
+'''

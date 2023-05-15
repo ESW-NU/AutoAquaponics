@@ -45,8 +45,14 @@ config_path, db_path, img_path = user_settings()
 
 # list of parameters (try to link with list in DataLogger?)
 param_dict = {}
-param_list = ['Sealed air cell v0 (mV)', 'Sealed air v1 (mV)', 'Sealed air cell v2 (mV)', 'Hori. cell v3 (mV)', 'Hori. cell v4 (mV)', 'Hori. cell v5 (mV)', 'Incubating v6 (mV)', 'v7 (mV)', 'v8 (mV)', 'v9 (mV)', 'v10 (mV)', 'v11 (mV)', 'v12 (mV)', 'v13 (mV)', 'v14 (mV)', 'p0 (uW)','p1 (uW)', 'p2 (uW)', 'p3 (uW)', 'p4 (uW)', 'p5 (uW)', 'p6 (uW)', 'p7 (uW)', 'p8 (uW)', 'p9 (uW)','p10 (uW)','p11 (uW)', 'p12 (uW)','p13 (uW)', 'p14 (uW)', 'Soil Temp (\N{DEGREE SIGN}C)', 'Soil Moisture (%)', 'Raw Moisture Reading (mV)']
-param_ylim = [(-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800),(-300, 800), (-300, 800), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500),(0, 500),(0, 500),(10, 35), (0, 100), (0, 2000)]
+param_list = ['Sealed air cell v0 (mV)', 'Sealed air v1 (mV)', 'Sealed air cell v2 (mV)', 'Hori. cell v3 (mV)', 'Hori. cell v4 (mV)', 'Hori. cell v5 (mV)',
+              'MARS v0 cell (mV)', 'MARS v3 cell (mV)', 'v8 (mV)', 'v9 (mV)', 'v10 (mV)', 'v11 (mV)', 'v12 (mV)', 'v13 (mV)', 'v14 (mV)', 'p0 (uW)','p1 (uW)',
+              'p2 (uW)', 'p3 (uW)', 'p4 (uW)', 'p5 (uW)', 'p6 (uW)', 'p7 (uW)', 'p8 (uW)', 'p9 (uW)','p10 (uW)','p11 (uW)', 'p12 (uW)','p13 (uW)',
+              'p14 (uW)', 'Soil Temp (\N{DEGREE SIGN}C)', 'Soil Moisture (%)', 'Raw Moisture Reading (mV)', 'TEROS Soil Moisture (%)', 'TEROS Temp (C)',
+              'EC (uS/cm)', 'Matric Potential (kPa)', 'O2 at v0 depth (%)', 'O2 at v3 depth (%)']
+param_ylim = [(-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800), (-300, 800),
+              (-300, 800), (-300, 800), (-300, 800),(-300, 800), (-300, 800), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500),
+              (0, 500), (0, 500), (0, 500), (0, 500), (0, 500), (0, 500),(0, 500),(0, 500),(10, 35), (0, 100), (0, 2000), (0, 100), (10, 35), (0, 600), (-1000, 0), (0, 22), (0, 22)]
 #param_list = ['pH', 'Water Temp', 'Air Temp', 'Nitrate', 'TDS', 'DO', 'Ammonia', 'Phosphate', 'Humidity', 'Flow Rate', 'Water Level']
 live_dict = {}
 
@@ -352,18 +358,18 @@ class HomePage(tk.Frame):
         #color variables
         #data table labels
         table_title = tk.Label(self, text="Data Summary", bg="white", font = LARGE_FONT)
-        table_title.place(x=28, y=100)
+        table_title.place(x=28, y=10)
         for i, param in enumerate(param_list): #tk.Label self refers to Homepage
             param_label = tk.Label(self, text=param, fg="black", bg="white",
                             font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                             width=16, height=1, anchor=W, justify=LEFT)
-            param_label.place(x=5, y=125+22*i)
+            param_label.place(x=5, y=35+22*i)
 
         for i, param in enumerate(param_list):
             loading_text = tk.Label(self, text="Loading", fg="black", bg="white",
                     font = MEDIUM_FONT, borderwidth = 2, relief = "ridge",
                     width=7, height=1)
-            loading_text.place(x=140, y=125+22*i)
+            loading_text.place(x=140, y=35+22*i)
             current_text = Live_Text(loading_text)
             live_dict[param] = current_text
     
