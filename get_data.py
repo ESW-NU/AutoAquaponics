@@ -46,16 +46,16 @@ chan = AnalogIn(ads, ADS.P0)
 chan1 = AnalogIn(ads, ADS.P1)
 
 
-def getData(last_distance, last_wtemp, last_hum, last_atemp):  #main function that calls on all other functions to generate data list
+def get_data(last_distance, last_wtemp, last_hum, last_atemp):  #main function that calls on all other functions to generate data list
     #read w1 water temp sensor
-    wtemp = getWTemp()
+    wtemp = get_water_temp()
     GPIO.output(pin_num,GPIO.HIGH)  #turn TDS sensor on
     sleep(0.5)
     #call TDS function to get a value while pin is HIGH
     if wtemp == np.nan:  #use last wtemp value if it's NaN
-        TDS = getTDS(last_wtemp)
+        TDS = get_tds(last_wtemp)
     else:
-        TDS = getTDS(wtemp)        
+        TDS = get_tds(wtemp)        
     GPIO.output(pin_num,GPIO.LOW)  #turn TDS sensor off
     sleep(0.5)
     
@@ -65,14 +65,14 @@ def getData(last_distance, last_wtemp, last_hum, last_atemp):  #main function th
     #pH = chan.voltage
     
     #read air temp and air humidity
-    atemp, hum = getDHT()
+    atemp, hum = get_dht()
     if type(hum) != float or type(atemp) != float:
         hum, atemp = last_hum, last_atemp
-    distance = 58.42 - getDistance(last_distance)
+    distance = 58.42 - get_distance(last_distance)
     
     #read flow rate
-    #flow1 = getFlowRate(12, 4.8)
-    #flow2 = getFlowRate(13, 0.273)
+    #flow1 = get_flow_rate(12, 4.8)
+    #flow2 = get_flow_rate(13, 0.273)
 
     return pH, TDS, hum, atemp, wtemp, distance  #, flow1, flow2
 
@@ -86,7 +86,7 @@ def read_temp_raw():
     f.close()
     return lines
 
-def getWTemp():
+def get_water_temp():
     for _ in range(5):
         lines = read_temp_raw()
         if len(lines) > 0:  #only index below if lines is not empty
@@ -102,7 +102,7 @@ def getWTemp():
     return np.nan
         
 #TDS sensor function
-def getTDS(wtemp):
+def get_tds(wtemp):
     Vtds_raw = chan1.voltage        #raw reading from sensor right now
     TheoEC = 684                    #theoretical EC of calibration fluid
     Vc = 1.085751885                #v reading of sensor when calibrating
@@ -115,7 +115,7 @@ def getTDS(wtemp):
     return TDS
 
 #DHT function
-def getDHT():
+def get_dht():
     temperature_c = np.nan
     humidity = np.nan
     while is_nan(temperature_c) or is_nan(humidity):  #test to see if the value is still nan
@@ -135,7 +135,7 @@ def getDHT():
 def is_nan(x):  #used in DHT function
     return (x is np.nan or x != x)
 
-def getDistance(last_distance):  #output distance in cm
+def get_distance(last_distance):  #output distance in cm
     #setup distance sensing
     new_reading = False
     counter = 0
@@ -176,7 +176,7 @@ def getDistance(last_distance):  #output distance in cm
     else:
         return (TimeElapsed * 34300)/2
 
-# def getFlowRate(FLOW_SENSOR_GPIO, k):
+# def get_flow_rate(FLOW_SENSOR_GPIO, k):
 #     GPIO.setmode(GPIO.BCM)
 #     GPIO.setup(FLOW_SENSOR_GPIO, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 #     global count

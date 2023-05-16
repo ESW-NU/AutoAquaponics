@@ -1,11 +1,11 @@
-from getData import getData
+from get_data import get_data
 import time
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 import numpy as np
-from BLE import BLE
-from BLE import FakeBLE
+from ble import BLE
+from ble import FakeBLE
 
 # ble = BLE()
 ble = FakeBLE()
@@ -82,7 +82,7 @@ def DataLogger():
     time_to_log = find_next_log_time(curr_time, LOG_EVERY * 60)
     
     while True:
-        pH, TDS, hum, atemp, wtemp, distance = np.round(getData(distance, wtemp, hum, atemp), 2)
+        pH, TDS, hum, atemp, wtemp, distance = np.round(get_data(distance, wtemp, hum, atemp), 2)
         curr_time = round(time.time())
         if curr_time <= time_to_log:
             continue
