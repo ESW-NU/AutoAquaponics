@@ -18,10 +18,6 @@ config = vars(args)
 LOG_EVERY = config['logging']
 REAL_BLE = config['fake']
 
-if REAL_BLE:
-    ble = BLE()
-else:
-    ble = FakeBLE()
 
 ble = BLE() if REAL_BLE else FakeBLE()
 ble.BLE_init()
@@ -80,14 +76,7 @@ doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot
 
 ref = db.collection('water-pump').document('bed-B')
 doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-B'))
-    
 
-if REAL_BLE:
-    print('\nWARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
-    ble = BLE()
-else:
-    print('\nWARNING Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
-    ble = FakeBLE()
 
 def find_next_log_time(x, base):
     maybe = base * round(x/base)
@@ -117,3 +106,8 @@ def DataLogger():
         time_to_log = find_next_log_time(curr_time, LOG_EVERY * 60)
        
 DataLogger()
+
+if REAL_BLE:
+    print('\nWARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
+else:
+    print('\nWARNING: Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
