@@ -18,7 +18,7 @@ config = vars(args)
 LOG_EVERY = config['logging']
 REAL_BLE = not config['fake']
 
-
+print('Logging frequency: {} min'.format(LOG_EVERY))
 if REAL_BLE:
     print('WARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`\n')
 else:
