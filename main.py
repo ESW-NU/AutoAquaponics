@@ -20,9 +20,9 @@ REAL_BLE = config['fake']
 
 
 if REAL_BLE:
-    print('WARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
+    print('WARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`\n')
 else:
-    print('WARNING: Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
+    print('WARNING: Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`\n')
 time.sleep(2)
 ble = BLE() if REAL_BLE else FakeBLE()
 ble.BLE_init()
