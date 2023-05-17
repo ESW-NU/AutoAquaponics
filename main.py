@@ -104,10 +104,10 @@ def DataLogger():
             data_dict[all_we_got_now[i]] = data_tuple[i]
         db.collection(u'stats').add(data_dict)
         time_to_log = find_next_log_time(curr_time, LOG_EVERY * 60)
-       
-DataLogger()
 
 if REAL_BLE:
     print('\nWARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
 else:
     print('\nWARNING: Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
+
+DataLogger()
