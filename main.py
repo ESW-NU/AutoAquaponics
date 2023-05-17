@@ -19,7 +19,13 @@ LOG_EVERY = config['logging']
 REAL_BLE = config['fake']
 
 
-ble = BLE() if REAL_BLE else FakeBLE()
+if REAL_BLE:
+    print('WARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
+    ble = BLE()
+else:
+    print('WARNING: Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
+    ble = FakeBLE()
+time.sleep(2)
 ble.BLE_init()
 
 all_we_got_now = ('unix_time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
@@ -77,7 +83,7 @@ doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot
 ref = db.collection('water-pump').document('bed-B')
 doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-B'))
 
-
+    
 def find_next_log_time(x, base):
     maybe = base * round(x/base)
     if maybe < x:
@@ -91,11 +97,6 @@ def DataLogger():
     atemp = np.nan
     curr_time = round(time.time())
     time_to_log = find_next_log_time(curr_time, LOG_EVERY * 60)
-
-    if REAL_BLE:
-        print('\nWARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
-    else:
-        print('\nWARNING: Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
     
     while True:
         pH, TDS, hum, atemp, wtemp, distance = np.round(get_data(distance, wtemp, hum, atemp), 2)
@@ -109,5 +110,5 @@ def DataLogger():
             data_dict[all_we_got_now[i]] = data_tuple[i]
         db.collection(u'stats').add(data_dict)
         time_to_log = find_next_log_time(curr_time, LOG_EVERY * 60)
-
+       
 DataLogger()
