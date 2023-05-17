@@ -83,10 +83,10 @@ doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot
     
 
 if REAL_BLE:
-    print('WARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
+    print('\nWARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
     ble = BLE()
 else:
-    print('WARNING Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
+    print('\nWARNING Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
     ble = FakeBLE()
 
 def find_next_log_time(x, base):
