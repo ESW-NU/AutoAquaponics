@@ -8,6 +8,15 @@
  This example code is in the public domain.
  */
 
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+
+// See the following for generating UUIDs:
+// https://www.uuidgenerator.net/
+
+#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
 #define O_1               22            // O define's show pin numbers for Outlets 1-10
 #define O_2               23
@@ -30,6 +39,12 @@
 #include <stdint.h>
 const int outlet_pins[16] = {O_1, O_2, O_3, O_4, O_5, O_6, O_7, O_8, O_9, O_10, T_1, T_2, T_3, T_4, T_5, T_6}; 
 
+BLEServer *pServer = NULL;
+BLEService *pService = NULL;
+BLECharacteristic *pCharacteristic = NULL;
+BLEAdvertising *pAdvertising = NULL;
+uint32_t message;
+
 hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
@@ -46,6 +61,89 @@ uint32_t duration[16] = {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0};       
 uint32_t cyc_cnts[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;                 // array that specifies how much time is left for on/off mode on outlets in time-cycle mode
                                                                                            //FOR duration[] ARRAY: time-cycle input is in minutes
                                                                                                                 // daily repeat mode input it in intervals of ten minutes
+class MyCallbacks: public BLECharacteristicCallbacks {
+    void onWrite(BLECharacteristic *pCharacteristic) {
+      std::string value = pCharacteristic->getValue();
+
+      if (value.length() > 0) {
+        Serial.println("*********");
+        Serial.print("New value: ");
+        message = 0;
+        for (int i = 0; i < value.length(); i++) {
+          message <<= 8;
+          message |= value[i];
+        }
+        //Documentation for his found on drive (bluetooth protocol)
+        //Niv everything after this is up to you
+        uint16_t blue_part = (message >> 2) & 0xFF; 
+        uint16_t red_part = (message >> 10) & 0x7FF;
+        uint16_t brown_part = (message >> 21) & 0x7FF;
+
+        Serial.println(message, BIN);
+        Serial.print("Outlet: ");
+        Serial.println(blue_part);
+        Serial.print("Red: ");
+        Serial.println(red_part);
+        Serial.print("Brown: ");
+        Serial.println(brown_part);
+        Serial.println("*********");
+
+        if ((message & 3) == 0) {
+          if (blue_part == 0) {
+            Serial.println("Start Message Sent!");
+            full_reset();
+            day_offset = red_part;
+            timerAlarmDisable(timer);
+            timerRestart(timer);
+            timerStop(timer);
+          }
+          if (blue_part == 1) {
+            full_recombobulate();
+            max_index = find_closest_timer() + 1;
+            timerRestart(timer);
+            timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
+            timerAlarmEnable(timer);
+            Serial.println("Restarted!");
+            Serial.println("Next time: ");
+            Serial.print(next_time);
+            Serial.println();
+          }
+        } else if ((message & 3) == 1) {
+          timerAlarmDisable(timer);
+          timerStop(timer);
+          al_list[blue_part].time_hit_1 = (day_time() + 1) % 1440;
+          al_list[blue_part].time_hit_2 = (red_part + day_time() + 1) % 1440;
+          al_list[blue_part].repeat_period = red_part * 2;
+          max_index = find_closest_timer() + 1;
+          timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
+          timerAlarmEnable(timer);
+          timerStart(timer);
+        } else if ((message & 3) == 2) {
+          timerAlarmDisable(timer);
+          timerStop(timer);
+          al_list[blue_part].time_hit_1 = red_part;
+          Serial.print("Huh?");
+          Serial.print(al_list[blue_part].time_hit_1);
+          Serial.println();
+          al_list[blue_part].time_hit_2 = (red_part + brown_part) % 1440;
+          al_list[blue_part].repeat_period = 1440;
+          recombobulate(blue_part);
+          max_index = find_closest_timer() + 1;
+          timerAlarmWrite(timer, (next_time - day_offset) * SCALE, false);
+          timerAlarmEnable(timer);
+          timerStart(timer);
+        } else if ((message & 3) == 3) {
+          al_list[blue_part].permanent = brown_part;
+          al_list[blue_part].permanence = red_part;
+          if (al_list[blue_part].permanence) {
+            digitalWrite(outputs[blue_part], !al_list[blue_part].permanent);
+          }
+          Serial.print("Permanence: ");
+          Serial.println(al_list[blue_part].permanence);
+        }
+      }
+    }
+};
  
 // Interrupt that is called every minute and increments the time counters accordingly
 void IRAM_ATTR on_min(){
