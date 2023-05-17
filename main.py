@@ -16,7 +16,7 @@ parser.add_argument('-f', '--fake', action="store_true", help='Send fake bluetoo
 args = parser.parse_args()
 config = vars(args)
 LOG_EVERY = config['logging']
-REAL_BLE = config['fake']
+REAL_BLE = not config['fake']
 
 
 if REAL_BLE:
