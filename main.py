@@ -19,10 +19,8 @@ LOG_EVERY = config['logging']
 REAL_BLE = config['fake']
 
 if REAL_BLE:
-    print('Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
     ble = BLE()
 else:
-    print('Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
     ble = FakeBLE()
 
 ble = BLE() if REAL_BLE else FakeBLE()
@@ -83,6 +81,13 @@ doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot
 ref = db.collection('water-pump').document('bed-B')
 doc = ref.on_snapshot(lambda doc_snapshot, changes, read_time: snap(doc_snapshot, 'water-pump', 'bed-B'))
     
+
+if REAL_BLE:
+    print('WARNING: Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
+    ble = BLE()
+else:
+    print('WARNING Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
+    ble = FakeBLE()
 
 def find_next_log_time(x, base):
     maybe = base * round(x/base)
