@@ -1,3 +1,4 @@
+# main.py
 from get_data import get_data
 import time
 import firebase_admin
@@ -6,9 +7,25 @@ from firebase_admin import firestore
 import numpy as np
 from ble import BLE
 from ble import FakeBLE
+import argparse
 
-# ble = BLE()
-ble = FakeBLE()
+parser = argparse.ArgumentParser(description="This script can be run with the following arguments:",
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('-l', '--logging', const=15, default=15, type=int, help='Data logging frequency (minutes)', nargs='?')
+parser.add_argument('-f', '--fake', action="store_true", help='Send fake bluetooth messages rather than real ones')
+args = parser.parse_args()
+config = vars(args)
+LOG_EVERY = config['logging']
+REAL_BLE = config['fake']
+
+if REAL_BLE:
+    print('Sending REAL bluetooth messages to ESP32. To send FAKE messages, quit and run `python main.py -f`')
+    ble = BLE()
+else:
+    print('Sending FAKE BLE messages to ESP32. To send REAL messages, quit and run `python main.py`')
+    ble = FakeBLE()
+
+ble = BLE() if REAL_BLE else FakeBLE()
 ble.BLE_init()
 
 all_we_got_now = ('unix_time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
