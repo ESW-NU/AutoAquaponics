@@ -1,5 +1,4 @@
 import time
-import ADS1263
 import RPi.GPIO as GPIO
 import math
 
@@ -112,66 +111,80 @@ c7 = AnalogIn(ads3, ADS.P2, ADS.P3)
 #import numpy for NaN
 import numpy as np
 
+#initialize ADC voltages in case of failure
+
 def getData(): #main function that calls on all other functions to generate data list
-    GPIO.output(25, GPIO.HIGH)
-#read Waveshare ADC Hat
-#     try:
-#         ADC = ADS1263.ADS1263()
-#         if (ADC.ADS1263_init_ADC1('ADS1263_7200SPS') == -1):
-#             exit()
-#         ADC.ADS1263_SetMode(0) #change to 1 for differential, 0 for single end
-# 
-#         # ADC.ADS1263_DAC_Test(1, 1)      # Open IN6
-#         # ADC.ADS1263_DAC_Test(0, 1)      # Open IN7
-#         
-#         if(TEST_ADC1):       # ADC1 Test
-#             #while(1):
-#             ADC_Value = ADC.ADS1263_GetAll()    # get ADC1 value
-#             adc1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-#             for i in range(0, 10):
-#                 if(ADC_Value[i]>>31 ==1):
-#                     adc1[i] = -(REF*2 - ADC_Value[i] * REF / 0x80000000)
-#                 else:
-#                     adc1[i] = (ADC_Value[i] * REF / 0x7fffffff)
-#     except IOError as e:
-#         print(e)
-    #turn out data into differential mode:
-    #print(adc1)
-    #adc1_diff = [adc1[0]-adc1[1], adc1[2]-adc1[3], adc1[4]-adc1[5], adc1[6]-adc1[7]]
-    #for i in range(0,len(adc1_diff)):
-    #    adc1_diff[i] = adc1_diff[i]*1000
-    #adc1_power = [voltage*(voltage/2000) for voltage in adc1_diff]
 #read w1 water temp sensor
     temp = getWTemp()
-#read soil moisture sensor
-    moisture_raw = chan7_1_sing.voltage*1000
-#calibrated value
-    moisture = 0.0000000081*(moisture_raw**3) - 0.0000175897*(moisture_raw**2) + 0.0131376197*moisture_raw - 3.0743960987
-    moisture = moisture * 100 #convert to percents
-#define readings from ADC
-    #pH = -5.82*chan.voltage + 22.1 #calibrated equation
-    v0 = chan0.voltage*1000
-    v1 = chan1.voltage*1000
-    v2 = chan2.voltage*1000
-    v3 = chan3.voltage*1000
-    v4 = chan4.voltage*1000
-    v5 = chan5.voltage*1000
-    v6 = chan6.voltage*1000
     
-    v_0 = c0.voltage*1000
-    v_1 = c1.voltage*1000
-    v_2 = c2.voltage*1000
-    v_3 = c3.voltage*1000
-    #v_4 = c4.voltage*1000 #sacrificed for O2 sensor thermistors
-    v_5 = c5.voltage*1000
-    v_6 = c6.voltage*1000
-    v_7 = c7.voltage*1000
+    try:
+    #read soil moisture sensor
+        moisture_0_raw = chan7_1_sing.voltage*1000 #in mV
+        moisture_1_raw = chan7_2_sing.voltage*1000 #in mV
+        moisture_0 = getVWC(chan7_1_sing.voltage)
+        moisture_1 = getVWC(chan7_2_sing.voltage)
+        
+    #define readings from ADC
+        #pH = -5.82*chan.voltage + 22.1 #calibrated equation
+        v0 = chan0.voltage*1000
+        v1 = chan1.voltage*1000
+        v2 = chan2.voltage*1000
+        v3 = chan3.voltage*1000
+        v4 = chan4.voltage*1000
+        v5 = chan5.voltage*1000
+        v6 = chan6.voltage*1000
+        
+        v_0 = c0.voltage*1000
+        v_1 = c1.voltage*1000
+        v_2 = c2.voltage*1000
+        v_3 = c3.voltage*1000
+        #v_4 = c4.voltage*1000 #sacrificed for O2 sensor thermistors
+        v_5 = c5.voltage*1000
+        v_6 = c6.voltage*1000
+        v_7 = c7.voltage*1000
+        
+        o2_0_raw = c4_1_sing.voltage
+        o2_1_raw = c4_2_sing.voltage
+        v0_anode_o2 = readO2([o2_0_raw, v_5, 52.8766, 22.486]) #thermistor reading in volts and differential oxygen reading in mV
+        v3_anode_o2 = readO2([o2_1_raw, v_6, 52.1266, 22.491]) #thermistor reading in volts and differential oxygen reading in mV
+        
+    except IOError as e:
+        print(e)
+        moisture_0_raw = 9999 #in mV
+        moisture_1_raw = 9999 #in mV
+        moisture_0 = 9999
+        moisture_1 = 9999
+#define readings from ADC
+#pH = -5.82*chan.voltage + 22.1 #calibrated equation
+        v0 = 9999
+        v1 = 9999
+        v2 = 9999
+        v3 = 9999
+        v4 = 9999
+        v5 = 9999
+        v6 = 9999
+
+        v_0 = 9999
+        v_1 = 9999
+        v_2 = 9999
+        v_3 = 9999
+        #v_4 = c4.voltage*1000 #sacrificed for O2 sensor thermistors
+        v_5 = 9999
+        v_6 = 9999
+        v_7 = 9999
+        o2_0_raw = 9999
+        o2_1_raw = 9999
+        v0_anode_o2 = 9999
+        v3_anode_o2 = 9999
+    
+    
     
     #read oxygen sensor
     #therm_raw = chan8_sing.voltage #in volts
     #therm_raw, o2_v, mVc, Tc (last two are calibration values)
-    v0_anode_o2 = readO2([c4_1_sing.voltage, v_5, 52.8766, 22.486]) #thermistor reading in volts and differential oxygen reading in mV
-    v3_anode_o2 = readO2([c4_2_sing.voltage, v_6, 52.1266, 22.491]) #thermistor reading in volts and differential oxygen reading in mV
+    
+    ##Error thrown on 175 sometimes!!
+    
 #read air temp and air humidity
     #atemp, hum = getDHT()#dht.read_retry(dht.DHT22, DHT)
     #if hum == np.nan or atemp == np.nan:
@@ -197,23 +210,33 @@ def getData(): #main function that calls on all other functions to generate data
     p_6 = v_6*(v_6/2000)
     p_7 = v_7*(v_7/2000)
     GPIO.output(25, GPIO.LOW)
-    VWC_TEROS, temp_TEROS, EC, matric_pot = readTEROS()
+    VWC_TEROS, temp_TEROS, EC, matric_pot_0, matric_pot_1 = readTEROS()
     
     return [v0, v1, v2, v3, v4, v5, v6, v_0, v_1, v_2, v_3, v_7,
             P0, P1, P2, P3, P4, P5, P6, p_0, p_1, p_2, p_3, p_7,
-            temp, moisture, moisture_raw, VWC_TEROS, temp_TEROS, EC, matric_pot, v0_anode_o2, v3_anode_o2
+            temp, moisture_0, moisture_0_raw, moisture_1, moisture_1_raw,
+            VWC_TEROS, temp_TEROS, EC, matric_pot_0, matric_pot_1, v0_anode_o2, v3_anode_o2
             ]
-#TEROS sensors:
+
+#EC-5 sensor:
+def getVWC(voltage):
+    moisture_raw = voltage*1000
+    #calibrated value
+    VWC = 0.0000000081*(moisture_raw**3) - 0.0000175897*(moisture_raw**2) + 0.0131376197*moisture_raw - 3.0743960987
+    VWC = VWC * 100 #convert to percents
+    return VWC
+
+#TEROS sensors, 3 of them:
 def readTEROS():
     ser.reset_input_buffer()
     while True:
         ser.write(b"data\n")
         data = ser.readline().decode('utf-8').rstrip().replace('-','+-').replace('\r', '+').split('+')
         #print(data)
-        if len(data) == 7:
-            raw_data = [float(x) for x in data] #[sensor0_id, VWC_adc_count, temp0, EC, sensor1_id, water_potential, temp1]
+        if len(data) == 10: #change this number depending on how many sensors/what type
+            raw_data = [float(x) for x in data] #[sensor0_id, VWC_adc_count, temp0, EC, sensor1_id, water_potential1, temp1, sensor2_id, water_potential2, temp2]
             VWC = (1.147e-9)*raw_data[1]**3 - (8.638e-6)*raw_data[1]**2 + (2.187e-2)*raw_data[1] - 1.821e1
-            return([VWC, raw_data[2], raw_data[3], raw_data[5]]) #[VWC(%), temp0(C), EC(μS/cm normalized to 25C), water_potential(kPa)]
+            return([VWC, raw_data[2], raw_data[3], raw_data[5], raw_data[8]]) #[VWC(%), temp0(C), EC(μS/cm normalized to 25C), water_potential_0(kPa), water_potential_1(kPa)]
 
 def readO2(sensor):
     #unpack sensor readings here
@@ -328,5 +351,4 @@ while True:
      #print(len(getData()))
      #getData()
      print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"),getData())
-     sleep(1)
-'''
+     sleep(1)'''
