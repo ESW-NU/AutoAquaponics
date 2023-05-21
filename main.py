@@ -32,7 +32,6 @@ cred = credentials.Certificate("./serviceAccountKey.json")
 app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
-LOG_EVERY = 15
 
 names = {
     'lights': ['shelf1', 'shelf2', 'fish-tank', 'basking'],
