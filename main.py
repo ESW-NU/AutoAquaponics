@@ -30,7 +30,7 @@ ble = BLE() if REAL_BLE else FakeBLE()
 ble.BLE_init()
 
 sensors = ('unix_time', 'pH', 'TDS', 'humidity', 'air_temp', 'water_temp', 'distance')
-cred = credentials.Certificate("./serviceAccountKey.json")
+cred = credentials.Certificate("../Desktop/serviceAccountKey.json")
 app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
