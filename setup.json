@@ -1,0 +1,5 @@
+{ 
+    "db_dir":"/home/pi/Desktop/",
+    "config_file":"/home/pi/Desktop/config.csv",
+    "img_path":"/home/pi/AutoAquaponics/Images/"
+}
