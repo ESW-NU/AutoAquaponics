@@ -34,7 +34,7 @@ This file handles all bluetooth messages sent to the ESP32, and is divided into 
 This file provides connection details to the system hardware.
 
 #### `serviceAccountKey.json`
-This file provides the connection details used by `main.py` to connect to the project's Firebase database.
+This file provides the connection details used by `main.py` to connect to the project's Firebase database. It is not tracked on GitHub due to security reasons but exists in the root directory on the RPi.
 
 #### `C++` and `flood_growbeds_manual` directory
 These directories contains C++ files used by the system electronics to properly operate the hardware.
