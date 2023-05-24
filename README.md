@@ -30,8 +30,5 @@ This file handles all bluetooth messages sent to the ESP32, and is divided into 
 - `BLE`: This class is a subclass of `ParentBLE` and implements the `__init__()`, `BLE_write()`, and `BLE_disconnect()` methods in order to send real bluetooth messages to the ESP32. It is the default class used by `main.py`.
 - `FakeBLE`: This class is a subclass of `ParentBLE` and implements the `__init__()`, `BLE_write()`, and `BLE_disconnect()` methods in order print "fake" bluetooth messages to the command line. It does not send any real messages to the hardware, and can be used when the hardware is not ready to accept messages.
 
-#### `packages.txt`
-This file provides connection details to the system hardware.
-
 #### `C++` and `flood_growbeds_manual` directory
 These directories contains C++ files used by the system electronics to properly operate the hardware.
