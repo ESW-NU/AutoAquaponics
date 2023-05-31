@@ -1,3 +1,33 @@
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+
+// See the following for generating UUIDs:
+// https://www.uuidgenerator.net/
+
+#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
+BLEServer *pServer = NULL;
+BLEService *pService = NULL;
+BLECharacteristic *pCharacteristic = NULL;
+BLEAdvertising *pAdvertising = NULL;
+uint32_t message;
+
+class MyCallbacks: public BLECharacteristicCallbacks {
+    void onWrite(BLECharacteristic *pCharacteristic) {
+      std::string value = pCharacteristic->getValue();
+
+      if (value.length() > 0) {
+        Serial.println("*********");
+        Serial.print("New value: ");
+        message = 0;
+        for (int i = 0; i < value.length(); i++) {
+          message <<= 8;
+          message |= value[i];
+        }
+        //Documentation for his found on drive (bluetooth protocol)
+
 /*
  Repeat timer example
 
@@ -39,6 +69,7 @@ volatile uint32_t tens_counter = 3;    // counts the number of ten-minute increm
 volatile uint32_t hour_counter = 19;    // counts the number of hours that have passed in current day
 volatile uint32_t day_counter = 0;     // counts the number of days that have passed in current week
 
+//each index is a different outlet (10 outlets and 6 screw terminals)
 uint32_t outlet_mode[16] = {3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 2, 3, 3, 3, 3};              // array holding values for the mode an outlet is set to
 uint32_t on_time[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 0, 0, 0, 0};              // array holding times at which outlets will turn on in ten-minute intervals from the start of the day
 uint32_t on_or_off[16] = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;                // array holding values for whether outlet is on or off 
