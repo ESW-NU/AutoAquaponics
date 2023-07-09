@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import ttk, W, LEFT, END
 #initializations for video
 from PIL import Image, ImageTk
-
+import codecs
 #uncomment later
 #import cv2   #open source computer vision library
 #cap = cv2.VideoCapture(0)
@@ -45,7 +45,7 @@ config_path, db_path, img_path = user_settings()
 
 # list of parameters (try to link with list in DataLogger?)
 param_dict = {}
-param_list = ['v3 0 (mV)', 'v3 1 (mV)', 'v4 2 (mV)', 'v0 3 (mV)', 'v0 4 (mV)', 'v0 5 (mV)', 'MARS+v0 (mV)', 'MARS+v3 (mV)',
+param_list = ['v3 0 (mV)', 'v3 1 (mV)', 'v3 2 (mV)', 'v0 3 (mV)', 'v0 4 (mV)', 'v0 5 (mV)', 'MARS+v0 (mV)', 'MARS+v3 (mV)',
               'v8 (mV)', 'v9 (mV)', 'v10 (mV)', 'v11 (mV)',
               'v3 0 (uW)', 'v3 1 (uW)', 'v3 2 (uW)', 'v0 3 (uW)', 'v0 4 (uW)', 'v0 5 (uW)', 'MARS+v0 (uW)', 'MARS+v3 (uW)',
               'p8 (uW)', 'p9 (uW)','p10 (uW)','p11 (uW)',
@@ -60,7 +60,7 @@ live_dict = {}
 
 # returns the current csv in a 2D list, where list[i][j] is the jth element of the ith row of the list
 def csv_read():
-    with open(config_path, "r") as file:
+    with open(config_path, encoding='utf-8', mode="r") as file:
         return list(csv.reader(file))
 
 # given a row name string and list to write, replaces the given row with the new list
@@ -68,7 +68,7 @@ def csv_read():
 # make sure the list to write is the proper length and contains the proper values
 def csv_write(row_name, to_write):
     row_number = config_dict[row_name]
-    with open(config_path, 'r', newline='') as file:
+    with open(config_path, mode='r', newline='', encoding='utf-8') as file:
             config_settings = list(csv.reader(file))
             if len(config_settings) > row_number:
                 config_settings[row_number] = to_write
@@ -80,7 +80,7 @@ def csv_write(row_name, to_write):
                 file.flush()
 
 #initialize entry configs, email_config, num_config, provider_config, and SQLite reader
-db_name = 'sensor_db.db'
+db_name = 'sensor_db'
 reader = Reader(db_path, db_name)
 num_contacts = 5
 

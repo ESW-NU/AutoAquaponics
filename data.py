@@ -23,7 +23,7 @@ class Logger:
         #(to print an alert later) 
         newdb = not os.path.isfile(self.dbname)
         #sqlite connection and cursor... (this will make a new database dbname.db if none exists)
-        self.conn = sqlite3.connect(self.dbname)
+        self.conn = sqlite3.connect(self.dbname, check_same_thread=False)
         self.c = self.conn.cursor()
 
         #SCANNING THE DATABASE
@@ -107,7 +107,7 @@ class Logger:
         #adding the timestamp
         #data_log = (datetime.now().strftime("%m/%d/%Y %H:%M:%S"),) + data_med
         data_log = (int(round(datetime.now().timestamp())),) + data_med #log time in unix as int
-        print(data_log) #timestamp is logged as int
+#         print(data_log) #timestamp is logged as int
         #print(Reader.query_by_time(self, 1622730196, 1622730226)) #test function, need to be changed
         
         #assign data to tables in data_dict
@@ -122,12 +122,14 @@ class Logger:
     def log_data(self):
         
         ## LOGGING
+        #print(self.data_dict.items())
         for tbl, data in self.data_dict.items(): #FOR ALL DATA IN DICT
             for rdg in data:
                 cnt = len(rdg) - 1
                 params = '?' + ',?'*cnt
                 self.c.execute("INSERT INTO {} VALUES({})".format(tbl, params),rdg) #pushes values into database (dictionary format)
                 self.conn.commit()
+            print("Logged", data)
         
         #empty the data dictionary
         self.data_dict = {}
@@ -139,6 +141,7 @@ class Logger:
     def commit(self):
         #commit sqlite transaction
         self.conn.commit()
+        print('committed')
     
 class Reader:
     def __init__(self,tgt_path,database):
@@ -168,8 +171,11 @@ class Reader:
         #print(self.c.fetchall())
     
     def query_by_num(self,table,num = 1,timeval = None): #this function lets you get the last num rows of data from the table
+        #print("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, num))
         self.c.execute("SELECT * FROM {} ORDER BY unix_time DESC LIMIT {}".format(table, num))
-        return self.c.fetchall()
+        data = self.c.fetchall()
+        self.close()
+        return data
         #print(self.c.fetchall())
 
     def query_by_time(self, start, end, columns): #this function lets you get a slice of the data between two unix times (start, end)

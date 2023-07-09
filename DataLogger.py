@@ -2,7 +2,7 @@ from main import user_settings
 #from getData import getData
 
 config_path, db_path, img_path = user_settings()
-db_name = 'sensor_db.db'
+db_name = 'sensor_db'
 
 '''v0, v1, v2, v3, v4, v5, v6, v_0, v_1, v_2, v_3, v_7,
 P0, P1, P2, P3, P4, P5, P6, p_0, p_1, p_2, p_3, p_7,
@@ -37,6 +37,7 @@ def DataLogger():
     from getData import getData #comment out if you are testing on computer
     import numpy as np
     sensor_plot_table = {'SensorData':(all_we_got_now, now_data_types)}
+    
     logger = Logger(db_path, db_name)
     logger.table(sensor_plot_table)
     last_distance = np.nan #to give an arbitrary initial value to getData for the first time the distance sensor fails
@@ -46,10 +47,13 @@ def DataLogger():
     while True:
         #change tsamp and nsamp for logging time/frequency
         #use this for RPi with real sensors (comment line below if on computer, also comment line 2)
-        last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", getData(), tsamp=2, nsamp=30),2)
+        last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", getData(), tsamp=1, nsamp=60),2)
+        
         #use this to simulate sensor logging data on computer (comment line below if on RPi)
         #last_distance, last_wtemp, last_atemp, last_hum = np.round(logger.collect_data("SensorData", data_fxn(last_distance, last_wtemp), last_distance, last_wtemp, last_hum, last_atemp, tsamp=1, nsamp=60),2)
         logger.log_data()
         logger.commit()
+        reader = Reader(db_path, db_name)
+        print("Reader data: ", reader.query_by_num(table="SensorData", num=1))
         
 #DataLogger()

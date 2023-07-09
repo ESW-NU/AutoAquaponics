@@ -1,9 +1,9 @@
+#!/usr/bin/python
 from time import sleep
 import csv
 from multiprocessing import Process
 import sendtext
 import sendemail
-
 # Set your own file path & config path in file setup.json
 # or as environment variables AQUA_testfile_dir, AQUA_config_file, AQUA_img_path
 _config_file = "setup.json"
@@ -59,17 +59,17 @@ def emailSender():
 if(__name__ == '__main__'):
     p1 = Process(target=start_data_logging)
     p1.daemon = True
-    p2 = Process(target=start_GUI)
-    p2.daemon = True
+    #p2 = Process(target=start_GUI)
+    #p2.daemon = True
     p3 = Process(target=emailSender)
     p3.daemon = True
     #start data logging
     p1.start()
     print("Loading Data...")
 
-    p2.start()
+    #p2.start()
     p3.start()
     #start GUI
     p1.join()
-    p2.join()
+    #p2.join()
     p3.join()

@@ -2,20 +2,6 @@ import time
 import RPi.GPIO as GPIO
 import math
 
-#Waveshare ADC Hat Initialization
-#######################
-REF = 5           # Modify according to actual voltage
-                    # external AVDD and AVSS(Default), or internal 2.5V
-# ADC1 test part
-TEST_ADC1       = True
-# ADC2 test part
-TEST_ADC2       = False
-# ADC1 rate test part, For faster speeds use the C program
-TEST_ADC1_RATE   = False
-# RTD test part 
-TEST_RTD        = False
-#######################
-
 #initialize GPIO pins for TDS sensor switch + distance sensor
 pin_num = 17
 pin_num2 = 27
@@ -32,9 +18,6 @@ import serial #for TEROS sensor to interface with Arduino
 #initalize debugging LED
 GPIO.setup(25, GPIO.OUT)
 
-from VL53L0x_rasp_python.python import VL53L0X
-# Create a VL53L0X object
-tof = VL53L0X.VL53L0X(i2c_bus=1,i2c_address=0x29)
 #import necessary modules and initialize I2C bus
 import board
 import busio
@@ -123,7 +106,6 @@ def getData(): #main function that calls on all other functions to generate data
         moisture_1_raw = chan7_2_sing.voltage*1000 #in mV
         moisture_0 = getVWC(chan7_1_sing.voltage)
         moisture_1 = getVWC(chan7_2_sing.voltage)
-        
     #define readings from ADC
         #pH = -5.82*chan.voltage + 22.1 #calibrated equation
         v0 = chan0.voltage*1000
@@ -145,8 +127,8 @@ def getData(): #main function that calls on all other functions to generate data
         
         o2_0_raw = c4_1_sing.voltage
         o2_1_raw = c4_2_sing.voltage
-        v0_anode_o2 = readO2([o2_0_raw, v_5, 52.8766, 22.486]) #thermistor reading in volts and differential oxygen reading in mV
-        v3_anode_o2 = readO2([o2_1_raw, v_6, 52.1266, 22.491]) #thermistor reading in volts and differential oxygen reading in mV
+        v3_anode_o2 = readO2([o2_0_raw, v_5, 52.8766, 22.486]) #thermistor reading in volts and differential oxygen reading in mV
+        v0_anode_o2 = readO2([o2_1_raw, v_6, 52.1266, 22.491]) #thermistor reading in volts and differential oxygen reading in mV
         
     except IOError as e:
         print(e)
@@ -176,23 +158,7 @@ def getData(): #main function that calls on all other functions to generate data
         o2_1_raw = 9999
         v0_anode_o2 = 9999
         v3_anode_o2 = 9999
-    
-    
-    
-    #read oxygen sensor
-    #therm_raw = chan8_sing.voltage #in volts
-    #therm_raw, o2_v, mVc, Tc (last two are calibration values)
-    
-    ##Error thrown on 175 sometimes!!
-    
-#read air temp and air humidity
-    #atemp, hum = getDHT()#dht.read_retry(dht.DHT22, DHT)
-    #if hum == np.nan or atemp == np.nan:
-     #   hum, atemp = last_hum, last_atemp
-    last_distance = 1000000
-    distance = getDistance(last_distance)
     #make sure distance is the last value on this list
-    hum = 9999#chan2.voltage
     P0 = v0*(v0/2000)
     P1 = v1*(v1/2000)
     P2 = v2*(v2/2000)
@@ -212,7 +178,7 @@ def getData(): #main function that calls on all other functions to generate data
     GPIO.output(25, GPIO.LOW)
     VWC_TEROS, temp_TEROS, EC, matric_pot_0, matric_pot_1 = readTEROS()
     
-    return [v0, v1, v2, v3, v4, v5, v6, v_0, v_1, v_2, v_3, v_7,
+    return [v0, v1, v2, v3, v4, v5, v6, v_7, v_0, v_1, v_2, v_3, #realized v_7 should be after v6 instead of after v_3
             P0, P1, P2, P3, P4, P5, P6, p_0, p_1, p_2, p_3, p_7,
             temp, moisture_0, moisture_0_raw, moisture_1, moisture_1_raw,
             VWC_TEROS, temp_TEROS, EC, matric_pot_0, matric_pot_1, v0_anode_o2, v3_anode_o2
@@ -235,7 +201,7 @@ def readTEROS():
         #print(data)
         if len(data) == 10: #change this number depending on how many sensors/what type
             raw_data = [float(x) for x in data] #[sensor0_id, VWC_adc_count, temp0, EC, sensor1_id, water_potential1, temp1, sensor2_id, water_potential2, temp2]
-            VWC = (1.147e-9)*raw_data[1]**3 - (8.638e-6)*raw_data[1]**2 + (2.187e-2)*raw_data[1] - 1.821e1
+            VWC = 100*((1.147e-9)*raw_data[1]**3 - (8.638e-6)*raw_data[1]**2 + (2.187e-2)*raw_data[1] - 1.821e1)
             return([VWC, raw_data[2], raw_data[3], raw_data[5], raw_data[8]]) #[VWC(%), temp0(C), EC(μS/cm normalized to 25C), water_potential_0(kPa), water_potential_1(kPa)]
 
 def readO2(sensor):
@@ -248,7 +214,7 @@ def readO2(sensor):
     Ts = 1/(A+B*math.log(Rt)+C*(math.log(Rt))**3) - 273.15 #in Celsius
     #print("O2 temp, mVc: " + str(Ts) + ", " + str(mVc))
     #Pb = 101.35 #barometric pressure in kPa, used for absolute concentration
-    mV0 = 3 #mV, estimated for SO-100 series sensors
+    mV0 = 1.750053407391583 #mV, estimated for SO-100 series sensors
     #CF = 0.295*Pb/(mVc-mV0) #kPa O2/mV, absolute concentration
     CF = 20.95/(mVc - mV0) #% O2/mV, relative concentration
     offset = CF*mV0
@@ -283,65 +249,7 @@ def getWTemp():
     else:
         print("READING DS18B20 AGAIN!")
         return getWTemp() #rerun function again'''
-'''        
-#TDS sensor function
-def getTDS(wtemp):
-    Vtds_raw = chan1.voltage #raw reading from sensor right now
-    TheoEC = 684 #theoretical EC of calibration fluid
-    Vc = 1.085751885 #v reading of sensor when calibrating
-    temp_calibrate = 23.25 #measured water temp when calibrating
-    rawECsol = TheoEC*(1+0.02*(temp_calibrate-25)) #temp compensate the calibrated values
-    K = (rawECsol)/(133.42*(Vc**3)-255.86*(Vc**2)+857.39*Vc)#defined calibration factor K
-    EC_raw = K*(133.42*(Vtds_raw**3)-255.86*(Vtds_raw**2)+857.39*Vtds_raw)
-    EC = EC_raw/(1+0.02*(wtemp-25)) #use current temp for temp compensation
-    TDS = EC/2 #TDS is just half of electrical conductivity in ppm
-    return TDS
 
-#DHT function
-def getDHT():
-    temperature_c = np.nan
-    humidity = np.nan
-    while is_nan(temperature_c) or is_nan(humidity):#test to see if the value is still nan
-        #print('Running DHT...') #can comment out later, just here to test reliability
-        try:
-            # get temp and humidity
-            temperature_c = dhtDevice.temperature
-            humidity = dhtDevice.humidity
-        except RuntimeError as error:
-            # Errors happen fairly often, DHT's are hard to read, just keep going
-            temperature_c = float('NaN')
-            humidity = float('NaN')
-            #continue
-        except Exception as error:
-            dhtDevice.exit()
-            raise error
-    return temperature_c, humidity
-
-def is_nan(x): #used in DHT function
-    return (x is np.nan or x != x)
-'''
-def getDistance(last_distance): #output distance in cm
-    #setup distance sensing stuff
-    # tof.change_address(0x32)
-    return 99999999
-    '''
-    tof.open()
-    # Start ranging
-    tof.start_ranging(VL53L0X.Vl53l0xAccuracyMode.BETTER)
-
-    timing = tof.get_timing()
-    if timing < 20000:
-        timing = 20000
-    #print("Timing %d ms" % (timing/1000))
-
-    distance = tof.get_distance()
-
-    tof.stop_ranging()
-    tof.close()
-    if distance > 0:
-        return distance/10 #return distance in cm
-    else:
-        return 9999999'''
 '''
 from time import sleep
 from datetime import datetime
